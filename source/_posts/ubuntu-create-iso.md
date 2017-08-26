@@ -4,6 +4,7 @@ tags:
   - ubunut
 categories: []
 date: 2012-01-02 08:00:00
+modified: 2012-01-02 08:00:00
 ---
 
 `Command > df` ( 查看磁碟分割區 )，如果是光碟機的話 應該會是 /dev/sr0
