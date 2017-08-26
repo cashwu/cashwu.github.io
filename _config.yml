@@ -78,3 +78,12 @@ theme: landscape
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type:
+
+
+# Admin
+admin:
+    name: cash
+    password: cash0929
+    secret: hey hexo
+    expire: 60*1
+    # cors: http://localhost:3000
