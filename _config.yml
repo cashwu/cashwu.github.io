@@ -72,7 +72,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: simplest
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -83,7 +83,7 @@ deploy:
 # Admin
 admin:
     name: cash
-    password: cash0929
-    secret: hey hexo
+    password: cash1234
+    secret: cash hexo
     expire: 60*1
     # cors: http://localhost:3000
