@@ -91,7 +91,7 @@ admin:
 nav:
   Home: .
   Archive: archives
-  About: about
+  #About: about
 
 social:
   github: https://github.com/cashwu
