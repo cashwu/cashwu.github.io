@@ -3,39 +3,23 @@ title: 'C# Delegate'
 tags:
   - 'c#'
 categories: []
-date: 2013-01-02 08:00:00
-modified: 2013-01-02 08:00:00
+date: 2013-05-10 08:00:00
+modified: 2013-05-10 08:00:00
 ---
 
 程式設定：有一個 Order 的 類別，可以透過它 取得 Price，而目前的 Price 都打 9 折
 
-```csharp
-class Program  
-{
-    static void Main(string[] args)
-    {
-        var obj = new Order();
+![](csharp-delegate/01.png)
 
-        int value = obj.GetPrice(100);
-        Console.WriteLine("Price is " + value);
-    }
-
-    class Order
-    {
-        public int GetPrice(int total)
-        {
-            return total * 9 / 10;
-        }
-    }
-}
-```
 不過如果今天要改打折的折數就很麻煩，要改到 method 裡面的內容，最理想的程式的修改(擴充)方式就是不要修改到原本的程式
 
 這個時候通常就會用一個參數來傳遞折扣數進 method 裡面，
 所以第 15行的程式碼就可能會修改成
-```
+
+```csharp
 public int GetPrice(int total,int discount)
 ```
+
 不過，這樣子的改法還是有缺點，
 如果折扣的方式要變的更加複雜的話，那也只能修改 method 裡面的程式碼
 
@@ -44,35 +28,8 @@ public int GetPrice(int total,int discount)
 以後只要折扣要變動，就只要修改那個 method 就好了，
 這樣子就可以作到不用修改到原本的程式，而已又可以修改(擴充)
 
-```csharp
-class Program  
-{
-    static void Main(string[] args)
-    {
-        var obj = new Order();
-        var handler = new PromoHandler(doPromo01);
+![](csharp-delegate/02.png)
 
-        int value = obj.GetPrice(handler,100);
-
-        Console.WriteLine("Price is " + value);
-    }
-
-    delegate int PromoHandler(int total);
-
-    static int doPromo01(int total)
-    {
-        return total * 7 / 10;
-    }
-
-    class Order
-    {
-        public int GetPrice(PromoHandler handler,int total)
-        {
-            return handler(total);
-        }
-    }
-}
-```
 我們利用 `delegate` 來作到這一件事情
 
 `delegate` 是一個特殊的型別
