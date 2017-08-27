@@ -9,7 +9,7 @@ modified: 2013-01-02 08:00:00
 
 程式設定：有一個 Order 的 類別，可以透過它 取得 Price，而目前的 Price 都打 9 折
 
-```
+```csharp
 class Program  
 {
     static void Main(string[] args)
@@ -43,7 +43,8 @@ public int GetPrice(int total,int discount)
 把計算折扣的 method 當成參數傳遞進去，這樣子原本的程式碼就不用修改，
 以後只要折扣要變動，就只要修改那個 method 就好了，
 這樣子就可以作到不用修改到原本的程式，而已又可以修改(擴充)
-```
+
+```csharp
 class Program  
 {
     static void Main(string[] args)
