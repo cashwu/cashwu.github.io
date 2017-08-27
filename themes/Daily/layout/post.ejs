@@ -11,9 +11,11 @@
               <p><%- page.subtitle %></p>
             <% } %>
           </h1>
+          <% if(page.title != 'About Me'){ %>
           <p class="posted-on">
-          <%= page.date.format(config.date_format) %>
+            <%= page.date.format(config.date_format) %>
           </p>
+          <% } %>
           <div class="tags-links">
             <% if (page.tags) { %>
               <% page.tags.each(function(tag){ %>
@@ -25,9 +27,15 @@
           </div>
         </div>
         <!-- Post Main Content -->
+        <% if(page.title != 'About Me'){ %>
         <div class="entry-content">
           <%- page.content %>
         </div>
+        <% } else { %>
+        <div class="entry-content center">
+            <%- page.content %>
+        </div>
+        <% } %>
       </article>
     </div>
     <!-- Comments -->

@@ -91,7 +91,7 @@ admin:
 nav:
   Home: .
   Archive: archives
-  #About: about
+  About: about
 
 social:
   github: https://github.com/cashwu
@@ -104,3 +104,5 @@ widget:
   content: 
 
 disqus_shortname: cashwugeek
+
+#https://github.com/GallenHu/hexo-theme-Daily/wiki
