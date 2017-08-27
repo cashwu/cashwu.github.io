@@ -11,7 +11,7 @@ modified: 2013-05-10 20:00:00
 
 直接來看程式碼
 
-![](csharp-event/01.png)
+![](./csharp-event/01.png)
 
 我們在 class 裡面 建立一個 event [23行]
 
@@ -33,7 +33,7 @@ modified: 2013-05-10 20:00:00
 
 就把 Member 丟給 Evnet 就好了，程式碼修改如下
 
-![](csharp-event/02.png)
+![](./csharp-event/02.png)
 
 在 33行的地方傳入 `this` 也就是 `Member 本身`
 
@@ -51,7 +51,7 @@ modified: 2013-05-10 20:00:00
 
 程式碼修改如下
 
-![](csharp-event/03.png)
+![](./csharp-event/03.png)
 
 先建立一個可以放資料的 class
 
@@ -63,7 +63,7 @@ modified: 2013-05-10 20:00:00
 
 我們可以在程式裡面 set 兩次 Name 來測試，結果如下
 
-![](csharp-event/04.png)
+![](./csharp-event/04.png)
 
 ---
 
@@ -71,8 +71,8 @@ modified: 2013-05-10 20:00:00
 
 答案是否定的，不過我們還是可以用其它的方式來達到，程式碼修改如下
 
-![](csharp-event/05.png)
-![](csharp-event/06.png)
+![](./csharp-event/05.png)
+![](./csharp-event/06.png)
 
 在父類別裡面會建立一個 Method 名稱為 `On[EventName]` [38行]
 

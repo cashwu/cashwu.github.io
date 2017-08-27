@@ -9,7 +9,7 @@ modified: 2013-05-10 08:00:00
 
 程式設定：有一個 Order 的 類別，可以透過它 取得 Price，而目前的 Price 都打 9 折
 
-![](csharp-delegate/01.png)
+![](./csharp-delegate/01.png)
 
 不過如果今天要改打折的折數就很麻煩，要改到 method 裡面的內容，最理想的程式的修改(擴充)方式就是不要修改到原本的程式
 
@@ -28,7 +28,7 @@ public int GetPrice(int total,int discount)
 以後只要折扣要變動，就只要修改那個 method 就好了，
 這樣子就可以作到不用修改到原本的程式，而已又可以修改(擴充)
 
-![](csharp-delegate/02.png)
+![](./csharp-delegate/02.png)
 
 我們利用 `delegate` 來作到這一件事情
 
