@@ -4,6 +4,8 @@ title: About Me
 comments: false
 ---
 
+![](https://avatars3.githubusercontent.com/u/4278751?v=4&s=460)
+
 I'm Cash Wu
 
 一個半路出家誤入歧途的程式宅
