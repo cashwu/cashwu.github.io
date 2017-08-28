@@ -6,8 +6,7 @@ categories: []
 date: 2014-04-12 08:00:00
 ---
 
-在 [Fine Uploader(二)](http://blog.cashwu.com/#/2014/04/05/FineUploader02) 中，我們已經完成基本的雛形，
-現在要來針對每個細節來作調整
+在 Fine Uploader(二) 中，我們已經完成基本的雛形，現在要來針對每個細節來作調整
 
 這次的內容主要是下面兩個主題：
 
@@ -139,5 +138,4 @@ debeg 可以看到，已經可以接到來自前端 input 的內容了
 
 參考連結：
 
--[http://kevintsengtw.blogspot.tw/2012/02/aspnet-mvcfile-uploader-part2.html](http://kevintsengtw.blogspot.tw/2012/02/aspnet-mvcfile-uploader-part2.html)
 -[http://kevintsengtw.blogspot.tw/2012/02/aspnet-mvcfile-uploader-part2.html](http://kevintsengtw.blogspot.tw/2012/02/aspnet-mvcfile-uploader-part2.html)
