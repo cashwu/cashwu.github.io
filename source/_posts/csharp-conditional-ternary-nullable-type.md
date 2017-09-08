@@ -1,5 +1,5 @@
 ---
-title: 'c# 三元運算式 & Nullable'
+title: 'C# 三元運算式 & Nullable'
 tags:
   - 'c#'
 categories: []
