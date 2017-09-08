@@ -14,7 +14,7 @@ string strB = ""; // empty
 string strC = " "; // whitespace  
 ```
 
-1.using == , just can found out is null or is empty single
+1.using `==` , just can found out is null or is empty single
 
 ```csharp
 (strA == null) //true
@@ -24,27 +24,27 @@ string strC = " "; // whitespace
 (strB == "") //true
 (strC == "") //false
 ```
-2.using trim() extension can found out is empty or is whitespace, but maybe have throw exception when the string is null
+2.using `trim()` extension can found out is empty or is whitespace, but maybe have throw exception when the string is null
 
 ```csharp
 (strA.Trim() == "") //throw exception
 (strB.Trim() == "") //true
 (strC.Trim() == "") //true
 ```
-3.using string.IsNullOrEmpty , can found out is null and empty both, but can't found out whitespace
+3.using `string.IsNullOrEmpty` , can found out is null and empty both, but can't found out whitespace
 
 ```csharp
 string.IsNullOrEmpty(strA) //true  
 string.IsNullOrEmpty(strB) //true  
 string.IsNullOrEmpty(strC) //false  
 ```
-4.using string.IsNullOrWhiteSpace , can found out is null and empty and whitespace, but the method maybe have performance issues
+4.using `string.IsNullOrWhiteSpace` , can found out is null and empty and whitespace, but the method maybe have performance issues
 
 ```csharp
 string.IsNullOrWhiteSpace(strA) //true  
 string.IsNullOrWhiteSpace(strB) //true  
 string.IsNullOrWhiteSpace(strC) //true  
 ```
-so, best way is using string.IsNullOrEmpty()
+so, best way is using `string.IsNullOrEmpty()`
 
-if not need have whitespace condition or using string.IsNullOrWhiteSpace() have whitespace condition
+if not need have whitespace condition or using `string.IsNullOrWhiteSpace()` have whitespace condition
