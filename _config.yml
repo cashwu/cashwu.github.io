@@ -5,14 +5,14 @@
 # Site
 title: Cash Wu Geek
 subtitle: My Coding, My Life
-description:
+description: My Coding, My Life
 author: Cash Wu
 language: zh-tw
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://tycoon-isabel-35762.netlify.com
+url: https://blog.cashwu.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
