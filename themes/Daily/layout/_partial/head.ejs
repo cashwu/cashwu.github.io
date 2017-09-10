@@ -62,4 +62,11 @@
   <!-- Custom CSS/Sass -->
   <%- css('css/style') %>
 
+    <script type="text/javascript">
+        var host = "blog.cashwu.com";
+        if ((host == window.location.host) && (window.location.protocol != "https:")){
+            window.location.protocol = "https";
+        }
+    </script>
+
 </head>
