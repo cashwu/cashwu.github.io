@@ -1,6 +1,6 @@
 ---
 title: >-
-  vue - Interpolation inside attributes has been removed. Use v-bind or the
+  Vue - Interpolation inside attributes has been removed. Use v-bind or the
   colon shorthand instead
 tags:
   - js
