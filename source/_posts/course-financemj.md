@@ -6,6 +6,7 @@ tags:
   - finance
 
 photos:
+ - https://d33wubrfki0l68.cloudfront.net/bf0894157ca117cbe48fb96f92885b051dc3977a/eac46/2017/09/11/course-financemj/03.png
 ---
 
 > 以下為不爆雷的上課分享 XD
