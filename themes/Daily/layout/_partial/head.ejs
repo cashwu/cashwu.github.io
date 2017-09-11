@@ -36,7 +36,8 @@
   <% } %>
   <!--Page Cover-->
   <% if (page.share_cover) { %>
-      <meta property="og:image" content="<%= config.url %><%= page.share_cover %>" />
+    <!--<meta property="og:image" content="<%= config.url %><%= page.share_cover %>" />-->
+    <meta property="og:image" content="<%= page.share_cover %>" />
   <% } else if (config.cover) { %>
       <meta property="og:image" content="<%= config.url %><%= config.cover %>"/>
   <% } %>
