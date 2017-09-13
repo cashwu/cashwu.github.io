@@ -16,6 +16,7 @@ url: https://blog.cashwu.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
+cover: /images/cover.png
 
 # Directory
 source_dir: source
