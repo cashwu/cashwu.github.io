@@ -2,12 +2,13 @@
 title: TEDxDadun 2017 從中感動 | 從此行動
 tags:
   - event
+  - ted
 categories: []
 date: 2017-09-18 00:01:31
 photos:
- - ./tedxdadun-2017/01.png
+ - https://d33wubrfki0l68.cloudfront.net/5f6b3edc23abce0638b64e1f880c56c29cf6e5cb/01f9e/2017/09/18/tedxdadun-2017/01.png
 share_cover:
- - ./tedxdadun-2017/01.png
+ - https://d33wubrfki0l68.cloudfront.net/5f6b3edc23abce0638b64e1f880c56c29cf6e5cb/01f9e/2017/09/18/tedxdadun-2017/01.png
 ---
 
 ![](./tedxdadun-2017/01.png)
@@ -15,7 +16,7 @@ share_cover:
 某天不小心在 FB 上面看到 TEDxDadun 的報名訊息，而且地點是在台中
 因為還蠻常看國外 TED 的 video，即然現在有機會可以在台中體驗到 TED，當然是立馬手刀報名
 
-一整天的議程包括了人生、文學、文化、環保的相關議題，整個半天非常的充實，下面記錄了一些我的重點
+隨手記錄了一些重點
 
 ### Tank - 接受好的環境，勇於改變
 
@@ -89,8 +90,6 @@ share_cover:
 
 ---
 
-如果你覺得還不錯，可以參考 TEDxDadun 的 [FB](https://www.facebook.com/TEDxDadun)
-
-TEDxDadun 的 youtube 也有當天的錄影 [上半場](https://youtu.be/Efu9HJl7Bbs?t=2505) [下半場](https://www.youtube.com/watch?v=6bSwEQN0BsE)
+半天的議程包括了人生、文學、文化、環保的相關議題，整個非常的充實，如果你也喜歡，建議明年也一起來參加，可以觀注 TEDxDadun 的 [FB](https://www.facebook.com/TEDxDadun)，而 TEDxDadun 的 youtube 也有當天的錄影 [上半場](https://youtu.be/Efu9HJl7Bbs?t=2505) [下半場](https://www.youtube.com/watch?v=6bSwEQN0BsE)
 
 註：部份影片片段沒有處理好回音的問題，在觀看的時候請注意
