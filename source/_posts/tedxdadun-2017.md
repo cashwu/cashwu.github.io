@@ -6,10 +6,12 @@ tags:
 categories: []
 date: 2017-09-18 00:01:31
 photos:
- - https://d33wubrfki0l68.cloudfront.net/5f6b3edc23abce0638b64e1f880c56c29cf6e5cb/01f9e/2017/09/18/tedxdadun-2017/01.png
+ - 
 share_cover:
- - https://d33wubrfki0l68.cloudfront.net/5f6b3edc23abce0638b64e1f880c56c29cf6e5cb/01f9e/2017/09/18/tedxdadun-2017/01.png
+ - 
 ---
+
+![](./tedxdadun-2017/01.png)
 
 某天不小心在 FB 上面看到 TEDxDadun 的報名訊息，而且地點是在台中
 因為還蠻常看國外 TED 的 video，即然現在有機會可以在台中體驗到 TED，當然是立馬手刀報名
