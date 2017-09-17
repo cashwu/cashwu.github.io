@@ -6,9 +6,9 @@ tags:
 categories: []
 date: 2017-09-18 00:01:31
 photos:
- - 
+ - https://d33wubrfki0l68.cloudfront.net/ef8443ec5c1448757021f60bc884a230812e4537/e7a27/2017/09/18/tedxdadun-2017/01.png
 share_cover:
- - 
+ - https://d33wubrfki0l68.cloudfront.net/ef8443ec5c1448757021f60bc884a230812e4537/e7a27/2017/09/18/tedxdadun-2017/01.png
 ---
 
 ![](./tedxdadun-2017/01.png)
