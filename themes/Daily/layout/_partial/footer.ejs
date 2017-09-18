@@ -1,17 +1,19 @@
 <!-- Footer-widgets -->
 <div class="footer-widgets">
-  <div class="row inside-wrapper">
-    <div class="col-1-3">
-      <aside>
-        <h1 class="widget-title"><%= config.widget ? config.widget.title : theme.widget.title  %></h1>
-        <div class="custom-widget-content">
-          <% var widget_content = config.widget ? config.widget.content : (config.description || theme.widget.content) %>
-          <%- widget_content %>
+    <div class="row inside-wrapper">
+        <div class="col-1-3">
+            <aside>
+                <h1 class="widget-title">
+                    <%= config.widget ? config.widget.title : theme.widget.title  %>
+                </h1>
+                <div class="custom-widget-content">
+                    <% var widget_content = config.widget ? config.widget.content : (config.description || theme.widget.content) %>
+                        <%- widget_content %>
+                </div>
+            </aside>
         </div>
-      </aside>
-    </div>
-    <div class="col-1-3">
-      <!--
+        <div class="col-1-3">
+            <!--
       <aside>
         <h1 class="widget-title"><%- __('contact') %></h1>
         <div class="widget-text">
@@ -27,31 +29,38 @@
         </div>
       </aside>
     -->
-    </div>
-    <div class="col-1-3">
-      <aside>
-        <h1 class="widget-title"><%- __('search') %></h1>
-        <div class="widget-text">
-          <form onSubmit="return appDaily.submitSearch('<%- config.search_engines %>')">
-            <p>
-              <input type="text" placeholder="search..." id="homeSearchInput">
-            </p>
-            <!-- <input type="submit" value="GO"> -->
-          </form>
         </div>
-      </aside>
+        <div class="col-1-3">
+            <aside>
+                <h1 class="widget-title">
+                    <%- __('search') %>
+                </h1>
+                <div class="widget-text">
+                    <form onSubmit="return appDaily.submitSearch('<%- config.search_engines %>')">
+                        <p>
+                            <input type="text" placeholder="search..." id="homeSearchInput">
+                        </p>
+                        <!-- <input type="submit" value="GO"> -->
+                    </form>
+                </div>
+            </aside>
+        </div>
     </div>
-  </div>
 </div>
 <!-- Footer -->
 <footer class="site-info">
-  <p>
-    <span><%- config.title %> &copy; 2012</span>
-    <!--
+    <p>
+        <span><%- config.title %> &copy; 2012</span>
+        <div style="text-align:center;">
+            <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"></a>
+            <br>
+            本著作係採用<a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">創用 CC 姓名標示-非商業性-相同方式分享 4.0 國際 授權條款</a>授權.
+        </div>
+        <!--
       <% if(config.footer !== null) { %>
       <span class="split">|</span>
       <span><%- config.footer || theme.footer %></span>
     <% } %>
     -->
-  </p>
+    </p>
 </footer>
