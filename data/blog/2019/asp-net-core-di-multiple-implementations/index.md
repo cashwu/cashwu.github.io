@@ -1,0 +1,122 @@
+---
+title: ASP.NET Core 如何使用內建的 DI 注入多個實作
+description: ASP.NET Core 如何使用內建的 DI 注入多個實作，也可以變向作到動態注入的效果
+date: 2019-04-16 09:55:05.146+08:00
+slug: "asp-net-core-di-multiple-implementations"
+tags: [ asp.net core , di ]
+---
+
+## 模擬多個實作
+
+下面我們使用 Log 寫入的不同來模擬多個實作
+
+```csharp
+public interface ILog
+{
+    void Info(string msg);
+}
+
+public class FileLog : ILog
+{
+    public void Info(string msg)
+    {
+        Console.WriteLine($"FileLog - {msg}");
+    }
+}
+
+public class SentryLog : ILog
+{
+    public void Info(string msg)
+    {
+        Console.WriteLine($"SentryLog - {msg}");
+    }
+}
+```
+
+## 註冊
+
+在 Startup 的 ConfigureServices 註冊兩個 Log
+
+```csharp
+services.AddScoped<ILog, FileLog>();
+services.AddScoped<ILog, SentryLog>();
+```
+
+## 使用單一 ILog
+
+在 controller 裡面注入 `ILog`
+
+```csharp
+private readonly ILog _log;
+public HomeController(ILog log)
+{
+    _log = log;
+}
+
+public IActionResult Index()
+{
+    _log.Info("TEST");
+    return Ok("OK");
+}
+```
+
+直接執行程式，會發現 ILog 跑的是 SentryLog
+
+![](/images/404.webp)
+
+> 在注入多個實作的時候，預設是拿到最後註冊的那一個
+
+## 使用多個 ILog
+
+把前面注入 `ILog` 換成 `IEnumerable<ILog>`，然後變成 `foreach` 寫入 Log
+
+```csharp
+private readonly IEnumerable<ILog> _logs;
+
+public HomeController(IEnumerable<ILog> logs)
+{
+    _logs = logs;
+}
+
+public IActionResult Index()
+{
+    foreach (var log in _logs)
+    {
+        log.Info("TEST");
+    }
+
+    return Ok("OK");
+}
+```
+
+執行程式，ILog 會寫入 FileLog 和 SentryLog
+
+![](/images/404.webp)
+
+> 這裡要注意的是注入的型別一定要是 `IEnumerable<>`，如果使用 `List<>` 是會出錯的
+
+## 動態使用 ILog
+
+如果要動態注入不同的實體，可以變向的使用判斷的方式來做到動態注入的效果，判斷的來源可以來自 appsetting 或是 database 都可以
+
+當然這個判斷可以寫成 extension method 會比較方便使用
+
+```csharp
+private readonly IEnumerable<ILog> _logs;
+
+public HomeController(IEnumerable<ILog> logs)
+{
+    _logs = logs;
+}
+
+public IActionResult Index()
+{
+   	var log = _logs.FirstOrDefault(a => a.GetType().Name == "FileLog");
+	log?.Info("TEST");
+    return Ok("OK");
+}
+```
+
+執行結果
+
+![](/images/404.webp)

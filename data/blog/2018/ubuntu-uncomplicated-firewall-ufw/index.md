@@ -1,0 +1,91 @@
+---
+title: Ubuntu - 簡單的防火牆設定 ufw
+description: Ubuntu 簡單的防火牆 ufw 設定
+date: 2018-12-10 13:10:08.645+08:00
+slug: "ubuntu-uncomplicated-firewall-ufw"
+tags: [ ubuntu ]
+---
+
+> OS - Ubuntu Desktop 18.04
+
+Ubuntu 有內建一個簡單的防火牆 (Uncomplicated Firewall) ufw，不過預設是沒有啟用的，下面就來設定 ufw，讓 Ubuntu 更安全
+
+- ufw 預設是不啟用的，可以用 status 來看一下狀態
+
+```shell
+sudo ufw status
+// Status: inactive
+```
+
+- 啟用 ufw，會訊問可能會中斷 SSH 連線是否同意
+
+```shell
+sudo ufw enable
+// Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+// Firewall is active and enabled on system startup
+```
+
+在下一次 status 就可以看到 enabble
+
+```shell
+sudo ufw status
+// Status: active
+```
+
+- 如果用 `verbose` 看詳細的狀態，可以看到預設的 `incoming` 是 deny 的，而 outoging 是 `allow` 的
+
+>> 打開 ufw 務必要小心，如果中斷現有的連線視窗的話，會連 SSH 都沒有辦法連上
+
+```shell
+sudo ufw status verbose
+// Status: active
+// Logging: on (low)
+// Default: deny (incoming), allow (outgoing), disabled (routed)
+// New profiles: skip
+```
+
+- 增加連線規則，第一個要先允許 SSH 的連線，可以使用 `sudo ufw allow` 加上 port 來允許連線
+
+```
+sudo ufw allow 22
+```
+
+加完之後可以看一下 status
+
+```
+sudo ufw status
+//Status: active
+//
+//To                         Action    From
+//--                         ------    ----
+//22                         ALLOW     Anywhere
+//22 (v6)                    ALLOW     Anywhere (v6)
+```
+
+- 刪除規刪的話，基本上就是原本 allow 前面加上 delete 就好了
+
+> 這裡為了方便有多加一個 23 的規則
+
+```shell
+sudo ufw delete allow 23
+// Rule deleted
+// Rule deleted (v6)
+```
+
+- `reject` 和 `deny` 的差別基本上就是 `reject` 會跟你說連不上，`deny` 不會跟你說
+
+- 我們可以將前面的 `allow 22` 改用 `limit 22` 以防止 DDOS，如果同一個 ip 在 30 秒之內進行了 6 次 (含) 以上錯誤的嘗試連線，ufw 會拒絕它的連結
+
+```shell
+sudo ufw limit 22
+// Rule updated
+// Rule updated (v6)
+```
+
+![](/images/404.webp)
+
+- 基本上加完規則後就會生效，如果怕的話，可以重啟 ufw 的服務
+
+```shell
+sudo systemctl restart ufw
+```

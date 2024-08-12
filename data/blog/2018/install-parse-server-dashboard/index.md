@@ -1,0 +1,119 @@
+---
+title: 安裝 Parse Server Dashboard
+description: Parse Dashboard 是官方出的一個獨立套件，提供給我們一個視覺化的方式來管理 Parse Server，而且非常容昜安裝，下面就來看怎麼安裝
+date: 2018-12-23 15:39:43.138+08:00
+slug: "install-parse-server-dashboard"
+tags: [ parse ]
+---
+
+Parse Dashboard 是官方出的一個獨立套件，提供給我們一個視覺化的方式來管理 Parse Server，而且非常容昜安裝，前面的[文章](https://blog.cashwu.com/blog/heroku-parse-server)已經安裝了 Parse Server 在 Heroku 上面，我們可以在 local 的環境架設 Parse Dashboard 來管理 Pasrse Server
+
+## 使用 npm global
+
+- 先使用 npm 安裝 dashboard 在 global
+
+```shell
+npm install -g parse-dashboard
+```
+
+- 新增一個 dashboard config 的 json file
+	- serverURL、appId 和 masterKey 請依自己的設定填入
+
+```json
+{
+  "apps": [
+    {
+      "serverURL": "http://localhost:1337/parse",
+      "appId": "myAppId",
+      "masterKey": "myMasterKey",
+      "appName": "Heroku Parse"
+    }
+  ]
+}
+```
+
+- 使用 CLI 啟動 dashboard，預設 port 是 4040
+	- 使用 `--config` 指定剛才新增的 config
+
+```shell
+parse-dashboard --config parse-dashboard-config.json
+```
+
+![](/images/404.webp)
+
+- 打開網頁，沒有問題的話就可以看到中間有連接到 Heroku 的 parse 了
+
+![](/images/404.webp)
+
+## 使用 express
+
+- 新增一個新的 node js
+
+```shell
+npm init
+```
+
+- 安裝 dashbaord 套件
+
+```shell
+npm install parse-dashboard express
+```
+
+- 新增 index.js，使用 `express` 寫 dashboard 相關的程式碼
+
+```js
+var express = require('express');
+var ParseDashboard = require('parse-dashboard');
+
+var dashboard = new ParseDashboard({
+  "apps": [
+	{
+      "serverURL": "http://localhost:1337/parse",
+      "appId": "myAppId",
+      "masterKey": "myMasterKey",
+      "appName": "Heroku Parse"
+    }
+  ]
+});
+
+var app = express();
+app.use('/', dashboard);
+
+var httpServer = require('http').createServer(app);
+httpServer.listen(4040);
+```
+
+- 使用 node 啟動 dashboard
+
+```shell
+node index.js
+```
+
+- 打開網頁，看到的畫面應該跟使用 npm global 的一樣
+
+## 使用者登入
+
+- 修改 config 的部份，增加 users 區塊，填入使用者的帳號和密碼
+
+```js
+var dashboard = new ParseDashboard({
+  "apps": [
+	{
+      "serverURL": "http://localhost:1337/parse",
+      "appId": "myAppId",
+      "masterKey": "myMasterKey",
+      "appName": "Heroku Parse"
+    }
+  ],
+  "users": [
+    {
+      "user":"user",
+      "pass":"password"
+    }
+  ]
+});
+```
+
+- 重新啟動後首頁就會變成是登入頁面了
+
+![](/images/404.webp)

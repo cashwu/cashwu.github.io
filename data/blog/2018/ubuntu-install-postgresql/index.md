@@ -1,0 +1,124 @@
+---
+title: Ubuntu - 安裝 PostgreSQL
+description: Ubuntu 安裝 PostgreSQL
+date: 2018-12-13 13:30:23.715+08:00
+slug: "ubuntu-install-postgresql"
+tags: [ ubuntu , postgresql ]
+---
+
+> OS - Ubuntu Desktop 18.04
+> ASP.NET Core MVC 2.2
+
+- ubuntu 的套件管理裡面預設就有 PostgreSQL，所以可以直接使用 `apt` 來安裝
+
+```shell
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+
+- 在 ubuntu 的 PostgreSQL 預設上使用者名稱如果一樣的話，可以直接登入到 db 裡面，預設安裝完，會有一個 `postgres` 的使用者讓我們使用
+
+- 我們可以切換到這個 `postgres` 使用者，然後進入 `psql` 的 command，可以使用 `\q` 離開
+
+```shell
+sudo -i -u postgres
+psql
+```
+
+![](/images/404.webp)
+
+![](/images/404.webp)
+
+![](/images/404.webp)
+
+- 基本上不會直接使用 `postgres` 這個帳號，會獨立每一個連線 (專案) 的帳號
+
+- 這裡使用 `postgres` 這個使用者來建立一個使用者 `mvc`，預設會有一個 `createuser` 的指令，而且可以使用 `interactiv` 作互動式的建立
+
+```shell
+createuser --interactiv
+```
+
+![](/images/404.webp)
+
+- 建立相同名稱的 database
+
+```shell
+createdb mvc
+```
+
+- 進入 psql，修改使用者的密碼
+
+```sql
+ALTER USER mvc WITH PASSWORD 'mvc';
+```
+
+![](/images/404.webp)
+
+- 然後把 db 的 owner 改成 `mvc`
+
+```sql
+ALTER DATABASE mvc OWNER TO mvc;
+```
+
+![](/images/404.webp)
+
+- 建立 Ubuntu 的使用者 `mvc`，讓這個 user 可以直接使用 PostgreSQL (如果已經有存在相同的 user 就不用在建立了)
+
+```
+sudo adduser mvc
+```
+
+- 使用 mvc user 進入 psql，預設會進入到和使用者同名的資料庫
+
+```
+sudo -i -u mvc
+psql
+```
+
+![](/images/404.webp)
+
+- 可以使用 `\conninfo` 來看當前的連線資訊
+
+![](/images/404.webp)
+
+- 為了讓外部可以使用 Client 端的工具連線，需要修改 PostgreSQL 的設定，讓 `mvc` 這個使用者可以從外部連線進 db
+
+- 修改 postgresql.conf，找到 `listen_addresses` 取消註解，把值改為 `*` (把監聽的 address 改為全部)
+
+```shell
+sudo vim /etc/postgresql/10/main/postgresql.conf
+```
+```shell
+listen_addresses = '*'
+```
+
+- 修改 pg_hba.conf，加入一行設定，參數依序為
+	- Type - host 表示遠端存取
+    - Database
+    - User
+    - Address，0.0.0.0/0 代表不限制
+    - Method - password 表示需要密碼
+
+```shell
+sudo vim /etc/postgresql/10/main/pg_hba.conf
+```
+```shell
+ host       mvc       mvc       0.0.0.0/0       password
+```
+
+- 修改完後重啟 PostgreSQL 服務
+
+```shell
+sudo systemctl restart postgresql
+```
+
+- 可以使用 Client 端連線看看，這裡是使用 `DataGrip`
+
+- 新增一個 PostgresSQL 的 Data Source，填入相關的資訊，測試連線應該是正常的
+
+![](/images/404.webp)
+
+![](/images/404.webp)
+
+> 後面會使用之前建立好的 ASP.NET Core MVC 專案來使用 PostgresSQL

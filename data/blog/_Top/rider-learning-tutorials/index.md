@@ -1,0 +1,38 @@
+---
+title: 「Top」Rider 學習資源
+description: 這篇文章主要是蒐集相關的 Rider 學習資源
+date: 2000-01-01
+slug: "jetbrains-rider-learning-tutorials"
+tags: [ rider ]
+---
+
+![](./1683332594929-sifan-liu-sl_oGl--GrY-unsplash.jpg)
+
+這篇文章主要是蒐集相關的 Rider 學習資源，之後有更新也會放在這裡
+
+## 影片
+
+- [.NET Guide - Rider Web Fundamentals - 官方 YouTube](https://www.youtube.com/playlist?list=PLQ176FUIyIUaLlrnDoeSgVst3XV_iQIMQ)
+- [Rider Video Tutorials - 官方 YouTube](https://www.youtube.com/playlist?list=PLQ176FUIyIUY8gxZkEYRa0SM8JyFsUT1v)
+- [.NET Guide - Rider Essentials - 官方 YouTube](https://www.youtube.com/playlist?list=PLQ176FUIyIUa9YhrRUPS8OTxq5G3l26IY)
+- [Cross-platform C# Programming with JetBrains' Rider - pluralsight](https://app.pluralsight.com/library/courses/csharp-jetbrains-rider-cross-platform-programming/table-of-contents)
+- [The New HTTP Client CLI](https://www.youtube.com/watch?v=mwiHAukbWjM)
+- [How to Search Everywhere in Any JetBrains IDE](https://www.youtube.com/watch?v=nzDgYoDgWGE)
+
+### Git
+
+- [SHELVE: The Solution to Uncommitted Work](https://www.youtube.com/watch?v=L02P_Qa62oQ)
+- [Resolving Git Merge Conflicts: The Easy Way](https://www.youtube.com/watch?v=mSfq1SoMocg)
+
+## 文章
+
+- [Rider 官方文件](https://www.jetbrains.com/help/rider/Introduction.html)
+
+---
+
+### 更新歷程
+
+- 20230717 增加「How to Search Everywhere in Any JetBrains IDE」
+- 20230530 增加「SHELVE: The Solution to Uncommitted Work」
+
+> 圖片來源 Photo by [Sifan Liu](https://unsplash.com/fansi_sifan?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/photos/sl_oGl--GrY?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText)

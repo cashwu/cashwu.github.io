@@ -1,0 +1,94 @@
+---
+title: Jenkins 發送 Slack 通知建置相關訊息
+description: Jenkins 發送 Slack 通知建置相關訊息
+date: 2019-04-28 10:31:31.224+08:00
+slug: "jenkins-slack-notification"
+tags: [ jenkins , slack ]
+---
+
+如果 Jenkins 是自動化建置，除非我們一直在上面，不然它如果建置失敗的話，我們怎麼可以在第一時間知道。我們就可以利用 Slack，在建置的過程中即時發送通知，讓我們可以不管在那裡都可以接到訊息。
+
+## 在 Slack 加入 Jenkins APP
+
+- 到 Slack 的 APPS (網址是 `https://<你的slack workspace>.slack.com/apps`)，畫面上搜尋 `jenkins`，點選 `Jenkins CI`
+
+![](/images/404.webp)
+
+- 在 Jenkins CI 的畫面，點選左邊的 `Add Configuration` 新增一個新的設定
+
+![](/images/404.webp)
+
+- 來到設定頁面，如果要把訊息送到原有的 channel 就選擇原有的，在這裡我自新增一個新的 channel，點選 `create a new channel`
+
+![](/images/404.webp)
+
+- 輸入 channel 的名稱 (注意要全小寫)，然後點選 `Create Channel` 建立
+
+![](/images/404.webp)
+
+- 回到畫面會顯示已經建立完成，然後 channel 也變成剛才建立的那一個，點選 `Add Jenkins CI integration` 建立
+
+![](/images/404.webp)
+
+- 一開始畫面上會有如何在 Jenkins 使用的流程教學，如果不看的話就直接點選 `close`，如果是第一次設定的話，可以看看，寫的還蠻詳細的
+
+![](/images/404.webp)
+
+- 在 Step 2 裡面有跟你說 Jenkins 要安裝什麼套件 (雖然現在套件名稱已經改了)
+- 在 Step 3 有兩個資料要先 copy 起來之後需要使用，`Base URL` 和 `Integration Token`
+
+![](/images/404.webp)
+
+- 如果關掉之後也是可以在按 `expand` 打開的
+
+![](/images/404.webp)
+
+- 頁面的下半部份的設定在這個測試沒有要修改，之後有需要修改再回來改就好了
+- 按 `Save Settings` 就完成設定了
+
+![](/images/404.webp)
+
+## Jenkins 安裝 Slack 外掛
+
+- 來到 Jenkins 的 `外掛程式管理`，搜尋 `Slack Notification`，然後點選安裝
+
+![](/images/404.webp)
+
+## 設定 Slack 外掛
+
+- 來到 Jenkins 的 `組態設定` 畫面，到 `Global Slack Notifiter Settings` 區塊
+
+![](/images/404.webp)
+
+- 先新增 Token，按 `Integration Token Credential ID` 右邊的 `Add`，加入一個 Jenkins 的 Credential
+
+![](/images/404.webp)
+
+- 類型選擇 `Secret text`，然後把前面在網頁上面 copy 的 `Integration Token` 放在 `Secret` 的欄位，然後在 `Description` 給它一個可以適別的名稱
+
+![](/images/404.webp)
+
+- 新增之後回到畫面上，填入前面在網頁上面 copy 的 `Base URL`，然後選擇剛才新增的 `slack token`，填入 channel id `#jenkinstest`，按下 `Test Connection` 測試，如果下面顯示 `Success` 就表示 Jenkins 可以連接到 Slack 了
+
+![](/images/404.webp)
+
+- 你的 Slack channel 也會收到一筆測試訊息
+
+![](/images/404.webp)
+
+## 專案設定
+
+- 來到專案設定畫面，新增一個 `建置後動作`，選擇 `Slack Notifications`
+
+![](/images/404.webp)
+
+- 設定 `Slack Notifications` 的區塊
+	- 最上面的正什麼情況需要送訊息，建議一開始可以先全部勾選，之後在來調整
+	- 再來是要不要包含測試相關訊息和要不要有相關的人員和標題
+	- 最下面的區域和剛才在 Jenkins 的組態設定是一樣的，也就是說，如果不設定就吃 Jenkins 的設定，如果設定的話就吃專案的
+
+![](/images/404.webp)
+
+- 儲存之後手動建置測試，就可以看到 Slack 的 channel 有收到相關的訊息了
+
+![](/images/404.webp)

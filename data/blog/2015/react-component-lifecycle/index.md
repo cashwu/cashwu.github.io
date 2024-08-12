@@ -1,0 +1,111 @@
+---
+title: React - Component Lifecycle
+description: React Component Lifecycle
+date: 2015-12-25 20:11:25.9+08:00
+slug: "react-component-lifecycle"
+tags: [ js , react ]
+---
+
+## 實例化
+
+當每個新的組件被創建、首次渲染時
+
+### getDefaultProps
+
+對於組件來說，只會被調用一次 (在組件類建立的时候調用一次)。對於沒有被父組件指定 props 屬性的組件來說，這個方法返回的對象可用來設置初始的 props 值，而且返回的值會被暫存下來，被合併到 `this.props`
+
+該方法返回的任何複雜對象會在所有的實例間共享，而不是每個實例擁有一份拷貝。
+
+### getInitialState
+
+對於組件的每個實例來說，只會被調用一次 (在組件掛載之前調用一次)。在這裡可以初始化每個實例的 `state`。與 `getDefaultProps` 方法不同的是，每次實例建立時該方法都會被調用一次，在這個方法裡面可以訪問到 `this.props`
+
+### componentWillMount
+
+會在第一次 `render` (渲染) 之前被調用。這裡也是在 render 方法調用前可以修改組件 state 的最後一次機會
+
+### render
+
+在這裡會建立一個 DOM，用來表示組件的輸出。對於一個組件來說，render 是唯一一個必需的方法，並且有特定的規則。render 的方法需要滿足下面條件：
+
+- 只能通過 this.props 和 this.state 訪問數據
+- 可以返回 null、false 或者任何 React 組件
+- 只能出現一個頂級組件，不能返回一組元素
+- 不改變組件的狀態或者修改 DOM 的輸出，盡量讓 render 保持簡單
+
+render 的方法返回的結果不是真正的 DOM，而是一個虛擬的 DOM，它會和直實的 DOM 作比較，來判斷是否有必要做出修改
+
+### componentDidMount
+
+render 方法成功調用並且直實的 DOM 被渲染之後，可以在這個方法裡面使用 this.getDOMNode() 方法取得相對應的 DOM 節點。例如：如果需要測量渲染出 DOM 元素的高度或者需要使用其它 js 的套件時，可以在這個方法掛上
+
+DOM 的初始化操作可以放在這裡，而當 React 運行在 Server 端時，componentDidMount 方法不會被調用
+
+下面是使用 jQuery UI 的 Autocomplete
+
+```js
+var datasource = [...];
+
+var MyComponent = React.createClass({  
+    render: function(){
+        return <input ... />;
+    },
+    componentDidMount: function(){
+        $(this.getDOMNode()).autocomplete({
+           source : datasource 
+        });
+    }
+});
+```
+
+## 存在期
+
+組件已經渲染好並且可以與它進行互動
+
+### componentWillReceiveProps
+
+在組件的 props 通過父組件修改時，這個方法會被調用。可以獲得更改 props 的對象和更新 state 的機會。該方法比較 `this.props` 和 `nextProps`，然後使用 `this.setState()` 來改變 state
+
+```js
+componentWillReceiveProps : function(newProps){  
+    if(newProps.checked !== undefined){
+        this.setState({
+           checked: newProps.checked
+        });
+    }
+}
+```
+
+### shouldComponentUpdate
+
+如果確定某個組件或者它的子組件不需要渲染新的 props 或者 state，該方法可以返回 false
+`在首次渲染期間或者調用 forceUpate 方法後，這個方法不會被調用`
+返回 false 是在告訴 React 要跳過 render 方法，以及前後的函數 (`componentWillUpdate` 和 `componentDidUpdate`)
+大多數的情況之下沒有必要使用它，如果使用不當，有可能會產生其它非遇期的 Bug
+
+### componentWillUpdate
+
+和 componentWillMount 類似，組件會接收到新的 props 或者 state 進行渲染之前調用方法
+你不可以在該方法中更新 props 或者 state，應該要使用 componentWillReceiveProps 方法來更新
+
+## render
+
+### componentDidUpdate
+
+和 componentDidMount 類似，可以更新已經渲染好的 DOM
+
+## 銷毀 & 清理期
+
+當 React 使用完一個組件，這個組件就必需從 DOM 中缷載和銷毀
+
+### componentWillUnmount
+
+會在組件被移除之前調用，可以在裡面添加需要撤銷的方法
+
+### 參考連結
+
+- [组件的详细说明和生命周期（Component Specs and Lifecycle）](http://reactjs.cn/react/docs/component-specs.html)
+- [浏览器中的工作原理](http://reactjs.cn/react/docs/working-with-the-browser.html)
+- [React Component Lifecycle](https://segmentfault.com/a/1190000003691119)
+- [深入 React 生命週期](http://andyyou.logdown.com/posts/370308)
+- [React：组件的生命周期](http://www.ido321.com/1653.html)

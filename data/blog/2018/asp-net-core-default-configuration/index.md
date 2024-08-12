@@ -1,0 +1,107 @@
+---
+title: ASP.NET Core 預設組態設定
+description: ASP.NET Core 裡面有很多方式都可以當成組態設定，我們來看一下預設有提供那些方式可以使用
+date: 2018-12-26 21:00:55.285+08:00
+slug: "asp-net-core-default-configuration"
+tags: [ asp.net core ]
+---
+
+ASP.NET Core 裡面有很多方式都可以當成組態設定，我們來看一下預設有提供那些方式可以使用
+
+> ASP.NET Core 2.2
+
+## 設定檔的種類
+
+- 在 ASP.NET Core 裡面預設有四種組態設定的方式
+	- appsettings.json
+		- appsettings.XXX.json
+	- User Secrets
+	- Environment Variables
+	- Command Line
+
+> 預設的意思指的是，在不修改程式碼，增加任何組態設定的擴充，建立完專案就可以使用的
+
+## 載入順序
+
+- 程式碼載入的順序就是上面我所列的順序，而後面的設定會蓋掉前面的設定，也就是說如果都有同樣的設定，愈後面的優先程級會愈高
+
+- 裡面比較特別的是 User Secrets，它只存在 `ASPNETCORE_ENVIRONMENT` 為 `Developement` 的環境，之前有一篇[文章](https://blog.cashwu.com/blog/asp-net-core-user-secret)在講怎麼使用，如果有興趣的可以去看看
+
+- Github [原始碼](https://github.com/aspnet/AspNetCore/blob/master/src/DefaultBuilder/src/WebHost.cs#L162) 在此，可以看一下
+
+## 測試
+
+- appsettings.json 設定為
+
+```json
+{
+  "Setting" : "From appsettings"
+}
+```
+
+- appsettings.Development.json 設定為
+
+```json
+{
+  "Setting" : "From appsettings.Development"
+}
+```
+
+- User Secrets 設定為
+
+![](/images/404.webp)
+
+- Environment Variables 的話，比較簡單的作法是修改專案檔下面的 `launchSettings.json`，在 `environmentVariables` 的地方，多加一個設定
+
+```json
+{
+  "profiles": {
+    "mvc": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:6543",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Setting": "From environment"
+      }
+    }
+  }
+}
+```
+
+- CLI 的話，比較簡單的作法也是改 `launchSettings.json`，多加一個 `commandLineArgs`
+
+```json
+{
+  "profiles": {
+    "mvc": {
+      "commandName": "Project",
+      "commandLineArgs": "--Setting \"From Cli\"",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:6543",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Setting": "From environment"
+      }
+    }
+  }
+}
+```
+
+- 如果用 CLI 執行的話，可以把參數放在後面
+
+```shell
+dotnet run --Setting "From Cli"
+```
+
+- 每一個都設定的話，執行結果就是
+
+![](/images/404.webp)
+
+- 有興趣的可以一層一層拿掉，看一下執行的結果
+
+## 後記
+
+- 雖然預設只有四種，其實 ASP.NET Core 提供了很多的擴充方式，如果有興趣的話可以看一下官方的[說明](https://docs.microsoft.com/zh-tw/aspnet/core/fundamentals/configuration/?view=aspnetcore-2.2)
+- ASP.NET Core 雖然提供了很多的方式可以讓我們來設定，不過如果不了解先後順序的話，很可能會發生奇怪的 Bug
+- 有時間的話還是要看一下原始碼，會對整個程式的結構有所了解

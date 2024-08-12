@@ -1,0 +1,165 @@
+---
+title: Ubuntu + ASP.NET Core MVC + Nginx
+description: 前面的文章已經安裝好 Nginx，和產生了 ASP.NET Core MVC 的專案，現在要把發佈出來的檔案跑起來然後使用 Nginx 作反向代理，讓外部可以看到
+date: 2018-12-12 10:44:09.752+08:00
+slug: "ubuntu-asp-net-core-mvc-publish-nginx"
+tags: [  ubuntu , asp.net core , nginx ]
+---
+
+前面的文章已經安裝好 [Ubuntu - 安裝 Nginx](https://blog.cashwu.com/blog/ubuntu-install-nginx)，和產生了 ASP.NET Core MVC 的專案了 [Ubuntu - 建立、執行和發佈 ASP.NET Core MVC 專案 ](https://blog.cashwu.com/blog/ubuntu-create-run-and-publish-asp-net-core-mvc-project)，現在要把發佈出來的檔案跑起來然後使用 Nginx 作反向代理，讓外部可以看到
+
+> OS - Ubuntu Desktop 18.04
+> ASP.NET Core MVC 2.2
+
+- 先建立一個 user 和 group (`mvc`)，等一下會使這個 user 來執行 Web App
+
+```shell
+sudo groupadd mvc
+sudo useradd -g mvc mvc
+```
+
+- 建立 nginx 的 Web App 資料夾，然後調整使用者和權限
+
+```shell
+sudo mkdir /var/www/mvc
+sudo chown -R mvc:mvc /var/www/mvc
+sudo chmod -R 755 /var/www/mvc/
+```
+
+- 來到 mvc 專案，修改 mvc 的 Startup.cs，找到下面這兩行把它刪除 (因為不使用 https 所以先把它刪除，不然會跳轉)
+
+```csharp
+app.UseHsts();
+app.UseHttpsRedirection();
+```
+
+- 發行 Web App
+
+```shell
+dotnet publish -c Release -r ubuntu.18.04-x64
+```
+
+- 把發佈出來的檔案 copy 到剛才建立的資料夾裡面
+
+```shell
+sudo cp -r bin/Release/netcoreapp2.2/ubuntu.18.04-x64/publish/* /var/www/mvc/
+```
+
+- 新增一個 Nginx 的 site available 設定，因為預設的網站是 80 port，這裡就用 8888 來當成 mvc 的 port
+
+```shell
+sudo vim /etc/nginx/sites-available/mvc
+```
+
+內容如下
+
+```shell
+server {
+		listen 8888 default_server;
+        listen [::]:8888 default_server;
+        server_name _;
+        location / {
+           proxy_pass         http://localhost:5000;
+           proxy_http_version 1.1;
+           proxy_set_header   Upgrade $http_upgrade;
+           proxy_set_header   Connection keep-alive;
+           proxy_set_header   Host $host;
+           proxy_cache_bypass $http_upgrade;
+           proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header   X-Forwarded-Proto $scheme;
+        }
+}
+```
+
+> 需要注意的是 `proxy_pass` 這裡的 port 要看 Web App 運行時的 port 而定
+
+- 把剛才建立的 available 設定檔，連結到 enabled 裡面
+
+```shell
+sudo ln -s /etc/nginx/sites-available/mvc /etc/nginx/sites-enabled/
+```
+
+![](/images/404.webp)
+
+- 檢查 Ngixn 的設定檔
+
+```shell
+sudo nginx -t
+```
+
+![](/images/404.webp)
+
+- 如果沒有問題的話就重啟 Nginx 的服務
+
+```shell
+sudo systemctl restart nginx
+```
+
+- 如果有設定防火牆，記得 allow 8888 port
+
+```shell
+sudo ufw allow 8888
+```
+
+- 來到 `/var/www/mvc` 資料夾，先手動執行 Web App 測試一下，等一下會建立服務讓它自動執行
+
+```shell
+dotnet mvc.dll
+```
+
+- 打開瀏覽器來到 8888 port 應該就可以看到畫面了
+
+![](/images/404.webp)
+
+- 當然不可能手動運行 Web App，所以要新增一個 mvc 的系統服務來自動執行，先停止剛才的運行，然後建立一個 `mvc.service` 的服務
+
+```shell
+sudo vim /etc/systemd/system/mvc.service
+```
+
+內容如下
+
+```shell
+[Unit]
+Description=mvc web app
+
+[Service]
+WorkingDirectory=/var/www/mvc
+ExecStart=/usr/bin/dotnet /var/www/mvc/mvc.dll
+# 這裡的路徑和名稱，請自己調整
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+SyslogIdentifier=dotnet-mvc
+User=mvc
+# 指定執行的使用者為建立的 mvc
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- 啟用 mvc.service
+
+```shell
+sudo systemctl enable mvc
+```
+
+![](/images/404.webp)
+
+- 執行 mvc.service
+
+```shell
+sudo systemctl start mvc
+```
+
+-  查看 mvc.service 的狀態，看到 `active` 就代表服務有正常啟動了
+
+```shell
+sudo systemctl status mvc
+```
+
+![](/images/404.webp)
+
+- 用服務的方式來執行 Web App 會看不到 Log，這個時候可以使用 `sudo journalctl -fu mvc.service` 來查看

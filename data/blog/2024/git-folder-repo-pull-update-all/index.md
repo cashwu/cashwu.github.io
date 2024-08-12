@@ -1,0 +1,67 @@
+---
+title: Git - 更新資料夾內所有的 git repo
+description: 今天突然想到，之前用 tfs 的時候，可以直接用 cli 的方式來更新所有資料夾下面的 repo，不知道 git 是不是也可以寫一個 shell 來更新，於是就有了這篇文章
+date: 2024-02-23
+slug: "git-folder-repo-pull-update-all"
+tags: [ git, shell ]
+---
+
+![](./cover.webp)
+
+今天突然想到，之前用 tfs 的時候，可以直接用 cli 的方式來更新所有資料夾下面的 repo，不知道 git 是不是也可以寫一個 shell 來更新，於是就有了這篇文章
+
+遇到這種事情，當然是把 ChatGPT 拿出來問一下，就有答案了 XDD。這是我跟 ChatGPT 的[交談過程](https://chat.openai.com/share/4cefa243-ba44-4fdb-8321-4481b3c88d71)
+
+下面是最後產生的 `shell` 
+
+```shell
+#!/bin/bash
+
+# 設定 SourceCode 資料夾路徑
+SOURCE_CODE_DIR="/path/to/SourceCode"
+
+# 儲存錯誤 repo 的陣列
+ERROR_REPOS=()
+
+# 進入 SourceCode 資料夾
+cd "$SOURCE_CODE_DIR" || exit
+
+# 取得所有資料夾（也就是所有 repo）的清單
+REPOS=$(find . -maxdepth 1 -type d)
+
+# 逐一處理每個 repo
+for repo in $REPOS; do
+    # 跳過 "." 和 ".." 資料夾
+    if [ "$repo" != "." ] && [ "$repo" != ".." ]; then
+        echo "Updating $repo ..."
+        # 進入 repo 資料夾
+        cd "$repo" || { echo "Error: Cannot enter $repo"; ERROR_REPOS+=("$repo"); continue; }
+        # 檢查是否有 master 分支，如果不存在，就切換到 main 分支
+        if ! git show-ref --verify --quiet "refs/heads/master"; then
+            git checkout main || { echo "Error: Cannot checkout to main branch"; ERROR_REPOS+=("$repo"); cd "$SOURCE_CODE_DIR" || exit; continue; }
+        else
+            git checkout master || { echo "Error: Cannot checkout to master branch"; ERROR_REPOS+=("$repo"); cd "$SOURCE_CODE_DIR" || exit; continue; }
+        fi
+        # 確保在對應的分支上進行 reset 和 pull
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        git reset --hard "origin/$CURRENT_BRANCH"
+        git pull origin "$CURRENT_BRANCH"
+        # 檢查是否有錯誤
+        if [ $? -ne 0 ]; then
+            echo "Error: Unable to update $repo"
+            # 將錯誤的 repo 加入 ERROR_REPOS
+            ERROR_REPOS+=("$repo")
+        fi
+        # 回到 SourceCode 資料夾
+        cd "$SOURCE_CODE_DIR" || exit
+    fi
+done
+
+# 列出錯誤的 repo
+echo "Errors occurred in the following repos:"
+for error_repo in "${ERROR_REPOS[@]}"; do
+    echo "$error_repo"
+done
+```
+
+> Photo by [Yancy Min](https://unsplash.com/@yancymin?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/a-close-up-of-a-text-description-on-a-computer-screen-842ofHC6MaI?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)

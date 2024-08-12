@@ -1,0 +1,42 @@
+---
+title: C# Dictionary 的 Key 使用 Enum 會不會有 Boxing 的效能問題 ?
+description: 看到在其它的 blog 中有留言說：如果 C# 的 Dictionary 的 Key 使用 Enum 型別的話，會有 Boxing/Unboxing 的效能問題，引起了我的好奇，用了這麼久的方式，到底會不會有問題
+date: 2022-11-13 13:42:27.873+08:00
+slug: "csharp-dictionary-key-enum-boxing-unboxing-issue"
+tags: [ c# ]
+---
+
+![](./cover.webp)
+
+
+## 前言
+
+看到在其它的 blog 中有留言說：如果 C# 的 Dictionary 的 Key 使用 Enum 型別的話，會有 Boxing/Unboxing 的效能問題，引起了我的好奇，用了這麼久的方式，到底會不會有問題
+
+## Question
+
+我們先來簡單的解釋一下這個問題，`Dictionary` 要決定 `TKey` 是不是唯一的時候，會使用 `TKey` 的 `EqualityComparer` 來比較，如果沒有傳入的話，會使用 `Default` 的那個，然後，在比較時會使用 `GetHashCode` 的方式取得兩邊的 hash 來看是不是相等。而 `Enum` 的型別，基本上是沒有 `GetHashCode` 這個方法，所以會先把它轉型成 `object`，再用 `object` 的 `GetHashCode`，這裡就會產生所謂的 Boxing，也會有效能上的問題。
+
+> 這裡只是大概描述一下問題，如果有興趣的話可以去深入研究，網路上應該可以找到蠻多相關資源的，而後續修正後的流程就不是像我上面描述的一樣
+
+## Research
+
+如果 Google 相關的關鍵字的話，大概都會看到這篇 stack overflow [dictionary enum key performance](https://stackoverflow.com/a/26281533) 的提問，而且回答的人也給了三個 solution。不過，如果看發問跟回答的時間已經是 2014 的時候了，年代有點久遠，無法確定現在是不是還有問題。
+
+再繼續找的話，會看到 Unity 也會談到類似的問題
+- [最佳實踐 - 了解 Unity 效能 - GC 和 Managed Heap](https://unitytaiwan.blogspot.com/2017/03/unity-gcmanaged-heap.html)
+- [最適化マニアクス知らないとはまる Dictionary の問題](https://masakami.com/archives/2019/02/03/78/)
+
+## Prove
+
+套一句 91 大說的，這個世界應該不是這樣子運轉的 ! 大家都會碰到的問題，而且是這麼基本的，難道 M 社不會知道 ? 或者是沒有人修正 ?
+
+找到相關的 Github Issue [GetHashCode should not box enums in generic methods #6979](https://github.com/dotnet/runtime/issues/6979) 跟 PR [Avoid boxing in calls to enum's GetHashCode #7895](https://github.com/dotnet/coreclr/pull/7895)，可以發現，在 2016/10 的時候就有人發 PR 修正這個問題了，後續也有一直在修正相關的問題
+
+再來，如果去看 NET Framework 4.8 的 [source code 相關程式碼](https://referencesource.microsoft.com/#mscorlib/system/collections/generic/equalitycomparer.cs,542680fa5b2d828d) 的話，可以發現，在取得 Default 的 `EqualityComparer` 時，有針對 `Enum` 作特別的處理，會使用數值型別的 `EqualityComparer` 來處理
+
+## 結論
+
+在某一版本的 NET Framework 開始就沒有這個 Enum Boxing 的問題了，至於是那一個版本，我就沒有在找了。
+
+> Photo by [chuttersnap](https://unsplash.com/chuttersnap?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on [Unsplash](https://unsplash.com/photos/fyaTq-fIlro)

@@ -1,0 +1,50 @@
+---
+title: Ubuntu mount windows share folder 
+description: Ubuntu mount windows share folder
+date: 2024-03-18
+slug: "ubuntu-mount-windows-share-folder"
+tags: [ ubuntu ]
+# tldr: Making GitHub Actions with Js Code
+draft: true
+---
+
+![](./cover.webp)
+
+
+```shell
+sudo apt update
+sudo apt install cifs-utils
+```
+
+
+```shell
+sudo mkdir /mnt/windows_share
+
+sudo mount -t cifs //<windows-ip>/<folder> /mnt/windows_share -o username=<username>
+```
+
+你可以將用於驗證的使用者名稱和密碼存儲在一個文件中，然後在掛載命令中引用該文件。
+第一行是 Windows 使用者名稱。
+第二行是 Windows 使用者的密碼。
+
+
+```shell
+sudo mount -t cifs //<windows-ip>/<folder> /mnt/windows_share -o credentials=/etc/win_cred 
+```
+
+```shell
+sudo umount /mnt/windows_share
+```
+
+> 圖片來源：網路。若分享內容有侵害您的圖片版權，請來信告知，我們會及時加上版權信息，若是您反對使用，本著對版權人尊重的原則，會儘速移除相關內容。
+
+> Photo by []() on [Unsplash]()
+
+
+---
+
+## 問題
+## 原因
+## 解法
+
+## 參考連結

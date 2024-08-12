@@ -1,0 +1,113 @@
+---
+title: C# - GeoIP Search IP Location
+description: C# - GeoIP Search IP Location
+date: 2015-09-29 20:38:31.139+08:00
+slug: "geoip-search-ip-location"
+tags:  [ c# ]
+---
+
+有一個需求是要分析來源 IP 的位置 (就是要知道 User 的 Location)，所以就用 Search `Geo IP` 相關的服務
+
+一般來說不外乎有呼叫次數的限制 (例如：GoogleMap)，超過就要付費。另外一種是用 DB 的方式來查詢，不過大多需要付費 (其實很合理啊 !!)
+
+不過如果只是需要測試或是公司不一定願意買單的話，一般開發人員都會想要找到是否有 FREE 的服務或者是 OpenSouce 的
+
+剛好找到一家公司 [MaxMind](https://dev.maxmind.com/)，它本身有付費的服務 (有分 API 和離線查詢的 DB)，不過，佛心的是它有 Free 的 Geo Databases 可以下載 (在這裡這個版本稱為 `Lite`)，雖然準確度沒有付費版本來的高，不過我覺得一般使用上就很夠用了，可以參考相關網頁說明 [GeoLite2 Free Downloadable Databases](https://dev.maxmind.com/geoip/geoip2/geolite2/)
+
+> 注意事項：因為它是 [CC 授權](http://creativecommons.org/licenses/by-sa/3.0/)，所以要使用產品的時候記得加註說明 
+>
+> This product includes GeoLite2 data created by MaxMind, available from
+http://www.maxmind.com.
+
+下面就來說明一下怎麼使用
+
+1、下載 Geo DB
+
+![](/images/404.webp)
+
+下載頁面會有 binary 和 CSV 的檔案，為了方便使用，我們這裡只下載 [GeoLite2 City binary](http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz)，下載後為 .gz 的壓縮檔，使用 7zip 解壓縮就可以得到 `GeoLite2-City.mmdb` 檔案
+
+2、使用 Console Project 來測試
+
+![](/images/404.webp)
+
+把前面下載的檔案 (GeoLite2-City.mmdb) 放在 Console Project 裡面
+
+![](/images/404.webp)
+
+這裡要注意，需要修改這個檔案的輸出，這樣子程式在執行的時候才會抓到這個檔案。
+
+在 `GeoLite2-City.mmdb` 檔案上面按 `F4` ，然後在屬性視窗裡面，把它俢改為 `Copy always` (如果是中文版的話，請自行對照修改)
+
+3、安裝 NuGet 套件
+
+![](/images/404.webp)
+
+在 [GeoIP2 Downloadable Databases](https://dev.maxmind.com/geoip/geoip2/downloadable/#MaxMind_APIs) 頁面裡面有一個 MaxMind APIs 的區塊，裡面有 [NuGet](https://www.nuget.org/packages/MaxMind.GeoIP2/) 的連結
+
+![](/images/404.webp)
+
+我們可以使用 `Install-Package MaxMind.GeoIP2` 來安裝相關的 Package
+
+4、使用 API
+
+![](/images/404.webp)
+
+在 [GitHub Pages](https://maxmind.github.io/GeoIP2-dotnet/) 裡面有寫到，雖然這個 API 是 for 正試版，不過 Lite 版也可以用使用
+
+在同一個頁面裡面有一個 `Database Usage` 的區塊，可以直接拿裡面 `City Database` 的範例程式碼來修改使用
+
+![](/images/404.webp)
+
+下面為修改後的測試程式
+
+```csharp
+static void Main(string[] args)  
+{
+    var path = Directory.GetCurrentDirectory();
+    path = path + @"\db\GeoLite2-City.mmdb";
+
+    using (var reader = new DatabaseReader(path))
+    {
+        var city = reader.City("24.24.24.24");
+
+        Console.WriteLine("Country.IsoCode .. " + city.Country.IsoCode);
+        Console.WriteLine("Country.Name .. " + city.Country.Name);
+        Console.WriteLine("---");
+        Console.WriteLine("City.Name .. " + city.City.Name);
+        Console.WriteLine("Postal.Code .. " + city.Postal.Code);
+        Console.WriteLine("---");
+        Console.WriteLine("Location.Latitude .. " + city.Location.Latitude); 
+        Console.WriteLine("Location.Longitude .. " + city.Location.Longitude); 
+
+        Console.ReadLine();
+    }
+}    
+```
+
+- 在這裡我們使用 `24.24.24.24` 這個 IP 來測試
+- `DatabaseReader` 裡面傳入的就是我們加入 Lite DB 的路徑
+
+## 比對產出結果
+
+下圖是程式執行後的結果
+
+![](/images/404.webp)
+
+在這裡我們使用幾個線上的服務來比對
+
+- [twseo](http://dir.twseo.org/ip-check.php)
+
+![](/images/404.webp)
+
+- [ifreesite](http://www.ifreesite.com/ipaddress/)
+
+![](/images/404.webp)
+
+- [geoipview](http://cn.geoipview.com/)
+
+![](/images/404.webp)
+
+可以看到不同服務間還是有誤差的，建議可以多試幾個不同的 IP 或是比對不同的服務試試看
+
+我覺得以 FREE 的角度來說的話，已經算很不錯了。如果有比較高的需求的話，可以考慮是否使用付費的版本，或者是其它相關的付費服務

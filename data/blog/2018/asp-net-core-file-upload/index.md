@@ -1,0 +1,101 @@
+---
+title: ASP.NET Core 檔案上傳
+description: ASP.NET Core 檔案上傳相比之前的 ASP.NET MVC 來說方便許多，就來看如何實作上傳的功能
+date: 2018-12-27 20:32:01.302+08:00
+slug: "asp-net-core-file-upload"
+tags:  [ asp.net core ]
+---
+
+ASP.NET Core 檔案上傳相比之前的 ASP.NET MVC 來說方便許多，就來看如何實作上傳的功能
+
+> ASP.NET Core 2.2
+
+## Html
+
+- Html 程式如下
+	- 記得 `enctype` 要改成 `multipart/form-data`
+	- input 的 `name` 等一下要和後端的程式對應
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload</title>
+</head>
+<body>
+	<form method="post" enctype="multipart/form-data">
+		<input type="file" name="img"/>
+		<button>Submit</button>
+	</form>
+</body>
+</html>
+```
+
+## 單檔上傳
+
+- ASP.NET Core 把上傳的檔案都封裝在 `IFormFile` 裡面了，只要名稱一樣就會 Binding 了
+
+- Action 程式如下
+	- 記得 `IFormFile` 的參數名稱要跟前端的對應
+
+```csharp
+[HttpPost]
+public IActionResult Index(IFormFile img)
+{
+    var name = img.Name;
+    var fileFileName = img.FileName;
+    var fileLength = img.Length;
+    var fileContentType = img.ContentType;
+
+    return View();
+}
+```
+
+- 寫入 MemoryStream 測試
+	- 只要使用 `CopyTo` 方法就可以很方便的使用 (也有非同步的 `CopyToAsync` 可以使用)
+
+![](/images/404.webp)
+
+- 寫入 FileStream 測試
+
+![](/images/404.webp)
+
+![](/images/404.webp)
+
+## 多檔上傳
+
+- 修改 Html
+	- 修改 input `name` 和多加 `multiple` 屬性
+
+```html
+<input type="file" name="imgs" multiple/>
+```
+
+- 修改 Action
+	- 改用 `List<IFormFile>` 接多個檔案和改參數名稱
+
+```csharp
+[HttpPost]
+public IActionResult Index(List<IFormFile> imgs)
+{
+    foreach (var img in imgs)
+    {
+        var name = img.Name;
+        var fileFileName = img.FileName;
+        var fileLength = img.Length;
+        var fileContentType = img.ContentType;
+    }
+
+    return View();
+}
+```
+
+- 測試
+
+![](/images/404.webp)
+
+## 後記
+
+- 在 ASP.NET Core 因為封裝了 `IFormFile`，又有 `CopyTo` 可以直接轉存，相對來說應該是比之前的版本來的簡單
+- 如果有上傳大檔的需求，請參考官方的[說明](https://docs.microsoft.com/zh-tw/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2#uploading-large-files-with-streaming)使用串流的寫法

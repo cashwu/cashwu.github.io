@@ -1,0 +1,101 @@
+---
+title: ASP.NET MVC - 使用 ASP.NET Core 的 IHttpClientFactory
+description: ASP.NET MVC 裡面的 HttpClient 一直以來都有很多誤解和問題，所以在 .NET Core 裡面就出現了 `IHttpClientFactory` 用來解決一直以來的問題，不過在原本的 ASP.NET MVC 裡面要怎麼`容昜` 的使用 .NET Core 的 IHttpClientFactory，請繼續看下去
+date: 2020-05-25 20:25:25.472+08:00
+slug: "asp-net-mvc-using-asp-net-core-ihttpclientfactory"
+tags: [ asp.net mvc ]
+---
+
+> 範例程式使用 ASP.NET MVC 5
+
+ASP.NET MVC 裡面的 `HttpClient` 一直以來都有很多誤解和問題 (有興趣可以參考黑大的 [HttpClient，該 using 還是 static?](https://blog.darkthread.net/blog/httpclient-sigleton/) )，所以在 .NET Core 裡面就出現了 `IHttpClientFactory` 用來解決一直以來的問題，不過在原本的 ASP.NET MVC 專案裡面要怎麼 `容昜` 的使用 .NET Core 的 `IHttpClientFactory`，請繼續看下去
+
+### 安裝 Autofac 套件
+
+- 在 MVC 5 的專案裡面先安裝 `Autofac` 和 `Autofac.Mvc5`，為了方便，就直接把註冊的程式寫在 `Global.asax.cs` 裡面，下面是程式碼
+
+> 因為這裡不是在講解 `Autofac` 的使用，所以有興趣的可以參考[官方文件](https://autofaccn.readthedocs.io/en/latest/integration/aspnet.html)
+
+```csharp
+protected void Application_Start()
+{
+    AreaRegistration.RegisterAllAreas();
+    FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+    RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+    AutofacContainer();
+}
+
+private static void AutofacContainer()
+{
+    var builder = new ContainerBuilder();
+
+    var assembly = Assembly.GetExecutingAssembly();
+    builder.RegisterControllers(assembly);
+
+    var container = builder.Build();
+    DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+}
+```
+
+### 安裝 Http 套件
+
+- 安裝套件 `Microsoft.Extensions.Hosting` 和 `Microsoft.Extensions.Http`，下面需要使用 `Hosting` 這個套件，建構出 `container` 去加入 `HttpClient` 然後轉介給 `Autofac`，程式碼如下
+
+```csharp
+private static void AutofacContainer()
+{
+    var builder = new ContainerBuilder();
+
+    var assembly = Assembly.GetExecutingAssembly();
+    builder.RegisterControllers(assembly);
+
+    builder.Register(c =>
+    {
+        var hostBuilder = new HostBuilder();
+        hostBuilder.ConfigureServices(s => s.AddHttpClient());
+
+        return hostBuilder.Build().Services.GetService<IHttpClientFactory>();
+    }).SingleInstance();
+
+    var container = builder.Build();
+    DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+}
+```
+
+- 接下來就可以測試看看可不可以注入 `IHttpClientFactory`，程式碼如下
+
+```csharp
+public class HomeController : Controller
+{
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public HomeController(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
+    public async Task<ActionResult> Index()
+    {
+        using (var httpClient = _httpClientFactory.CreateClient())
+        {
+            var result = await httpClient.GetStringAsync(new Uri("https://blog.cashwu.com"));
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+    }
+}
+```
+
+### 測試
+
+- 執行結果，可以看到已經有把網頁抓回來了
+
+![](./httpclient_VyheoF.webp)
+
+
+### 後記
+
+會有這篇文章主要是看到網路上的一篇 [Using IHttpClientFactory with Asp.Net MVC 5](https://hamidmosalla.com/2020/05/22/using-ihttpclientfactory-with-asp-net-mvc5/)，裡面使用 `Ninject` 來串接 `IHttpClientFactory`，我想應該也可以簡單的使用 `Autofac` 來做到一樣的事情，最後作出來果然夠簡單，不到 10 行的程式碼 XD
+
+>  完整的程式碼在 [Github](https://github.com/cashwu/NetFrameworkHttpClientFactory)

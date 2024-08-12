@@ -1,0 +1,147 @@
+---
+title: ASP.NET Core 的 資料保護功能 (Data Protection)
+description: ASP.NET Core 內建有資料保護功能，可以方便我們加解密資料
+date: 2019-01-02 10:45:49.341+08:00
+slug: "asp-net-core-data-protection"
+tags: [ asp.net core ]
+---
+
+ASP.NET Core 內建有資料保護功能，可以方便我們加解密資料
+
+> ASP.NET Core 2.2
+
+## 設定
+
+- 在 `Startup` 的 `ConfigureServices` 加入 Data Protection
+	- 使用 `PersistKeysToFileSystem` 把私鑰保存起來
+
+```csharp
+services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(@"dataProtection"));
+```
+
+- 程式一執行就會在根目錄下面建立私鑰的 XML 檔案
+	- 預設的過期時間為 `90天`
+	- 預設加密 (encryption) 的演算法為 `AES_256_CBC`
+	- 預設驗證 (validation) 的演算法為 `HMACSHA256`
+
+![](/images/404.webp)
+
+- 如果要修改預設的演算法可以使用 `UseCryptographicAlgorithms`
+	- 可以看到內建有許多的演算法可以選擇
+
+```csharp
+services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(@"dataProtection"))
+        .UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
+        {
+            EncryptionAlgorithm = EncryptionAlgorithm.AES_128_CBC,
+            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+        });
+```
+
+![](/images/404.webp)
+
+![](/images/404.webp)
+
+## 資料保護 (加解密)
+
+- 注入 `IDataProtectionProvider` 來使用
+	- 使用 `CreateProtector` 來建立保護者，可以把它想像成公鑰
+
+```csharp
+private readonly IDataProtector _dataProtector;
+
+public HomeController(IDataProtectionProvider provider)
+{
+    _dataProtector = provider.CreateProtector("Publish Key");
+}
+```
+
+- 加密
+
+```csharp
+var protectWord = _dataProtector.Protect("Hello Cash");
+```
+
+- 解密
+
+```csharp
+var unprotectWord = _dataProtector.Unprotect(protectWord);
+```
+
+- 測試
+
+![](/images/404.webp)
+
+## 有時間限制的資料保護 (加解密)
+
+- 修改前面的程式，多加 `ToTimeLimitedDataProtector`
+
+```csharp
+private readonly ITimeLimitedDataProtector _timeLimitedDataProtector;
+
+public HomeController(IDataProtectionProvider provider)
+{
+    _timeLimitedDataProtector = provider.CreateProtector("Publish Key")
+										.ToTimeLimitedDataProtector();
+}
+```
+
+- 加密
+	- 可以在第二個參數傳入過期的時間
+
+```csharp
+var protectWord = _timeLimitedDataProtector.Protect("Hello Cash", TimeSpan.FromSeconds(3));
+```
+
+- 解密
+	- 解密沒有影響
+
+```csharp
+var unprotectWord = _timeLimitedDataProtector.Unprotect(protectWord);
+```
+
+- 測試
+	- 過期時間為 2 秒，使用 `Thread.Sleep` 3 秒來測試
+	- 無法解密時會發生 `Exception`
+
+![](/images/404.webp)
+
+## 使用不同的 Protector 加解密
+
+- 加密
+
+```csharp
+var protectWord = _provider.CreateProtector("Key1").Protect("Hello Cash");
+```
+
+- 解密
+
+```csharp
+var unprotectWord = _provider.CreateProtector("key2").Unprotect(protectWord);
+```
+
+- 測試
+	- 因為 `Protector` 不同直接發生 `Exception`
+
+![](/images/404.webp)
+
+## 多重 Protector
+
+- 可以在同一個 `Protector` 之下在建立不同的 `Protector`，讓我們可以方便管理和使用
+
+```csharp
+provider.CreateProtector("System").CreateProtector("Sub System 1");
+provider.CreateProtector("System").CreateProtector("Sub System 2");
+```
+
+## 後記
+
+- 這篇把大概的 Data Protection 用法講解了一次，如果有比較特殊的需求可以參考[官方說明 - 設定 ASP.NET Core 資料保護](https://docs.microsoft.com/zh-tw/aspnet/core/security/data-protection/configuration/overview?view=aspnetcore-2.2)
+
+- Data Protection 的功能方便了我們在資料的加解密上面的實作，只要呼叫相關的方法就可以作到以往需要實作很多程式碼的麻煩
+
+- 不過這個加解密應該只適用在自己的系統上面，如果和第三方系統有加解密的需求，還是需要使用公開的加解密方式會比較方便
+
+- 目前還沒有測試到的部份是私鑰過期之後會有什麼情況，用之前私鑰加密是不是可以解密之類的
