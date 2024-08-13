@@ -21,7 +21,8 @@ export default function Home({ posts }) {
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {!posts.length && 'No posts found.'}
           {posts.slice(0, MAX_DISPLAY).map((post) => {
-            const { slug, date, title, summary, tags } = post
+            console.log(post)
+            const { slug, date, title, summary, tags, draft } = post
             return (
               <li key={slug} className="py-12">
                 <article>
@@ -40,7 +41,7 @@ export default function Home({ posts }) {
                               href={`/blog/${slug}`}
                               className="text-gray-900 dark:text-gray-100"
                             >
-                              {title}
+                              {title} {draft && <span className="text-red-500">(Draft)</span>}
                             </Link>
                           </h2>
                           <div className="flex flex-wrap">
