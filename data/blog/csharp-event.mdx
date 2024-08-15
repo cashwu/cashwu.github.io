@@ -1,16 +1,16 @@
 ---
 title: C# - Event
-description: C# Event
-date: 2013-05-10 16:15:02.069+08:00
-slug: "csharp-event"
+summary: C# Event
+date: 2013-05-10
 tags: [ c# ]
+draft: false
 ---
 
 繼上一篇講 `Delegate`，現在要來介紹 `Event`，可以把 Delegate 看成是 Event 的基礎，Event 是建立在 Delegate 之上
 
 直接來看程式碼
 
-![](./01.webp)
+![](/static/images/2013/csharp-event/01.webp)
 
 我們在 class 裡面 建立一個 event「23 行」
 
@@ -32,7 +32,7 @@ tags: [ c# ]
 
 就把 Member 丟給 Evnet 就好了，程式碼修改如下
 
-![](./02.webp)
+![](/static/images/2013/csharp-event/02.webp)
 
 在 33 行的地方傳入 `this` 也就是 `Member 本身`
 
@@ -50,7 +50,7 @@ tags: [ c# ]
 
 程式碼修改如下
 
-![](./03.webp)
+![](/static/images/2013/csharp-event/03.webp)
 
 先建立一個可以放資料的 class
 
@@ -62,7 +62,7 @@ tags: [ c# ]
 
 我們可以在程式裡面 set 兩次 Name 來測試，結果如下
 
-![](./04.webp)
+![](/static/images/2013/csharp-event/04.webp)
 
 ---
 
@@ -70,9 +70,9 @@ tags: [ c# ]
 
 答案是否定的，不過我們還是可以用其它的方式來達到，程式碼修改如下
 
-![](./05.webp)
+![](/static/images/2013/csharp-event/05.webp)
 
-![](./06.webp)
+![](/static/images/2013/csharp-event/06.webp)
 
 在父類別裡面會建立一個 Method 名稱為 `On「EventName」` 「38 行」
 
