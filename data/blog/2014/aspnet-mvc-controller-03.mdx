@@ -1,9 +1,9 @@
 ---
 title: ASP.NET MVC - Controller (三)
-description: ASP.NET MVC - Controller (三)
-date: 2014-07-18 10:48:11.224+08:00
-slug: "aspnet-mvc-controller-03"
+summary: ASP.NET MVC - Controller (三)
+date: 2014-07-18
 tags: [ asp.net mvc ]
+draft: false    
 ---
 
 ## TempData
@@ -14,7 +14,7 @@ tags: [ asp.net mvc ]
 
 通常會使用 `Redirect`、`RedirectToAction` 或 `RedirectToResult`，不然 TempData 有可能會提前消失
 
-![](./01.webp)
+![](/static/images/2014/aspnet-mvc-controller-03/01.webp)
 
 ---
 
@@ -25,14 +25,14 @@ tags: [ asp.net mvc ]
 ### 簡單模型繫結
 頁面上的表單 `欄位名稱` (或是 `QueryString` 的名稱) 和 `Action` 的參數一樣時，在 Action 執行的時候，就會透過 `DefaultModelBinder`，將 `表單` (或是 `QueryString`) 傳來的資料進行處理，傳給 Action 裡面同名的參數
 
-![](./02.webp)
+![](/static/images/2014/aspnet-mvc-controller-03/02.webp)
 
 ## FormCollection
 為繼承 `NameValeCollection` 內容都是 `key` 和 `value`
 
 下面的執行結果和上面是一樣的
 
-![](./03.webp)
+![](/static/images/2014/aspnet-mvc-controller-03/03.webp)
 
 ### 複雜模型擊結
 和簡單模型繫結差不多，只是表單資料對應到比較複雜的型別，通常 `Entity` 的型別都是如此
@@ -51,10 +51,10 @@ tags: [ asp.net mvc ]
 
 因為不用在 `Model` 裡面作 `Binding`，所以帶入的 `FormCollection` 根本用不到，而 `TryUpdateModel` 泛型所傳入的參數，就是要被繫結上的資料庫模型物件
 
-![](./04.webp)
+![](/static/images/2014/aspnet-mvc-controller-03/04.webp)
 
 如果只有 `特定欄位` 更新時，一定要在 `Action` 裡面加上 `Bind` 的條件或是用 `ViewModel` 的方式，不然會有資安問題
 
 ## ActionFilter
 
-![](./05.webp)
+![](/static/images/2014/aspnet-mvc-controller-03/05.webp)

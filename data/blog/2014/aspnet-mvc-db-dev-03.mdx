@@ -1,48 +1,48 @@
 ---
 title: ASP.NET MVC - 使用資料庫開發 (三)
-description: ASP.NET MVC - 使用資料庫開發 (三)
-date: 2014-07-11 15:52:57.522+08:00
-slug: "aspnet-mvc-db-dev-03"
-tags: [  asp.net mvc , ef ]
+summary: ASP.NET MVC - 使用資料庫開發 (三)
+date: 2014-07-11
+tags: [ asp.net mvc, ef ]
+draft: false
 ---
 
 ## 資料庫欄位有預設值時處理
 
 先在 `客戶資料` 裡面加一個 `建立時間` 的欄位，Type 為 `DateTime`，預設值為 `getdate()`
 
-![](./01.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/01.webp)
 
 打開 `EF`，在空白處按右鍵選擇 `從資料庫更新模型`
 
-![](./02.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/02.webp)
 
 出現資料庫選擇的視窗後直接按 `Finish` 就好了
 
-![](./03.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/03.webp)
 
 我們可以加入一個 使用 Entity 的 MVC 控制器 來測試
 
-![](./04.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/04.webp)
 
-![](./05.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/05.webp)
 
 - 註：Controller name 記得不要打中文
 
 因為新增時間為自動產生，所以在新增畫面把它拿掉
 
-![](./06.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/06.webp)
 
 在 Controller 部份也要把 Bind 的 Include 的欄位拿掉
 
-![](./07.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/07.webp)
 
 新增一筆資料測試
 
-![](./08.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/08.webp)
 
 會發現網頁報錯了
 
-![](./09.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/09.webp)
 
 - 註：錯誤訊息 (送出的值超出原本 `datetime` 的範圍，請改用 `datetime2`)
 
@@ -60,11 +60,11 @@ tags: [  asp.net mvc , ef ]
 
 註：意思是 程式無論怎麼新增跟修改，EF 都不會更新到資料庫
 
-![](./10.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/10.webp)
 
 MSDN 的說明
 
-![](./11.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/11.webp)
 
 之後就可以測試新增時是否會帶入預設值 (現在時間)，
 編輯時是否不會修改到欄位
@@ -72,4 +72,4 @@ MSDN 的說明
 如果資料欄位很多預設值的話，用 `XML` 打開 `EF` 直接在 `SSDL` 的地方找到資料表的名稱和欄位，
 直接加入程式碼就好了
 
-![](./12.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-03/12.webp)

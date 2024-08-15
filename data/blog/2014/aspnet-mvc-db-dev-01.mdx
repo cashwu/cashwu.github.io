@@ -1,42 +1,42 @@
 ---
 title: ASP.NET MVC - 使用資料庫開發 (一)
-description: ASP.NET MVC - 使用資料庫開發 (一)
-date: 2014-07-09 15:57:36.205+08:00
-slug: "aspnet-mvc-db-dev-01"
+summary: ASP.NET MVC - 使用資料庫開發 (一)
+date: 2014-07-09
 tags: [ asp.net mvc , ef ]
+draft: false
 ---
 
 ## 建立資料庫模型
 
 新增一個 `MVC` 專案，把測試資料庫拉進 `App_Data` 資料夾裡面 (也可以在資料夾上按右鍵加入存在的項目)
 
-![](./01.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/01.webp)
 
 在資料庫上點兩下應該會用 `伺服器管理員` 開啟，確認可以連接到資料庫
 
-![](./02.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/02.webp)
 
 在 `Model` 資料夾上按右鍵加入一個 `資料` > `ADO.NET Entity Data Model` > 名稱打 `Customer`
 
-![](./03.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/03.webp)
 
 選第一個 從資料庫產生模型
 
-![](./04.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/04.webp)
 
 預設會選取剛才有打開過的資料庫，如果這裡空的話就要按右邊的 `新連線` 手動加入資料庫，連線字串預設即可
 
-![](./05.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/05.webp)
 
 加入所有的資料表，`sysdiagrams` 為資料庫圖表可以不加入，命名空間預設即可
 
-![](./06.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/06.webp)
 
 完成之後就會產生資料庫圖表，並且在 `Model` 裡面產生幾個檔案
 
-![](./07.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/07.webp)
 
-![](./08.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/08.webp)
 
 - 附檔為 `.tt` 的是 `T4` 的範本，主要是產生 `C#程式碼` 的程式碼
 - `*.Context.cs` 是產生跟資料庫的連線，繼承 `DbContext`，背後還是使用 `ADO.NET` 跟資料庫連接
@@ -50,7 +50,7 @@ tags: [ asp.net mvc , ef ]
 
 ## ORM 技術
 
-![](./09.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/09.webp)
 
 將結構化的關連資料 (資料庫) 對映成 物件導向模型 (程式)，
 傳統的 `ADO.NET` 的轉換成本很高 (人力成本高)，
@@ -66,21 +66,21 @@ tags: [ asp.net mvc , ef ]
 
 - 註：`EF` 為 Entity Framework 的簡寫，之後都會改用 EF 來表示
 
-![](./10.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/10.webp)
 
 打開之後可以看到主要分為三個部份
 
 第一個部份是 SSDL (StorageModels) 這個部份放的是資料庫的資料
 
-![](./11.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/11.webp)
 
 第二個部份是 CSDL (ConceptualModels) 這個部份放的是程式碼的部份
 
-![](./12.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/12.webp)
 
 第三個部份是 MSL(C-S mapping) 這個部份放的是資料庫和程式碼的對應關系
 
-![](./13.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/13.webp)
 
 ## EF 的連線字串
 
@@ -88,7 +88,7 @@ tags: [ asp.net mvc , ef ]
 在最前面看到的 `metadata`，指的是會關連到三個檔案，
 也就是在 `EF` 裡面看到的三個部份 `SSDL`、`CSDL` 和 `MSL`
 
-![](./14.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/14.webp)
 
 我們可以透過設定把 `EF` 編譯輸出成三個 dll
 
@@ -96,19 +96,19 @@ tags: [ asp.net mvc , ef ]
 找到 `中斷資料成品處理`，預設是 `內嵌在輸出組件中`，把它改選到 `複製到輸出目錄`，
 改完後重新 `Build` 一次
 
-![](./15.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/15.webp)
 
 可以在 `專案資料夾` > `bin 資料夾` > `Models 資料夾`，裡面看到那三個檔案，
 主要是用副檔名來作區分
 
-![](./16.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/16.webp)
 
 如果用 `VisualStudio` 開啟，看到的內容就會跟在 `EF` 裡面看到的一樣
 
-![](./17.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/17.webp)
 
 如果打開看連線字串的話，會發現裡面 `metadata` 裡面的位置改成了 `bin 資料夾` 的位置
 
-![](./18.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-01/18.webp)
 
 - 註：如果是把 `Model` 切出去變成獨立專案的話，就需要修改這裡的設定，保哥有一篇文章在講這個設定 [關於 EF 獨立放在 DAL 專案的注意事項](http://blog.miniasp.com/post/2010/06/17/Entity-Framework-DAL-metadata-resource.aspx)

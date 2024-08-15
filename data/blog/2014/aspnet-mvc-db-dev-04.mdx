@@ -1,9 +1,9 @@
 ---
 title: ASP.NET MVC - 使用資料庫開發 (四)
-description: ASP.NET MVC - 使用資料庫開發 (四)
+summary: ASP.NET MVC - 使用資料庫開發 (四)
 date: 2014-07-12 05:49:08.943+08:00
-slug: "aspnet-mvc-db-dev-04"
 tags: [ asp.net mvc , ef ]
+draft: false
 ---
 
 ## 當資料庫有變動時 從資料庫更新模型時 不一定會更新
@@ -18,21 +18,21 @@ tags: [ asp.net mvc , ef ]
 
 先新增一個測試的資料表叫 `Test`，並且更新 `EF`
 
-![](./01.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/01.webp)
 
 在資料表上按右鍵，選擇刪除
 
-![](./02.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/02.webp)
 
 Update `EF` 之後重 Build，會發現有 Error 出現
 
-![](./03.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/03.webp)
 
 用 'XML' 打開 `EF` 來看，會發現 `CSDL` 的 `Test` 資料表沒有刪除
 
-![](./04.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/04.webp)
 
-![](./05.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/05.webp)
 
 手動把 `CSDL` 的 `Test` 資料表刪除就好了
 
@@ -46,19 +46,19 @@ Update `EF` 之後重 Build，會發現有 Error 出現
 
 把 `客戶資料` 之前新增的 `建立時間` 欄位給刪除
 
-![](./06.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/06.webp)
 
 Update `EF` 之後重 Build，會發現有 Error 出現
 
-![](./07.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/07.webp)
 
 用 'XML' 打開 `EF` 來看，會發現 `CSDL` 的資料欄位沒有刪除
 
-![](./08.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/08.webp)
 
-![](./09.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/09.webp)
 
-![](./10.webp)
+![](/static/images/2014/aspnet-mvc-db-dev-04/10.webp)
 
 手動把 `CSDL` 的資料欄位 `建立時間` 刪除就好了
 
