@@ -2,15 +2,15 @@
 title: 如果 lock 的區塊發生 exception 之後，會不會 unlock
 summary: 如果 lock 的區塊發生 exception 之後，會不會 unlock ?
 date: 2023-08-18T17:17:01+08:00
-tags: [ c# ]
+tags: [c#]
 draft: false
+images: ['/static/images/2023/csharp-what-happens-if-lock-object-block-raises-exception/cover.webp']
 ---
 
-![](./cover.webp)
+![](/static/images/2023/csharp-what-happens-if-lock-object-block-raises-exception/cover.webp)
 
 前幾天有工程師問我，如果 `lock` 的區塊發生 exception 之後，會不會 unlock ?
 這是個好問題，翻了一下官方的文件，以下的程式碼節錄至 [官方文件 lock statement - ensure exclusive access to a shared resource](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/statements/lock)
-
 
 ```csharp
 lock (x)
@@ -37,8 +37,7 @@ finally
 
 如果我們用 LINQPad 試試看產生出來的 `IL code`，基本上跟官網說的一樣，會自動在 lock 的程式碼區塊包 `try-finally`，在 finally 的時候 `unlock`
 
-![](./01.webp)
-
+![](/static/images/2023/csharp-what-happens-if-lock-object-block-raises-exception/01.webp)
 
 ---
 
