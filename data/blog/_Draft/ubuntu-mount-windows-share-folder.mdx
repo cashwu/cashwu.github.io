@@ -1,19 +1,19 @@
 ---
-title: Ubuntu mount windows share folder 
+title: Ubuntu mount windows share folder
 summary: Ubuntu mount windows share folder
 date: 2024-03-18
-tags: [ ubuntu ]
+tags: [ubuntu]
 draft: true
+lastmod: '2024-08-16'
+layout: PostSimple
 ---
 
 ![](./cover.webp)
-
 
 ```shell
 sudo apt update
 sudo apt install cifs-utils
 ```
-
 
 ```shell
 sudo mkdir /mnt/windows_share
@@ -24,7 +24,6 @@ sudo mount -t cifs //<windows-ip>/<folder> /mnt/windows_share -o username=<user
 你可以將用於驗證的使用者名稱和密碼存儲在一個文件中，然後在掛載命令中引用該文件。
 第一行是 Windows 使用者名稱。
 第二行是 Windows 使用者的密碼。
-
 
 ```shell
 sudo mount -t cifs //<windows-ip>/<folder> /mnt/windows_share -o credentials=/etc/win_cred 
@@ -38,11 +37,12 @@ sudo umount /mnt/windows_share
 
 > Photo by []() on [Unsplash]()
 
-
 ---
 
 ## 問題
+
 ## 原因
+
 ## 解法
 
 ## 參考連結
