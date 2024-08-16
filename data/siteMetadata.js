@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'Cash Wu Geek',
   author: 'Cash',
   headerTitle: 'Cash Wu Geek',
-  summary: 'my coding, my life',
+  description: 'my coding, my life',
   language: 'zh-tw',
   theme: 'dark', // system, dark or light
   siteUrl: 'https://blog.cashwu.com',
