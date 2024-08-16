@@ -1,9 +1,9 @@
 ---
 title: ASP.NET MVC - Fine Uploader (三)
-description: ASP.NET MVC Fine Uploader (三)
+summary: ASP.NET MVC Fine Uploader (三)
 date: 2014-04-12 08:01:14.868+08:00
-slug: "fine-uploader-03"
 tags: [  asp.net mvc , package ]
+draft: false
 ---
 
 在 Fine Uploader(二) 中，我們已經完成基本的雛形，現在要來針對每個細節來作調整
@@ -30,23 +30,23 @@ tags: [  asp.net mvc , package ]
 
 `controller` 修改如下：
 
-![](./01.webp)
+![](/static/images/2014/fine-uploader-03/01.webp)
 
 debug 可以看到傳進來的檔案了
 
-![](./02.webp)
+![](/static/images/2014/fine-uploader-03/02.webp)
 
 如果要自定義這個參數的話，也是可以
 
 `JS` 修改如下：
 
-![](./03.webp)
+![](/static/images/2014/fine-uploader-03/03.webp)
 
 在這裡把名稱改為 `uploadfile`，相對的 `controller` 裡面的名稱也要修改
 
 debeg 可以看到，一樣可以接到檔案
 
-![](./04.webp)
+![](/static/images/2014/fine-uploader-03/04.webp)
 
 ---
 
@@ -69,7 +69,7 @@ debeg 可以看到，一樣可以接到檔案
 
 `qqtotalfilesize` 和 `HttpPostedFileBase` 接到的 `ContentLength` 是相同的
 
-![](./05.webp)
+![](/static/images/2014/fine-uploader-03/05.webp)
 
 檔案大小的話因為 `HttpPostedFileBase` 裡面已經有了，
 所以其實不必在寫參數去接收，
@@ -91,12 +91,12 @@ debeg 可以看到，一樣可以接到檔案
 
 JS 修改如下：
 
-![](./06.webp)
+![](/static/images/2014/fine-uploader-03/06.webp)
 
 後端就可以用 `other` 接收到前端傳來的參數，
 debug 看到可以接收到前端傳來的 `abc123`
 
-![](./07.webp)
+![](/static/images/2014/fine-uploader-03/07.webp)
 
 不過這裡的參數是寫死的，
 如果要動態傳入某個 input 的值就必須寫在 `event` 裡面才可以
@@ -110,11 +110,11 @@ debug 看到可以接收到前端傳來的 `abc123`
 
 JS 修改如下：
 
-![](./08.webp)
+![](/static/images/2014/fine-uploader-03/08.webp)
 
 可以在 `function` 裡面寫 `console.log`，先測試執行的順序
 
-![](./09.webp)
+![](/static/images/2014/fine-uploader-03/09.webp)
 
 先在 html 裡面增加一個 `input` id 為 `params`，
 在 `onUpload` 時去取這個 input 的值再設定給參數，
@@ -124,15 +124,15 @@ JS 修改如下：
 
 JS 修改如下：
 
-![](./10.webp)
+![](/static/images/2014/fine-uploader-03/10.webp)
 
 - 註：原本設定裡面的 `params`，跟這裡的 `setParams` 會有衝突，要把原本的註解掉
 
 debeg 可以看到，已經可以接到來自前端 input 的內容了
 
-![](./11.webp)
+![](/static/images/2014/fine-uploader-03/11.webp)
 
-![](./12.webp)
+![](/static/images/2014/fine-uploader-03/12.webp)
 
 ---
 
