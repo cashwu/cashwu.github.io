@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     default: siteMetadata.title,
     template: `%s | ${siteMetadata.title}`,
   },
-  summary: siteMetadata.description,
+  description: siteMetadata.description,
   openGraph: {
     title: siteMetadata.title,
-    summary: siteMetadata.description,
+    description: siteMetadata.description,
     url: './',
     siteName: siteMetadata.title,
     images: [siteMetadata.socialBanner],
