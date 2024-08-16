@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 2.2 新的 Endpoint Routing
-description: 在 ASP.NET Core 2.2 的版本，Endpoint Routing 的行為和之前的版本不太一樣，來看一下差異的部份
+summary: 在 ASP.NET Core 2.2 的版本，Endpoint Routing 的行為和之前的版本不太一樣，來看一下差異的部份
 date: 2018-12-27 10:15:46.338+08:00
-slug: "asp-net-core-22-endpoint-routing"
 tags: [ asp.net core ]
+draft: false
 ---
 
 在 ASP.NET Core 2.2 的版本，Endpoint Routing 的行為和之前的版本不太一樣，來看一下差異的部份
@@ -21,50 +21,50 @@ services.AddMvc(options => options.EnableEndpointRouting = false)
 
 - 下面會產生這個 About 的連結來當測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 產生沒有參數的連結
 
 - 有 Enpoint Routing
 	- 以 `Action` nmae 產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 沒有 Enpoint Routing
 	- 保留傳入參數的大小寫
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 產生不存在的連結
 
 - 有 Enpoint Routing
 	- 無法產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 沒有 Enpoint Routing
 	- 一樣產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 產生非空參數的連結
 
 - 有 Endpoint Routing
 	- 無法產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 沒有 Endpoint Routing
 	- 一樣產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 產生可為空參數的連結
 
 - 不管有跟沒有 Endpoint Routing 的結果一樣
 	- 以 `Action` name 產生連結
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

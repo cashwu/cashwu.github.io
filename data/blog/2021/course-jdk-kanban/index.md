@@ -1,9 +1,9 @@
 ---
 title: Course - JDK 流看板方法 
-description: JDK 流看板方法上課心得
+summary: JDK 流看板方法上課心得
 date: 2021-10-31 23:25:00+08:00
-slug: "course-jdk-kanban"
-tags: [  course , kanban ]
+tags: [ course , kanban ]
+draft: false
 ---
 
 ![](./cover.webp)

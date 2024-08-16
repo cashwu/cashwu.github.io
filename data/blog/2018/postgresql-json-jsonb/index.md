@@ -1,9 +1,9 @@
 ---
 title: PostgreSQL - Json & Jsonb
-description: 比較 PostgreSQL 裡面 Json 和 Jsonb 的不同
+summary: 比較 PostgreSQL 裡面 Json 和 Jsonb 的不同
 date: 2018-12-20 13:18:48.974+08:00
-slug: "postgresql-json-jsonb"
 tags: [ postgresql ]
+draft: false
 ---
 
 下面會比較 PostgreSQL 裡面 Json 和 Jsonb 的不同
@@ -21,7 +21,7 @@ select '{ "name" : "cash" }'::Jsonb
 
 - 得到下面的結果，Jsonb 會 format Json 的格式，Json 不會
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 執行下面重復 Key 的 Json
 
@@ -32,7 +32,7 @@ select '{ "name" : "cash", "name" : "gg" }'::Jsonb
 
 - 得到下面的結果，Jsonb 會移除掉重復 Key 的 Json，會只保留最後一個
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 結論
 

@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - SSH 遠端登入主機
-description: Ubuntu SSH 遠端登入主機
+summary: Ubuntu SSH 遠端登入主機
 date: 2018-12-08 19:46:08.135+08:00
-slug: "ubuntu-ssh-remote-connection"
 tags: [ ubuntu ]
+draft: false
 ---
 
 > OS - Ubuntu Desktop 18.04
@@ -16,7 +16,7 @@ tags: [ ubuntu ]
 sudo apt install ssh
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 2、安裝好了之後就可以從另外一台電腦使用 SSH 連接，不過在連接前我們先產生憑證 (後面會使用到)，基本上就一直按 Enter 就好了
 
@@ -26,9 +26,9 @@ ssh-kegen
 > 如果有產生過的話會問你要不要 Overwrite
 > 因為 MAC 已經有產生過了，所以這裡用的是同一台 ubuntu 作示範
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 3、接下來就可以在 MAC 用  SSH 連線到 Ubuntu，第一次連線時會訊問是否要連線到那一台電腦，之後會需要 key 連線帳號的密碼，這樣子就可以登入了
 
@@ -37,7 +37,7 @@ ssh-kegen
 ssh cash@10.211.55.15
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 4、每次要打密碼實在是很麻煩，所以我們可以把前面產生憑證的 public key 複製一份到那一台 Ubuntu 上面，之後在使用 SSH 就可以不用打密碼，MAC 上可以使用 ssh-copy-id 來複製
 
@@ -55,7 +55,7 @@ curl -L https://raw.githubusercontent.com/beautifulcode/ssh-copy-id-for-OSX/mast
 ssh-copy-id cash@10.211.55.15
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 如果沒有辦法使用 `ssh-copy-id` 的話可以直接下指令 copy，ssh 後面的 `demo@198.51.100.0` 記得要換成自己的帳號和 ip
 
@@ -65,7 +65,7 @@ cat ~/.ssh/id_rsa.pub | ssh demo@198.51.100.0 "mkdir -p ~/.ssh && chmod 700 ~/.s
 
 5、好了之後在連線一次，就不用打密碼了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 6、如果連線一直有問題的話，可以查看 log
 

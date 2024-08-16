@@ -1,9 +1,9 @@
 ---
 title: Jasmine.js - Hello World
-description: Jasmine
+summary: Jasmine
 date: 2016-01-10 18:59:44.05+08:00
-slug: "jasminejs-hello-world"
-tags: [  js , testing ]
+tags: [ js , testing ]
+draft: false
 ---
 
 > using VSCode
@@ -39,11 +39,11 @@ describe("Hello world Test", function(){
 
 6.modify `SpecRunner.html` file, write `hello.js` and `hello.spec.js` path in script and remove other
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 7.browse `SpecRunner.html`, you can see `0 failures`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 8.if modify `hello.js`
 
@@ -55,4 +55,4 @@ function helloWorld(){
 
 9.refresh `SpecRunner.html`, you can see `1 failures`
 
-![](/images/404.webp)
+![](/static/images/404.webp)

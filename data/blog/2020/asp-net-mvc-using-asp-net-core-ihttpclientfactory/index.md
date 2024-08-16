@@ -1,9 +1,9 @@
 ---
 title: ASP.NET MVC - 使用 ASP.NET Core 的 IHttpClientFactory
-description: ASP.NET MVC 裡面的 HttpClient 一直以來都有很多誤解和問題，所以在 .NET Core 裡面就出現了 `IHttpClientFactory` 用來解決一直以來的問題，不過在原本的 ASP.NET MVC 裡面要怎麼`容昜` 的使用 .NET Core 的 IHttpClientFactory，請繼續看下去
+summary: ASP.NET MVC 裡面的 HttpClient 一直以來都有很多誤解和問題，所以在 .NET Core 裡面就出現了 `IHttpClientFactory` 用來解決一直以來的問題，不過在原本的 ASP.NET MVC 裡面要怎麼`容昜` 的使用 .NET Core 的 IHttpClientFactory，請繼續看下去
 date: 2020-05-25 20:25:25.472+08:00
-slug: "asp-net-mvc-using-asp-net-core-ihttpclientfactory"
 tags: [ asp.net mvc ]
+draft: false
 ---
 
 > 範例程式使用 ASP.NET MVC 5

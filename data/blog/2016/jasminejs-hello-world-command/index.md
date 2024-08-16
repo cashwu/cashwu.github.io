@@ -1,9 +1,9 @@
 ---
 title: Jasmine.js - Hello World  (using command line)
-description: Jasmine using command line
+summary: Jasmine using command line
 date: 2016-01-11 19:56:16.435+08:00
-slug: "jasminejs-hello-world-command"
 tags: [ js , testing ]
+draft: false
 ---
 
 > using VSCode
@@ -45,7 +45,7 @@ describe("Hello world Test", function(){
 ```shell
 $ jasmine
 ```
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 6.if modify `hello.js`
 
@@ -60,4 +60,4 @@ Object.prototype.SayHello = function(){
 ```shell
 $ jasmine
 ```
-![](/images/404.webp)
+![](/static/images/404.webp)

@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC - 強型別 Configuration
-description: 在 ASP.NET Core MVC 裡面預設有讀取 Configuration 的機制，而如果沒有要使用到 IOption，其實可以把讀到的 Configuration 用強型別的方式注入到要使用的地方，會更加方便的使用
+summary: 在 ASP.NET Core MVC 裡面預設有讀取 Configuration 的機制，而如果沒有要使用到 IOption，其實可以把讀到的 Configuration 用強型別的方式注入到要使用的地方，會更加方便的使用
 date: 2018-12-11 10:33:45.037+08:00
-slug: "asp-net-core-mvc-strong-type-configuration"
 tags: [ asp.net core ]
+draft: false
 ---
 
 在 ASP.NET Core MVC 裡面預設有讀取 Configuration 的機制，而如果沒有要使用到 IOption，其實可以把讀到的 Configuration 用強型別的方式注入到要使用的地方，會更加方便的使用

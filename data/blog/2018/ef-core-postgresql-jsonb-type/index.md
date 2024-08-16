@@ -1,9 +1,9 @@
 ---
 title: EF Core 使用 PostgreSQL Jsonb 型別
-description: 前面的文章有大概介紹了 PostgreSQL Json 和 Jsonb 的不同，現在要來看如何在 EF Core 裡面使用 Jsonb
+summary: 前面的文章有大概介紹了 PostgreSQL Json 和 Jsonb 的不同，現在要來看如何在 EF Core 裡面使用 Jsonb
 date: 2018-12-26 09:11:25.196+08:00
-slug: "ef-core-postgresql-jsonb-type"
 tags: [ ef core , postgresql ]
+draft: false
 ---
 
 前面的[文章](https://blog.cashwu.com/blog/postgresql-json-jsonb)有大概介紹了 PostgreSQL Json 和 Jsonb 的不同，現在要來看如何在 EF Core 裡面使用 Jsonb
@@ -14,7 +14,7 @@ tags: [ ef core , postgresql ]
 
 - 有一個 data 的 Table，`type` 和 `user` 為 `jsonb`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 欄位名叫 `user` 會跟內建的 `user` 相衝，在實務上使用的話應該避免
 
@@ -61,7 +61,7 @@ public class Data
 
 - 執行結果，把 DB 的資料變成 string 輸出了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 不過拿到字串的話，在程式還需要在轉換一次才方便使用，所以我們可以使用前面[文章](https://blog.cashwu.com/blog/ef-core-value-converter)有提過的 `Value Converter` 來 mapping 成強型別
 
@@ -119,7 +119,7 @@ public class User
 - 執行結果
 	- 可以看到已經轉成強型別了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 同場加映，使用 Sql Command
 
@@ -133,7 +133,7 @@ var data = _dbContext.Data.FromSql($"select * from data where data.user->>'Id' =
 
 - 執行結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

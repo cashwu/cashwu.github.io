@@ -1,9 +1,9 @@
 ---
 title: Rider EditorConfig csharp_new_line_before_members_in_object_initializers
-description: 在上一篇 Rider 啟用 EditorConfig 中有提到一個神奇的設定，現在就要來講這個設定的神奇行為 csharp_new_line_before_members_in_object_initializers
+summary: 在上一篇 Rider 啟用 EditorConfig 中有提到一個神奇的設定，現在就要來講這個設定的神奇行為 csharp_new_line_before_members_in_object_initializers
 date: 2022-08-06 21:38:19.683+08:00
-slug: "rider_editorconfig_csharp_new_line_before_members_in_object_initializers"
 tags: [ editorconfig , rider ]
+draft: false
 ---
 
 在上一篇 Rider 啟用 EditorConfig 中有提到一個神奇的設定，現在就要來講這個設定的神奇行為 `csharp_new_line_before_members_in_object_initializers`

@@ -1,9 +1,9 @@
 ---
 title: 修改 Mac 應用程式的快捷鍵
-description: 修改 Mac 應用程式的快捷鍵
+summary: 修改 Mac 應用程式的快捷鍵
 date: 2020-04-26 10:32:45.075+08:00
-slug: "mac-modify-application-shortcut"
-tags: [  mac ]
+tags: [ mac ]
+draft: false
 ---
 
 > 下面會用 `Edge` 的 `下載` 功能來示範如何修改快捷鍵

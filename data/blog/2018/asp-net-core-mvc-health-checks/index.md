@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC - 2.2 Health Checks
-description: ASP.NET Core MVC 2.2 有多了一個新功能叫 Health Checks，可以讓我們檢查程式的健康狀態
+summary: ASP.NET Core MVC 2.2 有多了一個新功能叫 Health Checks，可以讓我們檢查程式的健康狀態
 date: 2018-12-19 16:08:06.584+08:00
-slug: "asp-net-core-mvc-health-checks"
 tags: [ asp.net core ]
+draft: false
 ---
 
 ASP.NET Core MVC 2.2 有多了一個新功能叫 Health Checks，可以讓我們檢查程式的健康狀態
@@ -27,7 +27,7 @@ services.AddHealthChecks()
 
 - 打開設定的 Path，就會看到 `Healthy`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Check Report
 
@@ -47,7 +47,7 @@ app.UseHealthChecks("/check", new HealthCheckOptions
 
 - 輸出結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 
 ## Check Tag
@@ -82,9 +82,9 @@ app.UseHealthChecks("/check02", new HealthCheckOptions
 
 - 輸出結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Check PostgreSQL
 
@@ -116,7 +116,7 @@ app.UseHealthChecks("/check03", new HealthCheckOptions
 
 - 輸出結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 
 ## Health Check UI
@@ -172,4 +172,4 @@ app.UseHealthChecksUI(options =>
 - 來到 UI Path (`/CashCheck`) 就可以看到所有的 Check
 	- 預設每 10 秒畫面會 refresh 一次
 
-![](/images/404.webp)
+![](/static/images/404.webp)

@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用 MiniProfiler 監控網站效能
-description: 網站寫好之後總是覺得很慢，但是又不知道慢在那裡，你就需要有檢測的工具來幫你監控網站的效能，我們使用 MiniProfiler 這個套件可以簡單的來幫我們作到這件事情
+summary: 網站寫好之後總是覺得很慢，但是又不知道慢在那裡，你就需要有檢測的工具來幫你監控網站的效能，我們使用 MiniProfiler 這個套件可以簡單的來幫我們作到這件事情
 date: 2019-01-10 10:09:11.187+08:00
-slug: "asp-net-core-miniprofiler"
 tags: [ asp.net core , miniprofiler ]
+draft: false
 ---
 
 網站寫好之後總是覺得很慢，但是又不知道慢在那裡，你就需要有檢測的工具來幫你監控網站的效能，我們使用 MiniProfiler 這個套件可以簡單的來幫我們作到這件事情
@@ -63,15 +63,15 @@ public class HomeController : Controller
 - 先瀏覽預設的首頁 (`Home/Index`)，在瀏覽頁面 `/profiler/results`，就可以看到相關的檢測數據，載入這個頁面總共花了 `307.5ms`
 	- 前面的 `/profiler` 是自己設定的 `RouteBasePath`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 點 `more columns` 可以看到更多的欄位
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 點 `show trivial` 可以看到無關緊要的載入項目 (應該是速度 `< 1ms`)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 檢測 EF Core
 
@@ -100,7 +100,7 @@ public class HomeController : Controller
 	- 上面的速度欄位會多一個 `sql` 的欄位顯示連線 SQL 的速度，而且也會跟你說 sql 佔了總時間的比例，以下面的圖來看就是 `47.6%`
 	- 下面的 SQL 的相關資訊會有 Open、ExecuteReader、Close 的時間，而且也可以看到 EF Core 轉譯成 Sql Command 的結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 檢測 Razor
 
@@ -125,7 +125,7 @@ public class HomeController : Controller
 
 - 瀏覽頁面 `/profiler/results`，可以看到最下面多了一行 `View` 的時間，而且差不多是 `500ms`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 使用 MiniProfile 的 Step
 
@@ -153,7 +153,7 @@ public class HomeController : Controller
 
 - 瀏覽頁面 `/profiler/results`，可以看到多出了 `Test` 和 `SQL` 的名稱在 Controller 下面，然後最後面 SQL 的時間已經從 Controller 移到 SQL
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 把 Miniprofile 的資訊呈現在原畫面上
 
@@ -167,19 +167,19 @@ public class HomeController : Controller
 
 - 重新瀏覽畫面時就會看到左上角出現了四個數字，它把主要階段的數字呈現在這裡
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 每個數字都可以在點開，看到的其實就是另外一個頁面的內容把它整個整合在這裡
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 檢測 API
 
 - 其實 MAC 和 API 的使用方法都一樣，只差在沒有 `Razor` 的部份和資訊無法呈現在畫面上，直接補圖
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

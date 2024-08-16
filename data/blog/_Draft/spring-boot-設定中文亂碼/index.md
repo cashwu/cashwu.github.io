@@ -1,10 +1,8 @@
 ---
 title: spring-boot-設定中文亂碼 
-description: spring-boot-設定中文亂碼
+summary: spring-boot-設定中文亂碼
 date: 2024-03-14
-slug: "spring-boot-設定中文亂碼"
 tags: [ springboot ]
-# tldr: Making GitHub Actions with Js Code
 draft: true
 ---
 

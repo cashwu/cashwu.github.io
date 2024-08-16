@@ -1,9 +1,9 @@
 ---
 title: 如果 lock 的區塊發生 exception 之後，會不會 unlock
-description: 如果 lock 的區塊發生 exception 之後，會不會 unlock ?
+summary: 如果 lock 的區塊發生 exception 之後，會不會 unlock ?
 date: 2023-08-18T17:17:01+08:00
-slug: "csharp-what-happens-if-lock-object-block-raises-exception"
 tags: [ c# ]
+draft: false
 ---
 
 ![](./cover.webp)

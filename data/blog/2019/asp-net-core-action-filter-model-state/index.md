@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用 ActionFilter 驗證 ModelState
-description: ASP.NET Core 使用 ActionFilter 來驗證 ModelState
+summary: ASP.NET Core 使用 ActionFilter 來驗證 ModelState
 date: 2019-04-17 09:00:18.862+08:00
-slug: "asp-net-core-action-filter-model-state"
 tags: [ actionfilter , aop , asp.net core ]
+draft: false
 ---
 
 > 下面這個方法基本上只可以應用在 API 上面，如果是返回一個 View 時，可能就不適用
@@ -135,4 +135,4 @@ services.AddMvc(options =>
 
 - 實際的執行結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)

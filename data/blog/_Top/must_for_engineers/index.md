@@ -1,9 +1,9 @@
 ---
 title: 「Top」工程師必備
-description: 之前帶團隊時給 team member 的「工程師必備」文件，內容大多都是在網路蒐集的
-date: 2000-01-01
-slug: "must_for_engineers"
+summary: 之前帶團隊時給 team member 的「工程師必備」文件，內容大多都是在網路蒐集的
+date: 2999-01-01
 tags: [ mindset ]
+draft: false
 ---
 
 ![](./1683332594929-sifan-liu-sl_oGl--GrY-unsplash.jpg)

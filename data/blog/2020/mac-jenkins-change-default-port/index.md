@@ -1,18 +1,18 @@
 ---
 title: MAC 修改 Jenkins 預設的 Port
-description: MAC 修改 Jenkins 預設的 Port
+summary: MAC 修改 Jenkins 預設的 Port
 date: 2020-04-26 10:32:45.075+08:00
-slug: "mac-jenkins-change-default-port"
-tags:  [ jenkins , mac ]
+tags: [ jenkins , mac ]
+draft: false
 ---
 
 - 在之前的文章 ([移除 Jenkins 建立的使用者](https://blog.cashwu.com/mac-remove-jenkins-user)) 裡面有使用一個檔案 `/Library/LaunchDaemons/org.jenkins-ci.plist`，裡面有一個區塊說明真正執行 Jenkins 的 sh 檔位置
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 打開 `/Library/Application Support/Jenkins/jenkins-runner.sh` 這個檔案，上面的註解寫了如果你要修改參數的話，檔案位置在 `/Library/Preferrnces/org.jenkis-ci.plist`，然後要使用 `defaults` 這個指令
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 修改原本的 port 為 `8082`
 

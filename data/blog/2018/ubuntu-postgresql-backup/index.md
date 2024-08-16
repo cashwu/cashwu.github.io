@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - PostgreSQL Backup
-description: 備份在 Ubuntu 上面的 PostgreSQL
+summary: 備份在 Ubuntu 上面的 PostgreSQL
 date: 2018-12-14 16:30:19.761+08:00
-slug: "ubuntu-postgresql-backup"
 tags: [ postgresql , ubuntu ]
+draft: false
 ---
 
 請面的文章已經安裝好 PostgreSQL 了 ([Ubuntu - 安裝 PostgreSQL](https://blog.cashwu.com/blog/ubuntu-install-postgresql))，現在要來看怎麼備份 PostgreSQL

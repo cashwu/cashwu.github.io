@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用 ActionFilter 實作快取
-description: ASP.NET Core 使用 ActionFilter 來實作快取
+summary: ASP.NET Core 使用 ActionFilter 來實作快取
 date: 2019-04-17 10:30:37.33+08:00
-slug: "asp-net-core-action-filter-cache"
 tags: [ actionfilter , aop , asp.net core ]
+draft: false
 ---
 
 - 建立一個 `CacheActionFilter` class，實作 `Attribute` 和 `IAsyncActionFilter`
@@ -142,4 +142,4 @@ public ActionResult<string> Get(string name)
 }
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)

@@ -1,9 +1,9 @@
 ---
 title: tunnelto.dev 開源版的 ngrox 介紹
-description: 之前的文章 內網穿透神器 Serveo 介紹 有介紹 Serveo 這個內網穿透的神器，現在要來介紹另外一個 open source 的穿透神器 tunnelto.dev
+summary: 之前的文章 內網穿透神器 Serveo 介紹 有介紹 Serveo 這個內網穿透的神器，現在要來介紹另外一個 open source 的穿透神器 tunnelto.dev
 date: 2020-06-28 12:42:59.939+08:00
-slug: "tool-tunnelto-expose-local-to-internet-replace-ngrox"
-tags:  [ tool ]
+tags: [ tool ]
+draft: false
 ---
 
 之前的文章 [內網穿透神器 Serveo 介紹](https://blog.cashwu.com/blog/tool-serveo-expose-local-to-internet) 有介紹 [Serveo](https://serveo.net/) 這個內網穿透的神器，現在要來介紹另外一個 open source 的穿透神器 tunnelto.dev

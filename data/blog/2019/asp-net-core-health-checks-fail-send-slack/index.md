@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core Health Checks 失敗時使用 Slack 通知
-description: ASP.NET Core Health Checks 失敗時使用 Slack 通知
+summary: ASP.NET Core Health Checks 失敗時使用 Slack 通知
 date: 2019-04-18 14:27:25.543+08:00
-slug: "asp-net-core-health-checks-fail-send-slack"
 tags: [ asp.net core ]
+draft: false
 ---
 
 之前有寫過一篇文章 [ASP.NET Core MVC - 2.2 Health Checks](https://blog.cashwu.com/blog/asp-net-core-mvc-health-checks)，怎麼使用 2.2 的新功能 Health Check，現在要來加上 check 失敗時使用 Slack 通知
@@ -12,11 +12,11 @@ tags: [ asp.net core ]
 
 先到自己的  Incoming Webhooks APP 頁面，網址是 `https://你的slack名.slack.com/apps/A0F7XDUAZ-incoming-webhooks`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 可以按左邊的 `Add Configuration` 建立一個新的設定，然後把 WebHook URL 記下來，等一下會使用到
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 增加 Slack 設定
 
@@ -83,14 +83,14 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 如果設定檔沒有寫錯的話，在 UI 的 Webhooks 可以看到剛才寫在設定檔的內容
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 測試
 
 如果 Check 失敗時就會收到訊息
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 狀態回復時也會收到訊息
 
-![](/images/404.webp)
+![](/static/images/404.webp)

@@ -1,9 +1,9 @@
 ---
 title: Ubuntu + ASP.NET Core MVC + Nginx
-description: 前面的文章已經安裝好 Nginx，和產生了 ASP.NET Core MVC 的專案，現在要把發佈出來的檔案跑起來然後使用 Nginx 作反向代理，讓外部可以看到
+summary: 前面的文章已經安裝好 Nginx，和產生了 ASP.NET Core MVC 的專案，現在要把發佈出來的檔案跑起來然後使用 Nginx 作反向代理，讓外部可以看到
 date: 2018-12-12 10:44:09.752+08:00
-slug: "ubuntu-asp-net-core-mvc-publish-nginx"
-tags: [  ubuntu , asp.net core , nginx ]
+tags: [ ubuntu , asp.net core , nginx ]
+draft: false
 ---
 
 前面的文章已經安裝好 [Ubuntu - 安裝 Nginx](https://blog.cashwu.com/blog/ubuntu-install-nginx)，和產生了 ASP.NET Core MVC 的專案了 [Ubuntu - 建立、執行和發佈 ASP.NET Core MVC 專案 ](https://blog.cashwu.com/blog/ubuntu-create-run-and-publish-asp-net-core-mvc-project)，現在要把發佈出來的檔案跑起來然後使用 Nginx 作反向代理，讓外部可以看到
@@ -79,7 +79,7 @@ server {
 sudo ln -s /etc/nginx/sites-available/mvc /etc/nginx/sites-enabled/
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 檢查 Ngixn 的設定檔
 
@@ -87,7 +87,7 @@ sudo ln -s /etc/nginx/sites-available/mvc /etc/nginx/sites-enabled/
 sudo nginx -t
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果沒有問題的話就重啟 Nginx 的服務
 
@@ -109,7 +109,7 @@ dotnet mvc.dll
 
 - 打開瀏覽器來到 8888 port 應該就可以看到畫面了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 當然不可能手動運行 Web App，所以要新增一個 mvc 的系統服務來自動執行，先停止剛才的運行，然後建立一個 `mvc.service` 的服務
 
@@ -146,7 +146,7 @@ WantedBy=multi-user.target
 sudo systemctl enable mvc
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 執行 mvc.service
 
@@ -160,6 +160,6 @@ sudo systemctl start mvc
 sudo systemctl status mvc
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 用服務的方式來執行 Web App 會看不到 Log，這個時候可以使用 `sudo journalctl -fu mvc.service` 來查看

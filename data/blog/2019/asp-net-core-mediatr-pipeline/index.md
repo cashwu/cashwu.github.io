@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 實作 MediatR 的 Pipeline 功能
-description: ASP.NET Core 實作 MediatR 的 Pipeline 功能
+summary: ASP.NET Core 實作 MediatR 的 Pipeline 功能
 date: 2019-04-29 09:33:45.95+08:00
-slug: "asp-net-core-mediatr-pipeline"
 tags: [ asp.net core , mediatr ]
+draft: false
 ---
 
 之前的兩篇文章已經把 MediatR 的基本功能都介紹過了，現在要介紹 Pipeline 的功能
@@ -45,7 +45,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 在這裡使用之前的新增 Person 來作測試，可以看到有把 Request 給 Log 下來
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 新增 LogPostProcessor 實作 IRequestPostProcessor
 
@@ -83,7 +83,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 新增 LogBehavior 實作 IPipelineBehavior
 
@@ -124,7 +124,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 組合不同的 IPipelineBehavior
 
@@ -171,7 +171,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試，可以拿到執行 Request 的時間出現在 Log 前面
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果調整順序把 `RequestPerformanceBehavior` 移到 Pipeline 的第一個
 
@@ -186,7 +186,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 再一次測試，可以拿到執行 Request 的時間出現在 Log 後面，也就是放的順序和出現的順序是相反的
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

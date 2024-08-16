@@ -1,9 +1,9 @@
 ---
 title: C# Dictionary 的 Key 使用 Enum 會不會有 Boxing 的效能問題 ?
-description: 看到在其它的 blog 中有留言說：如果 C# 的 Dictionary 的 Key 使用 Enum 型別的話，會有 Boxing/Unboxing 的效能問題，引起了我的好奇，用了這麼久的方式，到底會不會有問題
+summary: 看到在其它的 blog 中有留言說：如果 C# 的 Dictionary 的 Key 使用 Enum 型別的話，會有 Boxing/Unboxing 的效能問題，引起了我的好奇，用了這麼久的方式，到底會不會有問題
 date: 2022-11-13 13:42:27.873+08:00
-slug: "csharp-dictionary-key-enum-boxing-unboxing-issue"
 tags: [ c# ]
+draft: false
 ---
 
 ![](./cover.webp)

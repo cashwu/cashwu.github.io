@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 檔案上傳
-description: ASP.NET Core 檔案上傳相比之前的 ASP.NET MVC 來說方便許多，就來看如何實作上傳的功能
+summary: ASP.NET Core 檔案上傳相比之前的 ASP.NET MVC 來說方便許多，就來看如何實作上傳的功能
 date: 2018-12-27 20:32:01.302+08:00
-slug: "asp-net-core-file-upload"
-tags:  [ asp.net core ]
+tags: [ asp.net core ]
+draft: false
 ---
 
 ASP.NET Core 檔案上傳相比之前的 ASP.NET MVC 來說方便許多，就來看如何實作上傳的功能
@@ -55,13 +55,13 @@ public IActionResult Index(IFormFile img)
 - 寫入 MemoryStream 測試
 	- 只要使用 `CopyTo` 方法就可以很方便的使用 (也有非同步的 `CopyToAsync` 可以使用)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 寫入 FileStream 測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 多檔上傳
 
@@ -93,7 +93,7 @@ public IActionResult Index(List<IFormFile> imgs)
 
 - 測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

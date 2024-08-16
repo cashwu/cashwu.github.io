@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - 安裝 PostgreSQL
-description: Ubuntu 安裝 PostgreSQL
+summary: Ubuntu 安裝 PostgreSQL
 date: 2018-12-13 13:30:23.715+08:00
-slug: "ubuntu-install-postgresql"
 tags: [ ubuntu , postgresql ]
+draft: false
 ---
 
 > OS - Ubuntu Desktop 18.04
@@ -25,11 +25,11 @@ sudo -i -u postgres
 psql
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 基本上不會直接使用 `postgres` 這個帳號，會獨立每一個連線 (專案) 的帳號
 
@@ -39,7 +39,7 @@ psql
 createuser --interactiv
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 建立相同名稱的 database
 
@@ -53,7 +53,7 @@ createdb mvc
 ALTER USER mvc WITH PASSWORD 'mvc';
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 然後把 db 的 owner 改成 `mvc`
 
@@ -61,7 +61,7 @@ ALTER USER mvc WITH PASSWORD 'mvc';
 ALTER DATABASE mvc OWNER TO mvc;
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 建立 Ubuntu 的使用者 `mvc`，讓這個 user 可以直接使用 PostgreSQL (如果已經有存在相同的 user 就不用在建立了)
 
@@ -76,11 +76,11 @@ sudo -i -u mvc
 psql
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 可以使用 `\conninfo` 來看當前的連線資訊
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 為了讓外部可以使用 Client 端的工具連線，需要修改 PostgreSQL 的設定，讓 `mvc` 這個使用者可以從外部連線進 db
 
@@ -117,8 +117,8 @@ sudo systemctl restart postgresql
 
 - 新增一個 PostgresSQL 的 Data Source，填入相關的資訊，測試連線應該是正常的
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 後面會使用之前建立好的 ASP.NET Core MVC 專案來使用 PostgresSQL

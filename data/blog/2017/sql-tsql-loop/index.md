@@ -1,9 +1,9 @@
 ---
 title: SQL - TSQL Loop
-description: TSQL Loop
+summary: TSQL Loop
 date: 2017-06-06 15:50:19.735+08:00
-slug: "sql-tsql-loop"
 tags: [ sql ]
+draft: false
 ---
 
 有的時候會在 DB 裡面塞一些假資料或者要測試新增資料時常常用到類似程式 Loop 的寫法

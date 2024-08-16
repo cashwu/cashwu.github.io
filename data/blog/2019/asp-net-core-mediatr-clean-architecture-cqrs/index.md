@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用 MediatR 簡單的實現 Clean Architecture、CQRS 和分層架構
-description: ASP.NET Core 使用 MediatR 簡單的實現 Clean Architecture、CQRS 和分層架構
+summary: ASP.NET Core 使用 MediatR 簡單的實現 Clean Architecture、CQRS 和分層架構
 date: 2019-04-21 10:14:23.425+08:00
-slug: "asp-net-core-mediatr-clean-architecture-cqrs"
 tags: [ asp.net core , clean architecture , cqrs , mediatr ]
+draft: false
 ---
 
 在原本正在運行的專案已經導入 Clean Architecture 的架構和實作，不過在看到了 [Clean Architecture with ASP.NET Core 2.1](https://www.youtube.com/watch?v=_lwCVE_XgqI) 這個分享後，覺得這個架構的實作比自己寫的還要漂亮，所以慢慢的把這個分享的東西導入到自己的架構裡面
@@ -16,7 +16,7 @@ tags: [ asp.net core , clean architecture , cqrs , mediatr ]
 - 先建立一個 `ASP.NET Core 2.2 MVC` 的專案 (`TestMediatR`)，然後再同一個 solution 下面再建立二個 `.NETCoreApp v2.2` 的 Library (`BusinessLogic` 和 `DataAssert`)，相關的專案 reference 如下圖
 	- TestMediatR -> BusinessLogic -> DataAssert
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 建置 DataAssert
 
@@ -170,7 +170,7 @@ public class PersonController : Controller
 
 - 實際測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 建置查詢 Person 的 BusinessLogic
 
@@ -248,7 +248,7 @@ public async Task<IActionResult> Query(PersonQuery query)
 
 - 實際測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 不同命名空間的 IHostingEnvironment
-description: ASP.NET Core 的 IHostingEnvironment 存在兩個不同的命名空間，Microsoft.AspNetCore.Hosting 和 Microsoft.Extensions.Hosting，這兩個有什麼不一樣呢？
+summary: ASP.NET Core 的 IHostingEnvironment 存在兩個不同的命名空間，Microsoft.AspNetCore.Hosting 和 Microsoft.Extensions.Hosting，這兩個有什麼不一樣呢？
 date: 2018-12-28 11:25:39.552+08:00
-slug: "asp-net-core-ihostingenvironment-namespace"
 tags: [ asp.net core ]
+draft: false
 ---
 
 ASP.NET Core 的 IHostingEnvironment 存在兩個不同的命名空間 `Microsoft.AspNetCore.Hosting`和`Microsoft.Extensions.Hosting`，這兩個有什麼不一樣呢 ?
@@ -12,7 +12,7 @@ ASP.NET Core 的 IHostingEnvironment 存在兩個不同的命名空間 `Microsof
 
 - 如果沒有相關的 namespace，注入時會叫你選擇
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Microsoft.AspNetCore.Hosting
 

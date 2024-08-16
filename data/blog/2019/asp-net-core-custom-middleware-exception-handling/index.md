@@ -1,10 +1,9 @@
 ---
 title: ASP.NET Core 自定義 Middleware 實作全站 Exception 處理
-description: ASP.NET Core 自定義 Middleware 實作全站 Exception 處理
+summary: ASP.NET Core 自定義 Middleware 實作全站 Exception 處理
 date: 2019-04-25 13:50:24.093+08:00
-draft: true
-slug: "asp-net-core-custom-middleware-exception-handling"
 tags: [ actionfilter , aop , asp.net core , exception ]
+draft: false
 ---
 
 在之前的文章 ( [ASP.NET Core 使用內建的 ExceptionHandler Middleware 實作全站 Exception 處理](https://blog.cashwu.com/blog/asp-net-core-exceptionhandler-middleware-handler-exception) )，使用內建的 ExceptionHandler 來處理全站的 Exception，現在要來看如何自定義 Middleware 處理全站的 Exception
@@ -62,15 +61,15 @@ public async Task InvokeAsync(HttpContext context)
 
 - 在 Action 裡面直接 throw Exception
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 網頁是空的，因為 Exception 已經被我們 catch 住了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - Log 也有寫到 Console
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 實作 Catch Exception 內容
 
@@ -111,11 +110,11 @@ public class CashExceptionHandler
 
 - 畫面上返回的是我們自定義的內容
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - Log 也有寫到 Console
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

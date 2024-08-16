@@ -1,0 +1,71 @@
+---
+title: C# - 數字轉換和四捨五入
+summary: C# 數字轉換和四捨五入
+date: 2015-05-18 08:15:21.161+08:00
+tags: [ c# ]
+draft: false
+---
+
+在 c# 裡面要作型別轉換的方式有很多種，
+下面列了幾種型別的轉換方式和遇到小數時怎麼作四捨五入的情況
+
+## 強制型別轉換
+
+```csharp
+int x = (int)4.99; //結果為 4  
+int x = (int)4.1; // 結果為 4  
+```
+
+有小數時會直接捨去
+
+## Convert.ToInt32
+
+```csharp
+int x = Convert.ToInt32(7.1); //結果為 7  
+int x = Convert.ToInt32(7.5); //結果為 8  
+int x = Convert.ToInt32(7.9); //結果為 8  
+int x = Convert.ToInt32(8.1); //結果為 8  
+int x = Convert.ToInt32(8.5); //結果為 8  
+int x = Convert.ToInt32(8.9); //結果為 9  
+```
+
+使用這個函數時會有一個比較特別的現象，如果說 .1 ~ .4 的話會捨去，.6~.9 的話會進位，而 .5 的進位與否是取決於如果進位之後是該數是偶數的話就進位，是奇數的話就捨去
+
+以上面的範例來看，7.5 進位的話為 8，所以就進位，8.5 進位的話為 9，所以就捨去，這個現象又叫做 `四捨六入五成雙`
+## Math.Round
+
+```csharp
+double x = Math.Round(8.5, MidpointRounding.AwayFromZero); //結果為 9  
+double x = Math.Round(8.5, MidpointRounding.ToEven); //結果為 8  
+```
+
+這個函數有第二個參數可以用，如果使用的是 `MidpointRounding.AwayFromZero` 就是一般正常的四捨五入，如果使用的是 `MidpointRounding.ToEven` 就是四捨六入五成雙
+
+## Math.Floor
+
+```csharp
+double x = Math.Floor(8.1); //結果為 8  
+double x = Math.Floor(8.5); //結果為 8  
+double x = Math.Floor(8.9); //結果為 8  
+```
+
+這個函數會回傳不大於該數的最大整數，也就是說有小數時會直接捨去
+
+## Math.Ceiling
+
+```csharp
+double x = Math.Ceiling(8.1); //結果為 9  
+double x = Math.Ceiling(8.5); //結果為 9  
+double x = Math.Ceiling(8.9); //結果為 9  
+```
+
+這個函數會回傳大於該數的最小整數，也就是說有小數時會直接進位
+
+
+### 參考連結
+
+- [MSDN 強制型別轉換](https://msdn.microsoft.com/zh-tw/library/yht2cx7b.aspx)
+- [MSDN Convert.ToInt32](https://msdn.microsoft.com/zh-tw/library/system.convert.toint32.aspx)
+- [MSDN Math.Round](https://msdn.microsoft.com/zh-tw/library/system.math.round.aspx)
+- [MSDN Math.Floor](https://msdn.microsoft.com/zh-tw/library/system.math.floor.aspx)
+- [MSDN Math.Ceiling](https://msdn.microsoft.com/zh-tw/library/system.math.ceiling.aspx)

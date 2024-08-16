@@ -1,8 +1,8 @@
 ---
 title: 就像油燈一樣
 date: 2023-12-17T12:20:34+08:00
-slug: "like-an-oil-lamp"
-tags: [  murmur ]
+tags: [ murmur ]
+draft: false
 ---
 
 ![](./cover.webp)

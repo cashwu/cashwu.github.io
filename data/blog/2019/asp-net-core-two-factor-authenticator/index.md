@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 實作雙重驗證 (2FA)
-description: 你的網站有雙重驗證 (Two-factor authentication，通稱 2FA) 嗎？來看一下怎麼使用  ASP.NET Core 實作 2FA 幫網站增加安全性吧 !!
+summary: 你的網站有雙重驗證 (Two-factor authentication，通稱 2FA) 嗎？來看一下怎麼使用  ASP.NET Core 實作 2FA 幫網站增加安全性吧 !!
 date: 2019-01-08 14:35:14.445+08:00
-slug: "asp-net-core-two-factor-authenticator"
 tags: [ asp.net core ]
+draft: false
 ---
 
 你的網站有雙重驗證 (`Two-factor authentication`，通稱 `2FA`) 的功能嗎 ? 來看一下怎麼使用  ASP.NET Core 實作 2FA 幫網站增加安全性吧 !!
@@ -43,22 +43,22 @@ var manualCode = setupInfo.ManualEntryKey;
 - 放在網頁上測試
 	- 可以看到 QRCode 和 Manual Key
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 使用 Google Authenticator APP 測試
 
 - 使用 APP 掃 QRCode
 	- 可以看到上面有我們設定的 Title 和 Email
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 使用 Manual Key 手動輸入
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 可以看到下面多了一個手動輸入的 2FA，產生的號碼是一樣的，只是它沒有 Title 而已
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 驗證
 
@@ -73,7 +73,7 @@ var valid = Authenticator.ValidateTwoFactorPIN("key", code);
 
 - 測試 APP 產出的數字是不是可用的
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

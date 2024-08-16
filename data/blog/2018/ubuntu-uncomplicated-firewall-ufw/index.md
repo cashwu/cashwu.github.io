@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - 簡單的防火牆設定 ufw
-description: Ubuntu 簡單的防火牆 ufw 設定
+summary: Ubuntu 簡單的防火牆 ufw 設定
 date: 2018-12-10 13:10:08.645+08:00
-slug: "ubuntu-uncomplicated-firewall-ufw"
 tags: [ ubuntu ]
+draft: false
 ---
 
 > OS - Ubuntu Desktop 18.04
@@ -82,7 +82,7 @@ sudo ufw limit 22
 // Rule updated (v6)
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 基本上加完規則後就會生效，如果怕的話，可以重啟 ufw 的服務
 

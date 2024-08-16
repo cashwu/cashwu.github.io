@@ -1,9 +1,9 @@
 ---
 title: C# char 轉型成 int
-description: C# char 轉型成 int
+summary: C# char 轉型成 int
 date: 2019-04-22 09:45:01.608+08:00
-slug: "csharp-convert-char-to-int"
 tags: [ c# , convert ]
+draft: false
 ---
 
 如果我們有一個 `char`，值是一個數字 (0 ~ 9)，那我們要如何轉換成 `int`

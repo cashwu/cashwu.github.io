@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用 JWT 驗證 
-description: ASP.NET Core 使用 JWT 驗證
+summary: ASP.NET Core 使用 JWT 驗證
 date: 2019-04-27 11:09:50.61+08:00
-slug: "asp-net-core-jwt-authentication"
 tags: [ asp.net core , jwt ]
+draft: false
 ---
 
 JWT 是前後端分離常使用的驗證方式，來看怎麼在 ASP.NET Core 裡面很簡單的加上這個驗證
@@ -109,15 +109,15 @@ public IActionResult JwtToken()
 
 - 實際執行 Action，就可以拿到 Token
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 可以到 [jwt.io](https://jwt.io/) 這個網站，把自己的 Token 貼進去，在右邊就可以看到 Token 的內容
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果滑鼠移到參考或是值上面的話，會有提示，而且日期也會轉成本地的時間
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Authorize Action
 
@@ -136,10 +136,10 @@ public IActionResult GetData()
 
 - 直接呼叫 `GetData` 的話就會回傳 `401`，然後會在 Header 裡面跟你說驗證的內容是使用 `Bearer`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 把產生出來的 Token 加到呼叫的 Header 裡面，這樣子就可以拿到資料了
 	- Key 是 `Authorization`
 	- Value 是 `Bearer Token內容`，記得中間有個空白
 
-![](/images/404.webp)
+![](/static/images/404.webp)

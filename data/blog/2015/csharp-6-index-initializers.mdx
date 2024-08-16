@@ -1,0 +1,42 @@
+---
+title: C# - 6.0 Index Initializers
+summary: C# 6.0 Index Initializers
+date: 2015-06-18 14:02:54.181+08:00
+tags: [ c# ]
+draft: false
+---
+
+## Before C# 6
+
+```csharp
+static void Main ( string [ ] args )  
+{ 
+    var dic = new Dictionary<int, string>();
+    dic.Add( 1, "Cash" );
+    dic.Add( 2, "Mary" );
+} 
+
+//or
+
+static void Main ( string [ ] args )  
+{ 
+    var dic = new Dictionary<int, string>() 
+    { 
+        { 1, "Cash" }, 
+        { 2, "Mary" } 
+    };
+} 
+```
+
+## C# 6
+
+```csharp
+static void Main ( string [ ] args )  
+{ 
+    var dic = new Dictionary<int , string>() 
+    { 
+        [1] = "Cash", 
+        [2] = "Mary"
+    };
+} 
+```

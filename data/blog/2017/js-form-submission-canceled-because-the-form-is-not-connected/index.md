@@ -1,20 +1,20 @@
 ---
 title: JS - form submission canceled because the form is not connected
-description: javascript form submission canceled because the form is not connected
-slug: "js-form-submission-canceled-because-the-form-is-not-connected"
+summary: javascript form submission canceled because the form is not connected
 date: 2017-06-05 08:48:44.305+08:00
-tags: [  js ]
+tags: [ js ]
+draft: false
 ---
 
 ## 問題
 
 在某次 Chrome 更新後，線上的系統突然沒有辦法送出表單，而且在 console 裡面出現警告
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 可以看到程式碼是動態建立一個 form，在把 form submit 出去
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 原因
 

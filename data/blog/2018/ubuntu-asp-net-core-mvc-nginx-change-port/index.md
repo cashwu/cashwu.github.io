@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - 修改跑在 Nginx 上面 ASP.NET Core MVC 執行的 Port
-description: 在同一台 Server 上如果執行多個 ASP.NET Core MVC 專案時，因為預設 port number 都是 5000，所以會發生衝突的問題無法執行，所以需要修改專案執行時的 port number
+summary: 在同一台 Server 上如果執行多個 ASP.NET Core MVC 專案時，因為預設 port number 都是 5000，所以會發生衝突的問題無法執行，所以需要修改專案執行時的 port number
 date: 2018-12-13 09:30:40.951+08:00
-slug: "ubuntu-asp-net-core-mvc-nginx-change-port"
 tags: [ ubuntu , asp.net core , nginx ]
+draft: false
 ---
 
 在同一台 Server 上如果執行多個 ASP.NET Core MVC 專案時，因為預設 port number 都是 5000，所以會發生衝突的問題無法執行，所以需要修改專案執行時的 port number
@@ -18,8 +18,8 @@ tags: [ ubuntu , asp.net core , nginx ]
 Environment=ASPNETCORE_URLS=http://*:5555;http://*:5551
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 記得在 Nginx 的設定中也要修改 proxy 的 port number
 
-![](/images/404.webp)
+![](/static/images/404.webp)

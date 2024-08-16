@@ -1,9 +1,9 @@
 ---
 title: Rider Enable EditorConfig
-description: 在 Rider 裡面要統一團隊的 Code Style，把設定檔變成 team share 是一個方式 (或是給其它人匯入規範的檔案)，不過我發現最快的方式，就是直接在 Rider 啟用 EditorConfig 然後把 Code Style 寫在裡面
+summary: 在 Rider 裡面要統一團隊的 Code Style，把設定檔變成 team share 是一個方式 (或是給其它人匯入規範的檔案)，不過我發現最快的方式，就是直接在 Rider 啟用 EditorConfig 然後把 Code Style 寫在裡面
 date: 2022-07-31 14:13:03.753+08:00
-slug: "rider-enable-editorconfig"
-tags: [  editorconfig , rider ]
+tags: [ editorconfig , rider ]
+draft: false
 ---
 
 Rider 支援 EditorConfig (Rider 官網 [Use EditorConfig](https://www.jetbrains.com/help/rider/Using_EditorConfig.html) ) 的 Code Style，下面就讓我們看怎麼啟用

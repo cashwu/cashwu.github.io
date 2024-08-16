@@ -1,9 +1,9 @@
 ---
 title: 電影 - 不老交響夢 - 把握當下
-description: 不老交響夢 - 把握當下
+summary: 不老交響夢 - 把握當下
 date: 2017-06-09 22:35:34.112+08:00
-slug: "movie-golden-orchestra-01"
-tags: [  movie , murmur ]
+tags: [ movie , murmur ]
+draft: false
 ---
 
 {{< youtube k2xwTUAJXg8 >}}

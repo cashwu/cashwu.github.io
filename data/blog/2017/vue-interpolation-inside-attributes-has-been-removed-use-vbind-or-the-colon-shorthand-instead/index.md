@@ -1,9 +1,9 @@
 ---
 title: Vue - Interpolation inside attributes has been removed. Use v-bind or the colon shorthand instead
-description: Vue - Interpolation inside attributes has been removed. Use v-bind or the colon shorthand instead
+summary: Vue - Interpolation inside attributes has been removed. Use v-bind or the colon shorthand instead
 date: 2017-06-02 09:16:38.314+08:00
-slug: "vue-interpolation-inside-attributes-has-been-removed-use-vbind-or-the-colon-shorthand-instead"
-tags: [  vue ]
+tags: [ vue ]
+draft: false
 ---
 
 ## 問題
@@ -13,7 +13,7 @@ tags: [  vue ]
 <td class=VAM id="database{{index + 1}}">  
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 解法
 

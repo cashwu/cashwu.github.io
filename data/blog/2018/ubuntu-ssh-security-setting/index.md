@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - SSH 安全性設定
-description: Ubuntu SSH 安全性設定
+summary: Ubuntu SSH 安全性設定
 date: 2018-12-10 11:04:26.753+08:00
-slug: "ubuntu-ssh-security-setting"
 tags: [ ubuntu ]
+draft: false
 ---
 
 > OS - Ubuntu Desktop 18.04

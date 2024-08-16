@@ -1,9 +1,9 @@
 ---
 title: Node.js - Hello World
-description: Hello World Node.js
+summary: Hello World Node.js
 date: 2016-01-09 20:03:27.18+08:00
-slug: "nodejs-hello-world"
 tags: [ nodejs ]
+draft: false
 ---
 
 > using VSCode
@@ -39,6 +39,6 @@ console.log("Server running at 1234 port");
 
 5、browse `localhost:1234`, you can see `Hello World`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 6、press `Shift + F5`, leave Debug mode back normal mode

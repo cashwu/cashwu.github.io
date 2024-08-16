@@ -1,8 +1,7 @@
 ---
 title: 通往極速開發的最後一哩路 Structural Search and Replace (SSR)
-description: ReSharper 裡面有一個非常強大的功能叫 Structural Search and Replace (簡稱 SSR)，類似 Regular Expression 一樣，可以找到類似 Structural 的程式碼，也可以把它 Replace 掉，更可以變成 VS (Rider) 裡面的燈泡
+summary: ReSharper 裡面有一個非常強大的功能叫 Structural Search and Replace (簡稱 SSR)，類似 Regular Expression 一樣，可以找到類似 Structural 的程式碼，也可以把它 Replace 掉，更可以變成 VS (Rider) 裡面的燈泡
 date: 2024-02-27
-slug: "jetbrains-structural-search-and-replace"
 tags: [jetbrains ]
 draft: true
 ---

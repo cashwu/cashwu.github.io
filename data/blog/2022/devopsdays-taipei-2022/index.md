@@ -1,9 +1,9 @@
 ---
 title: DevOpsDays Taipei 2022 
-description: 這是參加 DevOpsDays Taipei 2022 一些議程的心得。另外這次拿到的報到序號是 777 XD
+summary: 這是參加 DevOpsDays Taipei 2022 一些議程的心得。另外這次拿到的報到序號是 777 XD
 date: 2022-09-17 17:05:09.595+08:00
-slug: "devopsdays-taipei-2022"
 tags: [ event ]
+draft: false
 ---
 
 ## 多雲整合企業應用平台 DevOps SRE 落地實踐

@@ -1,9 +1,9 @@
 ---
 title: 學習的「守破離」
-description: 學習的「守破離」
+summary: 學習的「守破離」
 date: 2023-04-30 09:09:34.624+08:00
-slug: "learn-shuhari"
-tags: [  murmur ]
+tags: [ murmur ]
+draft: false
 ---
 
 ![](./cover.webp)

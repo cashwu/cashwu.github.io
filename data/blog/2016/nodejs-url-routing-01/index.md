@@ -1,9 +1,9 @@
 ---
 title: Node.js - Url Routing
-description: Node.js - Url Routing
+summary: Node.js - Url Routing
 date: 2016-01-18 19:50:59.609+08:00
-slug: "nodejs-url-routing-01"
 tags: [ nodejs ]
+draft: false
 ---
 
 > using VSCode
@@ -65,4 +65,4 @@ server.start(router.route);
 
 5、browse `localhost:1234`, you can see `Hello World` and the log in VSCode debug console window
 
-![](/images/404.webp)
+![](/static/images/404.webp)

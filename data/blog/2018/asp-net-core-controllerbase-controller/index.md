@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core ControllerBase 和 Controller
-description: ASP.NET Core 有兩個 Controller 可以繼承的父類別 ControllerBase 和 Controller，這兩個有什麼不同呢 ?
+summary: ASP.NET Core 有兩個 Controller 可以繼承的父類別 ControllerBase 和 Controller，這兩個有什麼不同呢 ?
 date: 2018-12-27 15:59:58.67+08:00
-slug: "asp-net-core-controllerbase-controller"
 tags: [ asp.net core ]
+draft: false
 ---
 
 ASP.NET Core 有兩個 Controller 可以繼承的父類別 ControllerBase 和 Controller，這兩個有什麼不同呢 ?

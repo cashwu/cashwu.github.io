@@ -1,9 +1,9 @@
 ---
 title: Node.js - Modules
-description: Node.js - Modules
+summary: Node.js - Modules
 date: 2016-01-17 19:54:38.938+08:00
-slug: "nodejs-modules"
-tags:  [ nodejs ]
+tags: [ nodejs ]
+draft: false
 ---
 
 > using VSCode

@@ -1,9 +1,9 @@
 ---
 title: 安裝 Parse Server Dashboard
-description: Parse Dashboard 是官方出的一個獨立套件，提供給我們一個視覺化的方式來管理 Parse Server，而且非常容昜安裝，下面就來看怎麼安裝
+summary: Parse Dashboard 是官方出的一個獨立套件，提供給我們一個視覺化的方式來管理 Parse Server，而且非常容昜安裝，下面就來看怎麼安裝
 date: 2018-12-23 15:39:43.138+08:00
-slug: "install-parse-server-dashboard"
 tags: [ parse ]
+draft: false
 ---
 
 Parse Dashboard 是官方出的一個獨立套件，提供給我們一個視覺化的方式來管理 Parse Server，而且非常容昜安裝，前面的[文章](https://blog.cashwu.com/blog/heroku-parse-server)已經安裝了 Parse Server 在 Heroku 上面，我們可以在 local 的環境架設 Parse Dashboard 來管理 Pasrse Server
@@ -39,11 +39,11 @@ npm install -g parse-dashboard
 parse-dashboard --config parse-dashboard-config.json
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 打開網頁，沒有問題的話就可以看到中間有連接到 Heroku 的 parse 了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 使用 express
 
@@ -116,4 +116,4 @@ var dashboard = new ParseDashboard({
 
 - 重新啟動後首頁就會變成是登入頁面了
 
-![](/images/404.webp)
+![](/static/images/404.webp)

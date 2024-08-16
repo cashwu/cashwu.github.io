@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC - Json 序列化大小寫問題
-description: 在 ASP.NET Core MVC 裡面預設的 Json 序列化行為和 ASP.NET MVC 不一樣，會把首字母變成小寫
+summary: 在 ASP.NET Core MVC 裡面預設的 Json 序列化行為和 ASP.NET MVC 不一樣，會把首字母變成小寫
 date: 2018-12-18 18:56:03.735+08:00
-slug: "asp-net-core-mvc-json-serialize-camel-case-issue"
 tags: [ asp.net core ]
+draft: false
 ---
 
 在 ASP.NET Core MVC 裡面預設的 Json 序列化行為和 ASP.NET MVC 不一樣，會把首字母變成小寫
@@ -26,7 +26,7 @@ public IActionResult Json()
 
 - 執行結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果調整的跟後端一樣的話，可以在 `Startup` 的 `ConfigureServices` 加一段 Json 的設定
 
@@ -41,4 +41,4 @@ services.AddMvc()
 
 - 在一次執行，就可以看到大小寫和後端的是一樣的
 
-![](/images/404.webp)
+![](/static/images/404.webp)

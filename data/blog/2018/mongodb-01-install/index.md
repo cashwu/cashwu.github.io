@@ -1,32 +1,32 @@
 ---
 title: MongoDB - (一) 安裝
-description: 安裝 MongoDB
+summary: 安裝 MongoDB
 date: 2018-04-06 05:32:50.451+08:00
-slug: "mongodb-01-install"
-tags: [  mongodb ]
+tags: [ mongodb ]
+draft: false
 ---
 
 > OS : Windows 10 pro 64bit
 
 - 先到 [官網](https://www.mongodb.com/download-center#community) 的下載頁面，點 `All Version Binaries`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 下載 3.2 版的 zip 檔
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 解壓到 `C:\` 命名成 MongoDB，結構如下圖
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 要把 `C:\MongoDB\mongodb\bin` 這個路徑加入系統的環境變數 (system path)
 
 - 在第一層目錄新增兩個資料夾，`data` 和 `log`，data 裡面在新增 `db` 和 `backup`，結構如下圖
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 在第一層目錄新增一個 `mongod.cfg` 設定檔，指定 db 和 log 的位置 (剛才新增的資料夾)，內容如下
 
@@ -37,14 +37,14 @@ logpath=C:\MongoDB\log\mongod.log
 
 - 在 `cmd` 打 ` mongod --config "C:\MongoDB\mongod.cfg"`，就會啟動 mongodb 
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 注意!! ：使用這個方式啟動 mongodb，關掉 cmd 就會停止 mongodb 的服務
 
 - 啟動後，在 `data\db` 裡面會新增 db 的相關檔案
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 在另外一個 `cmd` 打 `mongo` 就可以連線到 mongodb 
 
-![](/images/404.webp)
+![](/static/images/404.webp)

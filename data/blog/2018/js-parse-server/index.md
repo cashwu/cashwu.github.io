@@ -1,9 +1,9 @@
 ---
 title: 在 js 裡面使用 Parse Server
-description: 前面的文章已經把 Parse Server 架設在 Heroku 了，現在就來看怎麼在 js 裡面連接到 Parse Server 取得資料
+summary: 前面的文章已經把 Parse Server 架設在 Heroku 了，現在就來看怎麼在 js 裡面連接到 Parse Server 取得資料
 date: 2018-12-24 09:23:12.376+08:00
-slug: "js-parse-server"
 tags: [ js , parse ]
+draft: false
 ---
 
 前面的[文章](https://blog.cashwu.com/blog/heroku-parse-server)已經把 Parse Server 架設在 Heroku 了，現在就來看怎麼在 js 裡面連接到 Parse Server 取得資料
@@ -61,12 +61,12 @@ tags: [ js , parse ]
 
 - 打開 console 就可以看到有兩筆資料
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 可以使用之前[文章](https://blog.cashwu.com/blog/install-parse-server-dashboard)架設的 Dashboard 來比對
 	- 左邊紅色框起來的部份就是 `classes`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 其它詳細的 API 用法請參考[官方 SDK](https://docs.parseplatform.org/js/guide/#queries)
 
@@ -90,21 +90,21 @@ tags: [ js , parse ]
 
 - 預設支援 `Live Query` 的 classes 的只有 `Posts` 和 `Comments`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 打開網頁就可以看到它和 Parse Server 建立了一條 WebSocket
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 使用 curl 測試推資料到 Parse Server，可以看到網頁就會及時收到資料了
 
 > 這段一定要用動態的方式才看的出來 !!
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 對照 Dashboard 可以看到有 3 筆資料
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 基本上這個 Live Query 功能已經可以取代 SignalR 了 XD
 > 其它詳細的 API 用法請參考[官方 SDK](https://docs.parseplatform.org/js/guide/#live-queries)

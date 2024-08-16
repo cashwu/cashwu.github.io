@@ -1,9 +1,9 @@
 ---
 title: C# 使用 DebuggerDisplay 和 DebuggerTypeProxy 來呈現 Debugger 相關資訊
-description: C# 使用 DebuggerDisplay 和 DebuggerTypeProxy 來呈現 Debugger 相關資訊
+summary: C# 使用 DebuggerDisplay 和 DebuggerTypeProxy 來呈現 Debugger 相關資訊
 date: 2020-05-02 18:28:09.184+08:00
-slug: "csharp-debuggerdisplay-debuggertypeproxy-debugger-display-view"
 tags: [ c# ]
+draft: false
 ---
 
 > 這裡使用的 IDE 是 `Rider`，有可能在 `Visual Studio` 上面的呈現不同

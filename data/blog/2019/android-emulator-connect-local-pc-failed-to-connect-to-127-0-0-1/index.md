@@ -1,9 +1,9 @@
 ---
 title: Android 模擬器連接到本機電腦時發生 Failed to connect to 127.0.0.1
-description: Android 模擬器連接到本機電腦時發生 `Failed to connect to 127.0.0.1` 錯誤
+summary: Android 模擬器連接到本機電腦時發生 `Failed to connect to 127.0.0.1` 錯誤
 date: 2019-01-07 15:35:02.856+08:00
-slug: "android-emulator-connect-local-pc-failed-to-connect-to-127-0-0-1"
 tags: [ android ]
+draft: false
 ---
 
 ## 問題

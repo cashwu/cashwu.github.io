@@ -1,9 +1,9 @@
 ---
 title: C# 使用 TimeZoneInfo 轉換時區遇到 Daylight Saving 的問題
-description: C# 使用 TimeZoneInfo 轉換時區遇到 Daylight Saving 的問題
+summary: C# 使用 TimeZoneInfo 轉換時區遇到 Daylight Saving 的問題
 date: 2019-04-15 19:09:10.794+08:00
-slug: "csharp-timezoneinfo-converttime-daylight-saving"
 tags: [ c# , convert , datetime ]
+draft: false
 ---
 
 今天看到主廚大大寫了一篇文章 [「桌邊服務」DateTime 本身有沒有包含時區的資訊？](https://dotblogs.com.tw/supershowwei/2019/04/15/095324)，提到時區和轉換的問題，想到之前解決的一個 Bug 就提醒了一下遇到 Daylight Saving 時可能會發生問題，順手寫了這篇文章

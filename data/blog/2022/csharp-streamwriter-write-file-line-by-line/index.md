@@ -1,9 +1,9 @@
 ---
 title: C# StreamWriter write file line by line
-description: 因為要寫一個小工具需要逐行寫入檔案，突然想到之前有寫過兩篇文章 C# - Simple StreamWriter and StreamReader 和 C# - Simple FileStream Write and Read，結果好像沒有逐行寫檔的程式碼，簡單的記錄一下使用 StreamWriter 來逐行寫檔
+summary: 因為要寫一個小工具需要逐行寫入檔案，突然想到之前有寫過兩篇文章 C# - Simple StreamWriter and StreamReader 和 C# - Simple FileStream Write and Read，結果好像沒有逐行寫檔的程式碼，簡單的記錄一下使用 StreamWriter 來逐行寫檔
 date: 2022-08-13T11:28:04+08:00
-slug: "csharp-streamwriter-write-file-line-by-line"
 tags: [ c# ]
+draft: false
 ---
 
 ![](./cover.webp)

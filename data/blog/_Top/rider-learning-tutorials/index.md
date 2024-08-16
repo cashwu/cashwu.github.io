@@ -1,9 +1,9 @@
 ---
 title: 「Top」Rider 學習資源
-description: 這篇文章主要是蒐集相關的 Rider 學習資源
-date: 2000-01-01
-slug: "jetbrains-rider-learning-tutorials"
+summary: 這篇文章主要是蒐集相關的 Rider 學習資源
+date: 2999-01-01
 tags: [ rider ]
+draft: false
 ---
 
 ![](./1683332594929-sifan-liu-sl_oGl--GrY-unsplash.jpg)

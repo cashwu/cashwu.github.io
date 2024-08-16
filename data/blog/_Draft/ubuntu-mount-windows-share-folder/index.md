@@ -1,10 +1,8 @@
 ---
 title: Ubuntu mount windows share folder 
-description: Ubuntu mount windows share folder
+summary: Ubuntu mount windows share folder
 date: 2024-03-18
-slug: "ubuntu-mount-windows-share-folder"
 tags: [ ubuntu ]
-# tldr: Making GitHub Actions with Js Code
 draft: true
 ---
 

@@ -1,10 +1,11 @@
 ---
 title: Scrum - Retro 熱氣球
-description: Scrum - Retro 熱氣球
+summary: Scrum - Retro 熱氣球
 date: 2017-09-25 13:39:11.196+08:00
-slug: "scrum-retro-hot-air-balloon"
-tags:  [ scrum , retro ]
+tags: [ scrum , retro ]
+draft: false
 ---
+
 ## 步驟
 
 1、請團隊一起畫一個熱氣球，然後把自己畫上熱氣球
@@ -24,7 +25,7 @@ tags:  [ scrum , retro ]
 
 ## 成果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ### 參考連結
 

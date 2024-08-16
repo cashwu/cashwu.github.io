@@ -1,9 +1,9 @@
 ---
 title: EF Core 使用 Like 查詢
-description: 如何在 EF Core 裡面使用 Like 作查詢
+summary: 如何在 EF Core 裡面使用 Like 作查詢
 date: 2019-01-07 21:05:14.553+08:00
-slug: "ef-core-use-like"
 tags: [ ef core ]
+draft: false
 ---
 
 如何在 EF Core 裡面使用 Like 作查詢
@@ -27,9 +27,9 @@ _dbContext.User.Where(a => EF.Functions.Like(a.Name, "%bc"));
 
 - 結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

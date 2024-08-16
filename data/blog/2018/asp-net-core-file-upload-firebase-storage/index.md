@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 上傳檔案到 Firebase Storage
-description: 先前的文章已經有介紹過啟用 Firebase 的 Storage 服務和 ASP.NET Core 的檔案上傳，接下來就來看如何使用 ASP.NET Core 把檔案上傳到 Firebase 的 Storage 吧
+summary: 先前的文章已經有介紹過啟用 Firebase 的 Storage 服務和 ASP.NET Core 的檔案上傳，接下來就來看如何使用 ASP.NET Core 把檔案上傳到 Firebase 的 Storage 吧
 date: 2018-12-28 09:51:26.925+08:00
-slug: "asp-net-core-file-upload-firebase-storage"
-tags:  [ asp.net core , firebase ]
+tags: [ asp.net core , firebase ]
+draft: false
 ---
 
 先前的文章已經有介紹過[啟用 Firebase 的 Storage 服務](https://blog.cashwu.com/blog/firebase-create-project-user-enable-storage) 和 [ASP.NET Core 的檔案上傳](https://blog.cashwu.com/blog/asp-net-core-file-upload)，接下來就來看如何使用 ASP.NET Core 把檔案上傳到 Firebase 的 Storage 吧
@@ -66,11 +66,11 @@ using (var ms = new MemoryStream())
 
 - 測試，上傳後可以拿到圖片的 URL
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 檢查 Firebase，可以看到上傳的檔案
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 加入資料夾 `Folder` 測試
 
@@ -80,7 +80,7 @@ await storage.Child("Folder").Child(img.FileName).PutAsync(ms);
 
 - 檢查 Firebase，可以看到多了一個資料夾
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 刪除檔案
 
@@ -100,7 +100,7 @@ catch (Exception e)
 
 - 如果刪除不存在的檔案會發生 `Exception`，需要注意
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

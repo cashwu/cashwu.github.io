@@ -1,9 +1,9 @@
 ---
 title: 為你的 ASP.NET Core API 加上版本吧 !!
-description: 是不是有對外服務的 API 沒有辦法改版，怕改了就會有問題而影響到使用者，如果可以控制 API 的版本就沒有這個問題了，來為你的 API 加上版本吧 !!
+summary: 是不是有對外服務的 API 沒有辦法改版，怕改了就會有問題而影響到使用者，如果可以控制 API 的版本就沒有這個問題了，來為你的 API 加上版本吧 !!
 date: 2018-12-21 22:23:26.624+08:00
-slug: "asp-net-core-api-version"
 tags: [ asp.net core , api ]
+draft: false
 ---
 
 是不是有對外服務的 API 沒有辦法改版，怕改了就會有問題而影響到使用者，如果可以控制 API 的版本就沒有這個問題了，來為你的 API 加上版本吧 !!
@@ -62,11 +62,11 @@ public class Value2Controller : ControllerBase
 
 - 因為有預設值的設定，所以如果瀏覽 `api/values` 時，都會進到 `Value1Controller` 裡面
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 因為有設定 `ReportApiVersions`，所以看 Response 的 Header 就會看到有 `api-supported-versions`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 路由 Version
 
@@ -90,7 +90,7 @@ public class Value2Controller : ControllerBase
 
 - 修改後原本的路由就沒有用了，需要多傳 Version，這樣子就可以作到控制版本了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 淘汰 Version
 
@@ -106,4 +106,4 @@ public class Value1Controller : ControllerBase
 
 - 這樣子不管是用 1.0 還是 2.0，都會出現 `api-deprecated-versions` 和 `api-supported-versions` 跟你說目前的版本和要棄用的版本
 
-![](/images/404.webp)
+![](/static/images/404.webp)

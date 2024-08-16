@@ -1,10 +1,8 @@
 ---
 title: Spring Boot api 取得參數的幾種方式
-description: Spring Boot api 取得參數的幾種方式
+summary: Spring Boot api 取得參數的幾種方式
 date: 2024-03-18
-slug: "spring-boot-api-get-parameter-argument"
 tags: [ springboot ]
-# tldr: Making GitHub Actions with Js Code
 draft: true
 ---
 

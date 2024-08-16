@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC - StyleCop
-description: ASP.NET Core MVC 導入 StyleCop
+summary: ASP.NET Core MVC 導入 StyleCop
 date: 2018-12-10 10:21:28.686+08:00
-slug: "asp-net-core-mvc-stylecop"
 tags: [ asp.net core ]
+draft: false
 ---
 
 > ASP.NET Core MVC 2.1.6
@@ -13,11 +13,11 @@ ASP.NET Core MVC 導入 StyleCop 還蠻簡單的，基本上只要安裝一個�
 
 1、用 nuget 安裝 [StyleCop.Analyzers](https://www.nuget.org/packages/StyleCop.Analyzers)，安裝後直接 Build 就可以在 Build 的視窗裡面看到 Warning 了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 2、Rider 的程式碼分析功能有支援 StyleCop，會提醒你要怎麼修改才會 Fix 掉，以下圖來看，有問題的地方會用另外一種顏色來呈現，電燈泡也會有 Fix 的功能
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 3、如果想要出現 Error 而不是 Warning 的話，要在專案檔裡面加上 `TreatWarningsAsErrors` 的設定就可以了
 
@@ -27,7 +27,7 @@ ASP.NET Core MVC 導入 StyleCop 還蠻簡單的，基本上只要安裝一個�
 </propertygroup>
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 4、如果是要不檢查某個規格的話，可以新增一個 `.ruleset` 的檔案放在專案裡面 (多專案的話可以放在 solution)，然後在專案檔裡面使用 `CodeAnalysisRuleSet` 指定這個檔案就好了，加上之後就不會在檢查這些規則了
 
@@ -45,4 +45,4 @@ ASP.NET Core MVC 導入 StyleCop 還蠻簡單的，基本上只要安裝一個�
 
 > Id 在 Build 視窗裡面每一條 Error `[ ]` 裡面
 
-![](/images/404.webp)
+![](/static/images/404.webp)

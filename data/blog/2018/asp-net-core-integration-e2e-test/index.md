@@ -1,9 +1,9 @@
 ---
 title: 在 ASP.NET Core 寫整合 (E2E) 測試就跟單元測試一樣簡單
-description: 在 ASP.NET Core 2.1 之後新增了 WebApplicationFactory 讓我們可以更容昜的來寫整合 (E2E) 測試，就跟在寫單元測試一樣的方便
+summary: 在 ASP.NET Core 2.1 之後新增了 WebApplicationFactory 讓我們可以更容昜的來寫整合 (E2E) 測試，就跟在寫單元測試一樣的方便
 date: 2018-12-24 11:45:35.266+08:00
-slug: "asp-net-core-integration-e2e-test"
 tags: [ asp.net core , testing ]
+draft: false
 ---
 
 在 ASP.NET Core 2.1 之後新增了 `WebApplicationFactory` 讓我們可以更容昜的來寫整合 (E2E) 測試，就跟在寫單元測試一樣的方便
@@ -134,7 +134,7 @@ public async Task IndexTest()
 
 - 跑測試應該會是綠燈的
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 建立 API 的測試
 
@@ -150,13 +150,13 @@ public async Task ApiTest()
 
 - 跑測試應該會是綠燈的
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Debug
 
 - 可以非常方便的 Debug 就跟 UnitTest 一樣
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 修改 ASP.NET Core 專案使用 Database
 

@@ -1,8 +1,7 @@
 ---
 title: git include
-description: git include
+summary: git include
 date: 2024-03-31
-slug: "git-include"
 tags: [ git ]
 # tldr: Making GitHub Actions with Js Code
 draft: true

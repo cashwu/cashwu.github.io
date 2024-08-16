@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC + Vue
-description: 把 Vue 整合到 ASP.NET Core API 的專案裡面，執行 .NET Core 的時候就可以把 Vue 給叫起來，不用在下前端的指令
+summary: 把 Vue 整合到 ASP.NET Core API 的專案裡面，執行 .NET Core 的時候就可以把 Vue 給叫起來，不用在下前端的指令
 date: 2018-12-19 11:30:39.555+08:00
-slug: "asp-net-core-mvc-vue"
 tags: [ asp.net core , vue ]
+draft: false
 ---
 
 把 Vue 整合到 ASP.NET Core MVC 的專案裡面，執行 .NET Core 的時候就可以把 Vue 給叫起來，不用在下前端的指令
@@ -17,7 +17,7 @@ tags: [ asp.net core , vue ]
 dotnet new webapi -o corevue
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 這是用 `web` 或是 `webapi`，在 .NET Core 基本上是沒有什麼差別的
 
@@ -29,13 +29,13 @@ dotnet new webapi -o corevue
 vue core corevue
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 使用預設值建立就好
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 安裝 Webpack 套件
 
@@ -130,15 +130,15 @@ namespace corevue.Controllers
 dotnet run
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 打開 [`http://localhost:5000/`](http://localhost:5000/) 就可以看到畫面了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 連到預設的 [api](http://localhost:5000/api/values) 也沒有問題
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

@@ -1,12 +1,12 @@
 ---
 title: TEDxDadun 2017 從中感動 | 從此行動
-description: TEDxDadun 2017 從中感動 | 從此行動
+summary: TEDxDadun 2017 從中感動 | 從此行動
 date: 2017-09-18 14:00:53.989+08:00
-slug: "tedxdadun-2017"
-tags: [  event , ted ]
+tags: [ event , ted ]
+draft: false
 ---
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 某天不小心在 FB 上面看到 TEDxDadun 的報名訊息，而且地點是在台中
 因為還蠻常看國外 TED 的 video，即然現在有機會可以在台中體驗到 TED，當然是立馬手刀報名

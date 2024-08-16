@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 的 生命周期 IApplicationLifetime
-description: 如果想要知道 ASP.NET Core 的啟動和關閉，內建的 IApplicationLifetime 提供給我們三個屬性可以使用
+summary: 如果想要知道 ASP.NET Core 的啟動和關閉，內建的 IApplicationLifetime 提供給我們三個屬性可以使用
 date: 2018-12-28 13:36:12.446+08:00
-slug: "asp-net-core-iapplicationlifetime"
 tags: [ asp.net core ]
+draft: false
 ---
 
 

@@ -1,9 +1,9 @@
 ---
 title: Jenkins 換掉內建的 Theme
-description: Jenkins 換掉內建的 Theme
+summary: Jenkins 換掉內建的 Theme
 date: 2018-12-09 19:40:10.407+08:00
-slug: "jenkins-theme"
 tags: [ jenkins ]
+draft: false
 ---
 
 Jenkins 的 Theme 是很單調而且沒有辦法設定，不過有人寫了 Jenkins Theme 的外掛，讓我們可以很容易的換掉原本的 style
@@ -14,8 +14,8 @@ Jenkins 的 Theme 是很單調而且沒有辦法設定，不過有人寫了 Jenk
 
 3、到 Jenkins 的設定頁面，找到 Theme 的地方，新增一個 `Extra CSS`，把剛才下載的 css 檔內容貼上
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 4、存檔之後就可以看到不一樣的 Jenkins 了 XD
 
-![](/images/404.webp)
+![](/static/images/404.webp)

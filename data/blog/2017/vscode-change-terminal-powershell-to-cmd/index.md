@@ -1,16 +1,16 @@
 ---
 title: VSCode - change terminal powershell to cmd
-description: VSCode 內建的 terminal 改成 cmd
+summary: VSCode 內建的 terminal 改成 cmd
 date: 2017-06-07 15:45:14.5+08:00
-slug: "vscode-change-terminal-powershell-to-cmd"
 tags: [ vscode ]
+draft: false
 ---
 
 ## 問題
 
 在某次 VSCode 更新後，內建的 terminal 預設變成是 powerhsell，實在是用不習慣，所以就找到設定檔把它改回 cmd
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 解法
 
@@ -22,7 +22,7 @@ tags: [ vscode ]
 }
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ### 參考連結
 

@@ -1,10 +1,8 @@
 ---
 title: CSM SBE
-description: CSM SBE
+summary: CSM SBE
 date: 2024-03-18
-slug: "csm-sbe"
 tags: [ agile, sbe, csm ]
-# tldr: Making GitHub Actions with Js Code
 draft: true
 ---
 

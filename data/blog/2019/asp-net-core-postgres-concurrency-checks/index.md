@@ -1,9 +1,9 @@
 ---
 title: EF Core Postgres Concurrency Checks
-description: EF Core Postgres Concurrency Checks
+summary: EF Core Postgres Concurrency Checks
 date: 2019-04-28 15:00:04.248+08:00
-slug: "asp-net-core-postgres-concurrency-checks"
 tags: [ ef core , postgresql ]
+draft: false
 ---
 
 在 SQL Server 為了防止 Concurrency 的問題，是在資料表裡面多加一個類似 timestamp 的欄位 (`rowversion `) 來解決，而在 Postgres 怎麼解決這個問題 ? 

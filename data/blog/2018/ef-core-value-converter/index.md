@@ -1,9 +1,9 @@
 ---
 title: EF Core - 2.1 Value Converter
-description: 在 EF Core 2.1 加入了 Value Converter，讓我們可以更清鬆的轉換資料庫的資料變成我們需要的格式
+summary: 在 EF Core 2.1 加入了 Value Converter，讓我們可以更清鬆的轉換資料庫的資料變成我們需要的格式
 date: 2018-12-18 09:40:09.669+08:00
-slug: "ef-core-value-converter"
 tags: [ ef core ]
+draft: false
 ---
 
 在 EF Core 2.1 加入了 Value Converter，讓我們可以更清鬆的轉換資料庫的資料變成我們需要的格式
@@ -32,7 +32,7 @@ public class User
 
 - 從 migration 裡面也可以看到它的型態是 `int`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## Conversion
 
@@ -64,7 +64,7 @@ public class AppDbContext : DbContext
 
 - 在作一次 migration 的話可以看到型態變成 `string` 了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 資料庫的結果
 
@@ -77,7 +77,7 @@ user.Status = EnumStatus.Open;
 
 - 可以看到資料庫裡面的值變成了字串了，而程式碼這端用的還是原本的 `Enum`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## ValueConverter 類別
 

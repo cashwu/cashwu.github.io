@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core MVC - EF Core 使用 PostgreSQL
-description: 在 ASP.NET Core MVC 搭配 EF Core 使用 Postgre SQL
+summary: 在 ASP.NET Core MVC 搭配 EF Core 使用 Postgre SQL
 date: 2018-12-13 15:00:59.79+08:00
-slug: "asp-net-core-mvc-ef-core-postgresql"
 tags: [ asp.net core , ef core , postgresql ]
+draft: false
 ---
 
 前面的文章 ([Ubuntu - 安裝 PostgreSQL](https://blog.cashwu.com/blog/ubuntu-install-postgresql)) 已經有建立好一個 PostgreSQL，現在要使用 ASP.NET Core MVC 的專案去連結這個 Database
@@ -66,7 +66,7 @@ public void ConfigureServices(IServiceCollection services)
 dotnet ef migrations add init
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - update migrations 到 Database
 
@@ -74,8 +74,8 @@ dotnet ef migrations add init
 dotnet ef database update
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 使用其它的 Client 端 (這裡用的是 DataGrip) 查看 Database，有多了兩張 Table
 
-![](/images/404.webp)
+![](/static/images/404.webp)

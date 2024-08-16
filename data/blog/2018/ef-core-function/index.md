@@ -1,9 +1,9 @@
 ---
 title: EF Core - 呼叫 Function
-description: 如何在 EF Core 裡面去呼叫 Function
+summary: 如何在 EF Core 裡面去呼叫 Function
 date: 2018-12-20 10:57:06.143+08:00
-slug: "ef-core-function"
 tags: [ ef core ]
+draft: false
 ---
 
 如何在 EF Core 裡面去呼叫 Function
@@ -44,7 +44,7 @@ GO
 
 - DB 執行 Function 結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 設定 DbContext
 
@@ -84,8 +84,8 @@ var data = _dbContext.JoinData.FromSql($"select * from fn_Join({id})").ToList();
 
 - 結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 產生出來的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)

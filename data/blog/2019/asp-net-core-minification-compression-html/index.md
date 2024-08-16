@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 最小化和壓縮 HTML 輸出
-description: ASP.NET Core 最小化和壓縮 HTML 輸出
+summary: ASP.NET Core 最小化和壓縮 HTML 輸出
 date: 2019-04-26 11:52:52.695+08:00
-slug: "asp-net-core-minification-compression-html"
 tags: [ asp.net core , html ]
+draft: false
 ---
 
 一般而言，頁面的大小跟載入速度有很大的關係，我們來看如何在 ASP.NET Core 最小化和壓縮 HTML 輸出
@@ -44,7 +44,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 而且移除空白有不同的層級，建議使用 `WhitespaceMinificationMode.Safe` 選項
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 在 `Startup` 裡面的 `Configure` 去使用 `UseWebMarkupMin`
 
@@ -59,15 +59,15 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 - 下面是原始沒有移除空白的原始碼和大小
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 加入 Minification 之後的原始碼和大小
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 壓縮 HTML
 
@@ -109,7 +109,7 @@ services.AddWebMarkupMin(options =>
 
 - 可以看到網頁的 `Content-Encoding` 變成 `gzip` 了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

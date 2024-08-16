@@ -1,9 +1,9 @@
 ---
 title: C# 使用 Microsoft.VisualStudio.Threading.Analyzers 來檢查非同步程式
-description: 在 c# 裡面寫非同步程式有的時候會不小心少了 await 或是命名沒有使用 Async 結尾，我們可以使用套件來幫我們找到這些問題
+summary: 在 c# 裡面寫非同步程式有的時候會不小心少了 await 或是命名沒有使用 Async 結尾，我們可以使用套件來幫我們找到這些問題
 date: 2020-04-26 14:33:43.0+08:00
-slug: "csharp-using-microsoft-visualstudio-threading-analyzers-valid-async"
 tags: [ c# ]
+draft: false
 ---
 
 > 這裡會使用到 Nuget 套件 [Microsoft.VisualStudio.Threading.Analyzers](https://www.nuget.org/packages/Microsoft.VisualStudio.Threading.Analyzers/)

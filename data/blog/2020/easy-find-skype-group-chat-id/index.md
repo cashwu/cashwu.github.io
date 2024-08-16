@@ -1,9 +1,9 @@
 ---
 title: 容昜的找到 Skype 的 群組 (Group) Id
-description: 容昜的找到 Skype 的 群組 (Group) Id
+summary: 容昜的找到 Skype 的 群組 (Group) Id
 date: 2020-04-25 15:32:02.554+08:00
-slug: "easy-find-skype-group-chat-id"
 tags: [ skype bot ]
+draft: false
 ---
 
 打開 `Skype` 的[網頁版](https://web.skype.com/)，點到你要找的群組

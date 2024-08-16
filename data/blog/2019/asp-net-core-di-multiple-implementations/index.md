@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 如何使用內建的 DI 注入多個實作
-description: ASP.NET Core 如何使用內建的 DI 注入多個實作，也可以變向作到動態注入的效果
+summary: ASP.NET Core 如何使用內建的 DI 注入多個實作，也可以變向作到動態注入的效果
 date: 2019-04-16 09:55:05.146+08:00
-slug: "asp-net-core-di-multiple-implementations"
 tags: [ asp.net core , di ]
+draft: false
 ---
 
 ## 模擬多個實作
@@ -62,7 +62,7 @@ public IActionResult Index()
 
 直接執行程式，會發現 ILog 跑的是 SentryLog
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 在注入多個實作的時候，預設是拿到最後註冊的那一個
 
@@ -91,7 +91,7 @@ public IActionResult Index()
 
 執行程式，ILog 會寫入 FileLog 和 SentryLog
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 這裡要注意的是注入的型別一定要是 `IEnumerable<>`，如果使用 `List<>` 是會出錯的
 
@@ -119,4 +119,4 @@ public IActionResult Index()
 
 執行結果
 
-![](/images/404.webp)
+![](/static/images/404.webp)

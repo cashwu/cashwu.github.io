@@ -1,9 +1,9 @@
 ---
 title: Rider 套件 - IDEA Mind Map 介紹
-description: Rider (jetbrains) 有可以編輯 MindMap 的套件，而且可以把檔案放入版控裡面，團隊裡面就可以共同編輯了，而且也不用怕格式不同
+summary: Rider (jetbrains) 有可以編輯 MindMap 的套件，而且可以把檔案放入版控裡面，團隊裡面就可以共同編輯了，而且也不用怕格式不同
 date: 2020-05-13 22:36:15.613+08:00
-slug: "rider-plugin-idea-mind-map"
 tags: [ rider, jetbrains-plugin ]
+draft: false
 ---
 
 > 套件 [IDEA Mind Map](https://plugins.jetbrains.com/plugin/8045-idea-mind-map)

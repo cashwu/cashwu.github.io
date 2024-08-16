@@ -1,9 +1,9 @@
 ---
 title: SQL - TSQL Delay
-description: TSQL Delay
+summary: TSQL Delay
 date: 2017-06-07 14:48:19.869+08:00
-slug: "sql-tsql-dealy"
-tags:  [ sql ]
+tags: [ sql ]
+draft: false
 ---
 
 有的時候會在 DB 裡面模擬執行時執行時間過長的 Timeout

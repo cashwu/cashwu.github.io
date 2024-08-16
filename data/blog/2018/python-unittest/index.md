@@ -1,22 +1,22 @@
 ---
 title: Python - 單元測試
-description: Python 單元測試
+summary: Python 單元測試
 date: 2018-12-12 09:00:35.197+08:00
-slug: "python-unittest"
 tags: [ python ]
+draft: false
 ---
 
 > PyCharm 2018.3.1
 
 - 在專案上按右鍵，新增一個 python 檔案，選擇 unit test
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 新增出來的檔案會有一個預設的測試範本
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 在測試裡面新增一個類別
 
@@ -39,6 +39,6 @@ class CalculatorTests(unittest.TestCase):
 
 - 所需要的測試方法都在 `self` 裡面
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 比較不解的是，參數都是用 first 和 second 來當名稱，是不是用 expected 和 actual 會比較好一點，不過不意外的是前面的參數 (first) 是 expected

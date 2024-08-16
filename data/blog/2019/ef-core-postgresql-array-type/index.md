@@ -1,9 +1,9 @@
 ---
 title: EF Core 使用 PostgreSQL Array 型別
-description: 一般在儲存多筆資料到 DB 的時候都會開另一個 Table 來存放，要使用的話就要使用 Join 的方式來拿取，在 PostgreSQL 裡面有一個 Array 的資料型別可以讓我們方便的來儲存這類型的資料，來看如何在 EF Core 裡面使用 PostgreSQL Array 型別
+summary: 一般在儲存多筆資料到 DB 的時候都會開另一個 Table 來存放，要使用的話就要使用 Join 的方式來拿取，在 PostgreSQL 裡面有一個 Array 的資料型別可以讓我們方便的來儲存這類型的資料，來看如何在 EF Core 裡面使用 PostgreSQL Array 型別
 date: 2019-01-08 12:18:31.552+08:00
-slug: "ef-core-postgresql-array-type"
 tags: [ ef core , postgresql ]
+draft: false
 ---
 
 一般在儲存多筆資料到 DB 的時候都會開另一個 Table 來存放，要使用的話就要使用 Join 的方式來拿取，在 PostgreSQL 裡面有一個 Array 的資料型別可以讓我們方便的來儲存這類型的資料，來看如何在 EF Core 裡面使用 PostgreSQL Array 型別
@@ -40,7 +40,7 @@ public class User
 - 使用 EF Core 的 migrations 到 DB
 	- 可以看到在 DB 裡面的型別為 `text array`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 > 必須要注意的是在 C# 的型別要使用 `string array` 而不能是 `List<string>`，如果是使用 List 的話，相關的 Array 操作是無法轉譯成 SQL Command 的
 
@@ -63,12 +63,12 @@ public void Insert()
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 查看 Table
 	- 可以看到 DB 裡面的表示方式是使用 `{ }`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 修改
 
@@ -86,7 +86,7 @@ public void Update()
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 查詢
 
@@ -98,7 +98,7 @@ public void Update()
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 取出單筆資料查詢
 
@@ -108,7 +108,7 @@ _dbContext.User.Where(a => a.Phones[0] == "1234")
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 使用 `SequenceEqual` 查詢
 	- 基本上就是比對兩個 Array 是不是相等，而且順序要相同
@@ -119,7 +119,7 @@ _dbContext.User.Where(a => a.Phones.SequenceEqual(new[] { "1234", "5678", "4321"
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 長度查詢
 
@@ -129,7 +129,7 @@ _dbContext.User.Where(a => a.Phones.Length == 3)
 
 - 產生的 SQL Command
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 後記
 

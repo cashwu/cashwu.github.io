@@ -1,9 +1,9 @@
 ---
 title: 不寫一行程式完成簡單的發送訊息 Skype Bot (一)
-description: 不寫一行程式完成簡單的發送訊息 Skype Bot
+summary: 不寫一行程式完成簡單的發送訊息 Skype Bot
 date: 2020-04-25 14:42:14.107+08:00
-slug: "not-code-skype-bot-01"
 tags: [ azure , bot , skype bot ]
+draft: false
 ---
 
 > 下一篇文章 [不寫一行程式完成簡單的發送訊息 Skype Bot (二)](https://blog.cashwu.com/blog/not-code-skype-bot-02)

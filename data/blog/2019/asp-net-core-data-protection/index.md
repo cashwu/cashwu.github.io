@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 的 資料保護功能 (Data Protection)
-description: ASP.NET Core 內建有資料保護功能，可以方便我們加解密資料
+summary: ASP.NET Core 內建有資料保護功能，可以方便我們加解密資料
 date: 2019-01-02 10:45:49.341+08:00
-slug: "asp-net-core-data-protection"
 tags: [ asp.net core ]
+draft: false
 ---
 
 ASP.NET Core 內建有資料保護功能，可以方便我們加解密資料
@@ -25,7 +25,7 @@ services.AddDataProtection()
 	- 預設加密 (encryption) 的演算法為 `AES_256_CBC`
 	- 預設驗證 (validation) 的演算法為 `HMACSHA256`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果要修改預設的演算法可以使用 `UseCryptographicAlgorithms`
 	- 可以看到內建有許多的演算法可以選擇
@@ -40,9 +40,9 @@ services.AddDataProtection()
         });
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 資料保護 (加解密)
 
@@ -72,7 +72,7 @@ var unprotectWord = _dataProtector.Unprotect(protectWord);
 
 - 測試
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 有時間限制的資料保護 (加解密)
 
@@ -106,7 +106,7 @@ var unprotectWord = _timeLimitedDataProtector.Unprotect(protectWord);
 	- 過期時間為 2 秒，使用 `Thread.Sleep` 3 秒來測試
 	- 無法解密時會發生 `Exception`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 使用不同的 Protector 加解密
 
@@ -125,7 +125,7 @@ var unprotectWord = _provider.CreateProtector("key2").Unprotect(protectWord);
 - 測試
 	- 因為 `Protector` 不同直接發生 `Exception`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 多重 Protector
 

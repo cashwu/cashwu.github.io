@@ -1,9 +1,9 @@
 ---
 title: 不寫一行程式完成簡單的發送訊息 Skype Bot (二)
-description: 不寫一行程式完成簡單的發送訊息 Skype Bot
+summary: 不寫一行程式完成簡單的發送訊息 Skype Bot
 date: 2020-04-25 17:44:55.774+08:00
-slug: "not-code-skype-bot-02"
 tags: [ bot , integromat , skype bot ]
+draft: false
 ---
 
 > 上一篇文章 [不寫一行程式完成簡單的發送訊息 Skype Bot (一)](https://blog.cashwu.com/blog/not-code-skype-bot-01)

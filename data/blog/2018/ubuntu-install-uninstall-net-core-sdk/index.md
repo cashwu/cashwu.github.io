@@ -1,9 +1,9 @@
 ---
 title: Ubuntu - 安裝和移除 .NET Core SDK
-description: Ubuntu 安裝 .NET Core SDK
+summary: Ubuntu 安裝 .NET Core SDK
 date: 2018-12-11 15:42:43.235+08:00
-slug: "ubuntu-install-uninstall-net-core-sdk"
 tags: [ asp.net core , ubuntu ]
+draft: false
 ---
 
 > OS - Ubuntu Desktop 18.04
@@ -12,11 +12,11 @@ tags: [ asp.net core , ubuntu ]
 
 > 目前的 SDK 版本為 2.2
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 選擇相對應的 Linux 版本，在這裡選擇的是 `Ubuntu 18.04`，然後跟著下面的指令操作就好了
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 下載 Microsoft 的 Key 並註冊到 Ubuntu
 
@@ -41,7 +41,7 @@ dotnet --version
 dotnet --info
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 如果有舊的版本需要移除，請參考[官網文件](https://docs.microsoft.com/zh-tw/dotnet/core/versions/remove-runtime-sdk-versions?tabs=Linux#uninstalling-net-core)，使用 `list-sdks` 查出有安裝的版本，然後就可以下指令移除
 
@@ -50,7 +50,7 @@ dotnet --list-sdks
 // 版本為 2.2.100
 ```
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ```shell
 sudo rm -rf /usr/share/dotnet/sdk/2.2.100

@@ -1,9 +1,9 @@
 ---
 title: C# - compare string is null or empty
-description: C# - compare string is null or empty
+summary: C# - compare string is null or empty
 date: 2016-01-18 19:49:14.279+08:00
-slug: "csharp-compare-string-is-null-or-empty"
 tags: [ c# ]
+draft: false
 ---
 
 There have 3 string variable

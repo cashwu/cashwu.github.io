@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core 使用內建的 ExceptionHandler Middleware 實作全站 Exception 處理
-description: ASP.NET Core 使用內建的 ExceptionHandler Middleware 實作全站 Exception 處理
+summary: ASP.NET Core 使用內建的 ExceptionHandler Middleware 實作全站 Exception 處理
 date: 2019-04-24 09:47:25.236+08:00
-slug: "asp-net-core-exceptionhandler-middleware-handler-exception"
 tags: [ aop , asp.net core , exception , middleware ]
+draft: false
 ---
 
 要實作全站的 Exception Handler 的話，內建的 `Middleware` 有一個 `UseExceptionHandler` 可以使用，而且可以在 `ExceptionHandlerOptions` 裡面寫我們需要 Handler 的邏輯
@@ -57,19 +57,19 @@ public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
 
 - 在某個 Action 裡面直接 throw Exception
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 實際執行 Action，可以看到畫面上返回的是我們自定義的內容
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - 然後 Status Code 是 `500`
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 - Log 也有寫到 Console
 
-![](/images/404.webp)
+![](/static/images/404.webp)
 
 ## 寫成 Extension
 
