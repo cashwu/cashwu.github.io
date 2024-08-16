@@ -1,0 +1,52 @@
+---
+title: C# - 6.0 Exception Filters
+summary: C# 6.0 Exception Filters
+date: 2015-08-01 21:02:01.961+08:00
+tags: [c#]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+## Before C# 6
+
+```csharp
+static void Main ( string [ ] args )
+{
+    try
+    {
+        doSomething();
+    }
+    catch (Exception ex)
+    {
+        if (ex.Message == "DataNotFount")
+        {
+            Console.WriteLine("DataNotFount");
+        }
+        else if (ex.Message == "ChangePasswordError")
+        {
+            Console.WriteLine("ChangePasswordError");
+        }
+    }
+}
+```
+
+## C# 6
+
+```csharp
+static void Main ( string [ ] args )
+{
+    try
+    {
+        doSomething();
+    }
+    catch (Exception ex) when (ex.Message == "DataNotFount")
+    {
+        Console.WriteLine("DataNotFount");
+    }
+    catch (Exception ex) when (ex.Message == "ChangePasswordError")
+    {
+        Console.WriteLine("ChangePasswordError");
+    }
+}
+```

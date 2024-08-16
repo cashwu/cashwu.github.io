@@ -1,0 +1,77 @@
+---
+title: Ubuntu - SSH 遠端登入主機
+summary: Ubuntu SSH 遠端登入主機
+date: 2018-12-08 19:46:08.135+08:00
+tags: [ubuntu]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+> OS - Ubuntu Desktop 18.04
+
+一般而言我們在 window 要連線到另外一台電腦時會使用遠端連線 (mstsc)，而 Linux 通常會使用 SSH 的方式用 Terminal 連線登入，在這裡會使用 MAC SSH 連線登入到 Ubuntu
+
+1、Ubuntu Desktop 預設是沒有安裝 SSH 的套件，所以沒有辦法使用 SSH 的方式被連線，需要先安裝 SSH 套件
+
+```shell
+sudo apt install ssh
+```
+
+![](/static/images/404.webp)
+
+2、安裝好了之後就可以從另外一台電腦使用 SSH 連接，不過在連接前我們先產生憑證 (後面會使用到)，基本上就一直按 Enter 就好了
+
+```
+ssh-kegen
+```
+
+> 如果有產生過的話會問你要不要 Overwrite
+> 因為 MAC 已經有產生過了，所以這裡用的是同一台 ubuntu 作示範
+
+![](/static/images/404.webp)
+
+![](/static/images/404.webp)
+
+3、接下來就可以在 MAC 用 SSH 連線到 Ubuntu，第一次連線時會訊問是否要連線到那一台電腦，之後會需要 key 連線帳號的密碼，這樣子就可以登入了
+
+```shell
+#ssh 帳號@ip
+ssh cash@10.211.55.15
+```
+
+![](/static/images/404.webp)
+
+4、每次要打密碼實在是很麻煩，所以我們可以把前面產生憑證的 public key 複製一份到那一台 Ubuntu 上面，之後在使用 SSH 就可以不用打密碼，MAC 上可以使用 ssh-copy-id 來複製
+
+```shell
+# MAC 可以使用 brew 來安裝
+brew install ssh-copy-id
+# 或是直接下載安裝
+curl -L https://raw.githubusercontent.com/beautifulcode/ssh-copy-id-for-OSX/master/install.sh | sh
+```
+
+安裝好就可以下 ssh-copy-id (過程中有可能需要 key 連線帳號的密碼)
+
+```shell
+#ssh-copy-id 帳號@ip
+ssh-copy-id cash@10.211.55.15
+```
+
+![](/static/images/404.webp)
+
+如果沒有辦法使用 `ssh-copy-id` 的話可以直接下指令 copy，ssh 後面的 `demo@198.51.100.0` 記得要換成自己的帳號和 ip
+
+```shell
+cat ~/.ssh/id_rsa.pub | ssh demo@198.51.100.0 "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >>  ~/.ssh/authorized_keys"
+```
+
+5、好了之後在連線一次，就不用打密碼了
+
+![](/static/images/404.webp)
+
+6、如果連線一直有問題的話，可以查看 log
+
+```shell
+tail -f /var/log/auth.log
+```

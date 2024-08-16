@@ -1,0 +1,77 @@
+---
+title: ASP.NET MVC - 使用資料庫開發 (三)
+summary: ASP.NET MVC - 使用資料庫開發 (三)
+date: 2014-07-11
+tags: [asp.net mvc, ef]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+## 資料庫欄位有預設值時處理
+
+先在 `客戶資料` 裡面加一個 `建立時間` 的欄位，Type 為 `DateTime`，預設值為 `getdate()`
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/01.webp)
+
+打開 `EF`，在空白處按右鍵選擇 `從資料庫更新模型`
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/02.webp)
+
+出現資料庫選擇的視窗後直接按 `Finish` 就好了
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/03.webp)
+
+我們可以加入一個 使用 Entity 的 MVC 控制器 來測試
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/04.webp)
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/05.webp)
+
+- 註：Controller name 記得不要打中文
+
+因為新增時間為自動產生，所以在新增畫面把它拿掉
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/06.webp)
+
+在 Controller 部份也要把 Bind 的 Include 的欄位拿掉
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/07.webp)
+
+新增一筆資料測試
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/08.webp)
+
+會發現網頁報錯了
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/09.webp)
+
+- 註：錯誤訊息 (送出的值超出原本 `datetime` 的範圍，請改用 `datetime2`)
+
+真的原因是 `建立時間` 欄位型態為 `DateTime` 而且是不可 null，
+送到資料庫時，預設是帶 `0001/01/01`，
+而資料庫並沒有把欄位帶入 `getdate()` 的預設值，
+而是傳入 `0001/01/01`，所以才會導致出錯
+
+- 註：SQL 2014 DateTime 的範圍為 `1753 年 1 月 1 日到 9999 年 12 月 31 日`
+
+## 解決方法
+
+打開 Entity，找到欄位後按 `F4`，在 `屬性` 裡面找到 `資料產生模式`，預設為 `None`，改選為 `Computed`，
+修改後存檔重 Build
+
+註：意思是 程式無論怎麼新增跟修改，EF 都不會更新到資料庫
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/10.webp)
+
+MSDN 的說明
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/11.webp)
+
+之後就可以測試新增時是否會帶入預設值 (現在時間)，
+編輯時是否不會修改到欄位
+
+如果資料欄位很多預設值的話，用 `XML` 打開 `EF` 直接在 `SSDL` 的地方找到資料表的名稱和欄位，
+直接加入程式碼就好了
+
+![](/static/images/2014/aspnet-mvc-db-dev-03/12.webp)

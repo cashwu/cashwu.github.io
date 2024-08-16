@@ -1,0 +1,50 @@
+---
+title: 幫 MonoLisa 字型補上 icon 字型 Nerd Fonts
+summary: MonoLisa 本身並不支援 Nerd Fonts，不過我們可以自己幫它補上去，就來看怎麼幫 MonoLisa 補上 NerFonts
+date: 2024-03-13
+tags: [monolisa, programming]
+draft: false
+images: ['/static/images/2024/monolisa-patch-icon-nerd-fonts/cover.webp']
+layout: PostSimple
+---
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/cover.webp)
+
+[MonoLisa](https://www.monolisa.dev) 是一款付費軟體開發專用的字體，有興趣的話，可以看一下官方的說明，這個字型優化了什麼部份
+
+不過，這個字體的一個比較大的問題是，不支援在 command line 下面的相關 icon 的顯示，在它的 FAQ 中也有寫到 [How to enable Nerd Fonts with MonoLisa ?](https://www.monolisa.dev/faq#how-to-enable-nerd-fonts-with-monolisa)
+
+這裡提到的 `Nerd Fonts` 是一個非常流行的 icon 字體，它目前已經支援非常多的 icon (有興趣的話，可以看一下它的 [官方網站](https://www.nerdfonts.com))。而 MonoLisa 是沒有直接支援 (包含) Nerd Font，你需要自己把 Nerd Font 補到 (patched) MonoLisa 的字型裡面
+
+下面我們就參考官方的 FQA 中介紹的這套工具 `daylinmorgan/monolisa-nerdfonts-patch`，來幫 MonoLisa 加上 Nerd Fonts
+
+相關的流程，可以參考 [Github](https://github.com/daylinmorgan/monolisa-nerdfont-patch) 裡面的說明，其中比較要注意的是，要運行的話，需要 `python` 和 `fontforge` 或者要使用 `docker`，為了方便或是不想在安裝軟體的話，推薦直接用 `docker`
+
+1. 先下載 Github 的專案到電腦
+2. 下載 MonoLisa 的字型，放到 `MonoLisa` 資料夾內
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/01.webp)
+
+3. 使用 command line 打開專案的根目錄，執行 `ARGS="--docker -c" make patch` 命令，跑完結束會有 `Happy typing!` 的訊息
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/02.webp)
+
+4. 完成的字型會放在 `patched` 的資料夾內，字型的命名也會改成 `MonoLisaNerdFont-XX`
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/03.webp)
+
+5. 可以在不同的 command line 上面看一下前後的對照結果
+
+`Warp` 如果沒有辦法顯示的話，就會為空
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/04.webp)
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/05.webp)
+
+`Mac 內建的 Terminal` 如果沒有辦法顯示的話，就會變成 ?
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/06.webp)
+
+![](/static/images/2024/monolisa-patch-icon-nerd-fonts/07.webp)
+
+> Photo by [Natalia Y.](https://unsplash.com/@foxfox?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/brass-letter-plates-in-black-wooden-box-bMybTSV7RFY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)

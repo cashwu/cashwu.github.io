@@ -1,0 +1,168 @@
+---
+title: React Form
+summary: React Form
+date: 2015-12-27 20:06:22.455+08:00
+tags: [js, react]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+## 基本的 Form 操作
+
+1 getInitialState 設置 state (input 的 defaultValue)
+2 input 的值在渲染時設置 (state)
+3 input 的值在 onChange 時，handleChange 被調用
+4 handleChange 更新 state 的值
+5 重新渲染時，更新 input
+
+```js
+var MyForm = React.createClass({
+  getInitialState: function () {
+    return {
+      hellotTo: 'Hello World!',
+    }
+  },
+  handleChange: function (event) {
+    this.setState({
+      hellotTo: event.target.value,
+    })
+  },
+
+  submitHandler: function (event) {
+    event.preventDefault()
+
+    alert(this.state.hellotTo)
+  },
+  render: function () {
+    return (
+      <form onSubmit={this.submitHandler}>
+        <input
+          ref="hellotTo"
+          type="text"
+          value={this.state.hellotTo}
+          onChange={this.handleChange}
+        />
+        <br />
+        <button type="submit">Speak</button>
+      </form>
+    )
+  },
+})
+```
+
+## Lable
+
+如果要使用 Lable 的話，因為 `for` 是 JS 裡面的保留字，所以要使用 `htmlFor`
+
+```html
+<lable htmlFor="name">Name:</lable>
+```
+
+## Select Multiple
+
+select 為 multiple 時，select 的值在選項被選擇時不會更新，只有選項的 `selected` 屬性會發化，下面的作法是在 `onChange` 時檢查是否被選中
+
+```js
+var MyForm = React.createClass({
+  getInitialState: function () {
+    return {
+      options: ['A'],
+    }
+  },
+  handleChange: function (event) {
+    var checked = []
+    var sel = event.target
+    console.log(sel)
+    for (var i = 0; i < sel.length; i++) {
+      var option = sel.options[i]
+      console.log(option)
+      if (option.selected) {
+        checked.push(option.value)
+      }
+    }
+    console.log(checked)
+    this.setState({
+      options: checked,
+    })
+  },
+
+  submitHandler: function (event) {
+    event.preventDefault()
+
+    alert(this.state.options)
+  },
+  render: function () {
+    return (
+      <form onSubmit={this.submitHandler}>
+        <select multiple="true" value={this.state.options} onChange={this.handleChange}>
+          <option value="A">First Option</option>
+          <option value="B">Second Option</option>
+          <option value="C">First Option</option>
+        </select>
+        <br />
+        <button type="submit">Speak</button>
+      </form>
+    )
+  },
+})
+```
+
+## Radio
+
+radio 相對來說比較簡單一點，因為一次只會有一個選中，直接下判斷就可以
+
+```js
+var MyForm = React.createClass({
+  getInitialState: function () {
+    return {
+      radio: 'B',
+    }
+  },
+  handleChange: function (event) {
+    this.setState({
+      radio: event.target.value,
+    })
+  },
+
+  submitHandler: function (event) {
+    event.preventDefault()
+
+    alert(this.state.radio)
+  },
+  render: function () {
+    return (
+      <form onSubmit={this.submitHandler}>
+        <label htmlFor="A">A</label>
+        <input
+          id="A"
+          type="radio"
+          value="A"
+          checked={this.state.radio === 'A'}
+          onChange={this.handleChange}
+        />
+        <br />
+        <label htmlFor="B">B</label>
+        <input
+          id="B"
+          type="radio"
+          value="B"
+          checked={this.state.radio === 'B'}
+          onChange={this.handleChange}
+        />
+        <br />
+        <label htmlFor="C">C</label>
+        <input
+          id="C"
+          type="radio"
+          value="C"
+          checked={this.state.radio === 'C'}
+          onChange={this.handleChange}
+        />
+        <br />
+        <button type="submit">Speak</button>
+      </form>
+    )
+  },
+})
+```

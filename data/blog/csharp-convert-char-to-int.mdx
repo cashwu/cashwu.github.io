@@ -1,0 +1,66 @@
+---
+title: C# char 轉型成 int
+summary: C# char 轉型成 int
+date: 2019-04-22 09:45:01.608+08:00
+tags: [c#, convert]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+如果我們有一個 `char`，值是一個數字 (0 ~ 9)，那我們要如何轉換成 `int`
+
+```csharp
+var a = '1';
+```
+
+### 強制轉型
+
+- 直覺的想法是強制轉型，不過得到的結果會是 `49`，而不是 `1`，因為它轉成 `ASCII` 輸出了 (請參考 [Wiki](https://zh.wikipedia.org/wiki/ASCII) )
+
+```csharp
+int i = (int)a;
+// 49
+```
+
+### Convert.ToInt32
+
+如果使用 `Convert.ToInt32` 的話會得到相同的結果 `49`
+
+```csharp
+int i = Convert.ToInt32(a);
+// 49
+```
+
+### int.Parse
+
+試著使用 `int.Parse`，得到的結果就是 `1` 了，不過因為傳入的型別要 `string`，所以還要 `ToString`
+
+```
+int i = int.Parse(a.ToString());
+// 1
+```
+
+### Char.GetNumericValue
+
+- 在 `Char` 裡面有提供一個 `GetNumericValue` 靜態方法可以使用，不過因為它的回傳值是 `double`，所以還是需要轉換成 `int`
+
+```csharp
+int i = (int)Char.GetNumericValue(a);
+// 1
+```
+
+### 直接減 0
+
+- 在上星期上課的時候看到一個特別的寫法，直接減掉 `'0'` 就可以得到我們要的結果了 `1` 了，真的是很神奇的寫法，後來發現，因為它把兩個字都轉成 `ASCII` 了，所以相減的結果還是 `1` (`49 - 48`)
+
+```
+int i = (a - '0');
+// 1
+```
+
+> 注意：這裡的 `0` 一定要是 `Char`，如果是`數字`的話，還是會得到 `49`
+
+## 後記
+
+使用最後一種`減掉'0'`，我覺得是最方便的寫法，不過如果不知道的人就覺會完全看不懂為什麼這樣子寫可以 work。如果要比較好理解的話，就使用 `Char.GetNumericValue`，我之前都是使用這個方法，不過如果返回值不是要 `double` 的話，就要在轉一次。

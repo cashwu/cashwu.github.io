@@ -1,0 +1,195 @@
+---
+title: ASP.NET Core 實作 MediatR 的 Pipeline 功能
+summary: ASP.NET Core 實作 MediatR 的 Pipeline 功能
+date: 2019-04-29 09:33:45.95+08:00
+tags: [asp.net core, mediatr]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+之前的兩篇文章已經把 MediatR 的基本功能都介紹過了，現在要介紹 Pipeline 的功能
+
+> 範例 Repository 在 [Github](https://github.com/cashwublog/TestMediatR)
+
+## 新增 LogPreProcessor 實作 IRequestPreProcessor
+
+- `IRequestPreProcessor` 指的是每一個 Request `之前`都會執行一次，泛型的型別就是實作 `IRequest` 的型別，因為是在 Request 之前，所以在 `Process` 裡面只拿的到 `Request` 的資料
+
+```csharp
+public class LogPreProcessor<TRequest> : IRequestPreProcessor<TRequest>
+{
+    private readonly ILogger<TRequest> _logger;
+
+    public LogPreProcessor(ILogger<TRequest> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task Process(TRequest request, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation($"{nameof(LogPreProcessor<TRequest>)} Request -- {JsonConvert.SerializeObject(request)}");
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+- 在 `Startup` 裡面去註冊剛才新增的 `LogPreProcessor`
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMediatR(typeof(AddPersonCommand).GetTypeInfo().Assembly);
+    services.AddTransient(typeof(IRequestPreProcessor<>), typeof(LogPreProcessor<>));
+}
+```
+
+- 在這裡使用之前的新增 Person 來作測試，可以看到有把 Request 給 Log 下來
+
+![](/static/images/404.webp)
+
+## 新增 LogPostProcessor 實作 IRequestPostProcessor
+
+- `IRequestPostProcessor` 指的是每一個 Request `之後`都會執行一次，泛型的型別有兩個，就是實作 `IRequest` 的型別和 `Response` 的型別，因為是在 Request 之後，所以在 `Process` 可以拿的的到 `Request` 和 `Response` 的資料
+
+```csharp
+public class LogPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
+{
+    private readonly ILogger<TRequest> _logger;
+
+    public LogPostProcessor(ILogger<TRequest> logger)
+    {
+        _logger = logger;
+    }
+
+    public Task Process(TRequest request, TResponse response)
+    {
+        _logger.LogInformation($"{nameof(LogPostProcessor<TRequest, TRequest>)} Request -- {JsonConvert.SerializeObject(request)}");
+        _logger.LogInformation($"{nameof(LogPostProcessor<TRequest, TResponse>)} Response -- {JsonConvert.SerializeObject(response)}");
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+- 在 `Startup` 裡面把原本註冊的 `LogPreProcessor` 改成 `LogPostProcessor`
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMediatR(typeof(AddPersonCommand).GetTypeInfo().Assembly);
+    services.AddTransient(typeof(IRequestPostProcessor<>), typeof(LogPostProcessor<>));
+}
+```
+
+- 測試
+
+![](/static/images/404.webp)
+
+## 新增 LogBehavior 實作 IPipelineBehavior
+
+- `IPipelineBehavior` 和 ASP.NET Core 的 `Middleware` 很像，裡面有 `next` 可以使用，可以自行決定在呼叫 `IRequestHandler` 的前或後要作什麼，泛型的型別有兩個，實作 `IRequest` 和 `Response` 的型別
+
+```csharp
+   public class LogBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    {
+        private readonly ILogger<TRequest> _logger;
+
+        public LogBehavior(ILogger<TRequest> logger)
+        {
+            _logger = logger;
+        }
+
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        {
+            _logger.LogInformation($" LogBehavior Request -- {JsonConvert.SerializeObject(request)}");
+
+            var response = await next();
+
+            _logger.LogInformation($" LogBehavior Response -- {JsonConvert.SerializeObject(response)}");
+
+            return response;
+        }
+    }
+```
+
+- 在 `Startup` 裡面把註冊的型別換成 `LogBehavior`
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMediatR(typeof(AddPersonCommand).GetTypeInfo().Assembly);
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LogBehavior<,>));
+}
+```
+
+- 測試
+
+![](/static/images/404.webp)
+
+## 組合不同的 IPipelineBehavior
+
+- 在新增一個 `RequestPerformanceBehavior`，用來測量 Request 的執行時間
+
+```csharp
+public class RequestPerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+{
+    private readonly Stopwatch _timer;
+    private readonly ILogger<TRequest> _logger;
+
+    public RequestPerformanceBehavior(ILogger<TRequest> logger)
+    {
+        _timer = new Stopwatch();
+
+        _logger = logger;
+    }
+
+    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+    {
+        _timer.Start();
+
+        var response = await next();
+
+        _timer.Stop();
+
+        _logger.LogInformation($"{nameof(RequestPerformanceBehavior<TRequest, TRequest>)} running time - {_timer.ElapsedMilliseconds}");
+
+        return response;
+    }
+}
+```
+
+- 在 `Startup` 裡面註冊 `RequestPerformanceBehavior`，加到最後面
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMediatR(typeof(AddPersonCommand).GetTypeInfo().Assembly);
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LogBehavior<,>));
+	services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehavior<,>));
+}
+```
+
+- 測試，可以拿到執行 Request 的時間出現在 Log 前面
+
+![](/static/images/404.webp)
+
+- 如果調整順序把 `RequestPerformanceBehavior` 移到 Pipeline 的第一個
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMediatR(typeof(AddPersonCommand).GetTypeInfo().Assembly);
+	services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehavior<,>));
+	services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LogBehavior<,>));
+}
+```
+
+- 再一次測試，可以拿到執行 Request 的時間出現在 Log 後面，也就是放的順序和出現的順序是相反的
+
+![](/static/images/404.webp)
+
+## 後記
+
+MediatR 有提供 Pipeline 的功能，某種程度上面還蠻方便的，不過也因為它的功能沒有那麼強大，所以使用的範圍來說還是有限的，如果需要作到比較多的事情，使用 `ActionFilter` 和 `Middleware` 還是比較方便一些

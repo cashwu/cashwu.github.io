@@ -1,0 +1,37 @@
+---
+title: EntityFramework - Override SaveChange
+summary: EntityFramework Override SaveChange
+date: 2015-06-11 22:39:17.906+08:00
+tags: [ef]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+```csharp
+public partial class ContosoUniversityEntities
+{
+    public override int SaveChanges()
+    {
+        // 變更追蹤器，取得所有快取的物件
+        var entities = this.ChangeTracker.Entries();
+
+        foreach (var entity in entities)
+        {
+            if (entity.Entity is Course)
+            {
+                if (entity.State == EntityState.Modified)
+                {
+                    //var ori = entity.OriginalValues.GetValue<string>("Title");
+                    //var cur = entity.CurrentValues.GetValue<string>("Title");
+                    //取得有修改欄位的原始值和修改後的值
+
+                    entity.CurrentValues.SetValues(new { ModifiedOn = DateTime.Now });
+                }
+            }
+        }
+
+        return base.SaveChanges();
+    }
+}
+```

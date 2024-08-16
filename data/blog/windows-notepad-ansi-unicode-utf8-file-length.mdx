@@ -1,0 +1,34 @@
+---
+title: Windows notepad ANSI, Unicode, UTF-8 File Length
+summary: Windows notepad ANSI, Unicode, UTF-8 File Length
+date: 2015-05-13 08:17:31.984+08:00
+tags: [windows]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+在使用 windows notepad 存檔時，選擇不同的檔案格式計算字元的方式不太一樣，下面單純的計錄一下計算的方式，不講古。
+
+## ANSI
+
+預設的存檔格式就是使用 ANSI，英文字為 `1 byte`，中文字為 `2 byte`
+所以 `ABC中文字` 總共為 `9 byte`，檔案大小也是 `9 byte`
+
+## Unicode
+
+1 個字元為 `2 byte`，所以 `ABC中文字` 總共為 12 byte，
+
+因為會在字元的最前面加上 2 byte 的 `BOM (Byte Order Mark)`，所以檔案大小為 `14 byte`
+
+## UTF-8
+
+ASCII 的部份 (< 127) 為 `1 byte`，其它的 (>= 127) 為 `3 byte`，
+
+所以 `ABC中文字` 總共為 `12 byte`，而 BOM 為 3 byte，所以檔案大小為 `15 byte`
+
+### 參考連結
+
+- [BOM wiki](http://zh.wikipedia.org/wiki/%E4%BD%8D%E5%85%83%E7%B5%84%E9%A0%86%E5%BA%8F%E8%A8%98%E8%99%9F)
+- [ASCII wiki](http://zh.wikipedia.org/wiki/ASCII)
+- [Code Page wiki](http://zh.wikipedia.org/wiki/%E4%BB%A3%E7%A0%81%E9%A1%B5)

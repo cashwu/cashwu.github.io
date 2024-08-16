@@ -1,0 +1,374 @@
+---
+title: 在 ASP.NET Core 寫整合 (E2E) 測試就跟單元測試一樣簡單
+summary: 在 ASP.NET Core 2.1 之後新增了 WebApplicationFactory 讓我們可以更容昜的來寫整合 (E2E) 測試，就跟在寫單元測試一樣的方便
+date: 2018-12-24 11:45:35.266+08:00
+tags: [asp.net core, testing]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+在 ASP.NET Core 2.1 之後新增了 `WebApplicationFactory` 讓我們可以更容昜的來寫整合 (E2E) 測試，就跟在寫單元測試一樣的方便
+
+> ASP.NET Core 2.2 (此功能在 ASP.NET Core 2.1 之後的版本)
+> Xunit 2.4.0
+
+## ASP.NET Core 專案
+
+- MVC 為了測試方便直接 reutrn 一個 `h1`
+
+```csharp
+public class HomeController : Controller
+{
+    public IActionResult Index()
+    {
+        return new ContentResult
+        {
+            Content = "<h1>OK</h1>",
+            ContentType = "text/html",
+            StatusCode = (int)HttpStatusCode.OK
+        };
+    }
+}
+```
+
+- API 為了測試方便直接 reutrn 一個 `User object`
+
+```csharp
+public class ValuesController : Controller
+{
+    [HttpGet]
+	[Route("api/values")]
+    public IActionResult Get()
+    {
+        return Ok(new User { Name = "Cash" });
+    }
+}
+```
+
+- Startup 這裡為了簡單，拿掉不相關的程式
+
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+    }
+
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
+        app.UseMvc(routes =>
+        {
+            routes.MapRoute(name: "default",
+                            template: "{controller=Home}/{action=Index}/{id?}");
+        });
+    }
+}
+```
+
+## 建立 WebFactory & TestBase
+
+- 測試專案加入套件 [Microsoft.AspNetCore.Mvc.Testing](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Testing) 和 [Microsoft.AspNetCore.App](https://www.nuget.org/packages/Microsoft.AspNetCore.App)
+
+- 在測試專案裡面建立 `WebFactory.cs`，繼承 `WebApplicationFactory`，並且設計成可傳入專案的 `Startup` 當成泛型參數
+
+```csharp
+public class WebFactory<TStartup> : WebApplicationFactory<TStartup>
+	where TStartup : class
+{
+}
+```
+
+- 建立 `TestBase.cs` 並且繼承 WebFactory (需要使用 `Xunit` 的 `IClassFixture`)，傳入專案的 `Startup` 當成泛型參數
+
+```csharp
+public class TestBase : IClassFixture<WebFactory<Startup>>
+{
+}
+```
+
+- constructor 傳入 `WebFactory` 並且使用 `CreateClient` 生成 HttpClient 當成 Field
+
+```csharp
+public class TestBase : IClassFixture<WebFactory<Startup>>
+{
+    protected HttpClient _client;
+
+    public TestBase(WebFactory<Startup> factory)
+    {
+        _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            HandleCookies = true,
+            AllowAutoRedirect = false
+        });
+    }
+}
+```
+
+## MVC & API 測試
+
+- 建立 `WebTest.cs`，繼承 `TestBase`，在 constructor 傳入和 TestBase 相同的物件
+
+```csharp
+public class WebTest : TestBase
+{
+    public WebTest(WebFactory<Startup> factory)
+            : base(factory)
+    {
+    }
+}
+```
+
+- 建立 Index 的測試
+  - 使用 `TestBase` 的 `HttpClient`，取得網頁
+
+```csharp
+[Fact]
+public async Task IndexTest()
+{
+    var response = await _client.GetAsync("/");
+    var result = await response.Content.ReadAsStringAsync();
+	Assert.Equal("<h1>OK</h1>", result);
+}
+```
+
+- 跑測試應該會是綠燈的
+
+![](/static/images/404.webp)
+
+- 建立 API 的測試
+
+```csharp
+[Fact]
+public async Task ApiTest()
+{
+    var response = await _client.GetAsync("/api/values");
+    var user = await response.Content.ReadAsAsync<User>();
+    Assert.Equal("Cash", user.Name);
+}
+```
+
+- 跑測試應該會是綠燈的
+
+![](/static/images/404.webp)
+
+## Debug
+
+- 可以非常方便的 Debug 就跟 UnitTest 一樣
+
+![](/static/images/404.webp)
+
+## 修改 ASP.NET Core 專案使用 Database
+
+- 建立 AppDbContext
+
+```csharp
+public class AppDbContext : DbContext
+{
+	public AppDbContext(DbContextOptions<AppDbContext> options)
+	: base(options)
+	{
+	}
+
+	public DbSet<User> User { get; set; }
+}
+
+public class User
+{
+	public int Id { get; set; }
+
+	public string Name { get; set; }
+}
+```
+
+- 修改 `Startup` 的 ConfigureServices 註冊 AppDbContext
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext<AppDbContext>(optionsBuilder =>
+    {
+        optionsBuilder.UseSqlServer("connection");
+    });
+
+    services.AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+}
+```
+
+- 修改 MVC 使用 AppDbContext
+
+```csharp
+public class HomeController : Controller
+{
+    private readonly AppDbContext _dbContext;
+
+    public HomeController(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public IActionResult Index()
+    {
+        var user = _dbContext.User.FirstOrDefault();
+        return new ContentResult
+        {
+            Content = $"<h1>{user.Name}</h1>",
+            ContentType = "text/html",
+            StatusCode = (int)HttpStatusCode.OK
+        };
+    }
+}
+```
+
+- 修改 API 使用 AppDbContext
+
+```csharp
+public class ValuesController : Controller
+{
+    private readonly AppDbContext _dbContext;
+
+    public ValuesController(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    [HttpGet]
+    [Route("api/values")]
+    public IActionResult Get()
+    {
+        var user = _dbContext.User.FirstOrDefault();
+        return Ok(user);
+    }
+}
+```
+
+## 修改測試使用 Database
+
+- 修改 `WebFactory`，override `ConfigureWebHost`，在裡面使用 `InMemoryDatabase`，並且在 Database Created 之後塞入測試資料
+
+> 請注意，因為這裡使用的是 `InMemoryDatabase`，所以不是所有的 Database 操作都可以用 `InMemoryDatabase`，請參考[官方說明](https://docs.microsoft.com/zh-tw/ef/core/miscellaneous/testing/in-memory#inmemory-is-not-a-relational-database)
+
+```csharp
+public class WebFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services =>
+        {
+            var serviceProvider = new ServiceCollection()
+                                      .AddEntityFrameworkInMemoryDatabase()
+                                      .BuildServiceProvider();
+
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseInMemoryDatabase("InMemoryDb");
+                options.UseInternalServiceProvider(serviceProvider);
+            });
+
+            using (var scope = services.BuildServiceProvider().CreateScope())
+            {
+                var scopedServices = scope.ServiceProvider;
+                var db = scopedServices.GetRequiredService<AppDbContext>();
+
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+
+                db.User.Add(new User { Id = 1, Name = "Hello Cash"});
+                db.SaveChanges();
+            }
+        });
+    }
+}
+```
+
+- 修改 MVC 測試
+
+```csharp
+[Fact]
+public async Task IndexTest()
+{
+    var response = await _client.GetAsync("/");
+    var result = await response.Content.ReadAsStringAsync();
+
+    Assert.Equal("<h1>Cash</h1>", result);
+}
+```
+
+- 修改 API 測試
+
+```csharp
+[Fact]
+public async Task ApiTest()
+{
+    var response = await _client.GetAsync("/api/values");
+    var user = await response.Content.ReadAsAsync<User>();
+    Assert.Equal("Hello Cash", user.Name);
+}
+```
+
+- 跑測試應該都可以拿到綠燈
+
+## 驗證 Database
+
+- 除了可以使用 Database 之外，比較重要的應該是可以驗證到 Database 裡面的資料
+
+- 修改 `TestBase` 增加一個 `DbOperator`，讓測試程式可以傳入一個 Action 去操作 Database
+
+```csharp
+public class TestBase : IClassFixture<WebFactory<Startup>>
+{
+    private readonly WebFactory<Startup> _factory;
+    protected HttpClient _client;
+
+    public TestBase(WebFactory<Startup> factory)
+    {
+        _factory = factory;
+        _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            HandleCookies = true,
+            AllowAutoRedirect = false
+        });
+    }
+
+    protected void DbOperator(Action<AppDbContext> action)
+    {
+        using (var scope = _factory.Server.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            action.Invoke(dbContext);
+        }
+    }
+}
+```
+
+- 修改 MVC 測試去驗證 Database
+
+```csharp
+[Fact]
+public async Task IndexTest()
+{
+    var response = await _client.GetAsync("/");
+    var result = await response.Content.ReadAsStringAsync();
+
+    Assert.Equal("<h1>Cash</h1>", result);
+
+	DbOperator(db =>
+    {
+        var user = db.User.FirstOrDefault();
+        Assert.Equal("Hello Cash", user.Name);
+    });
+}
+```
+
+## 後記
+
+- 把怎麼使用內建的 WebApplicationFactory 作整合 (E2E) 測試的主要步驟都演示了一次，我覺得跟之前的方式比較起來不同的地方是
+
+  - 運行整合 (E2E) 測試就跟單元測試一樣快，可以比較針對需求來寫測試
+  - 可以方便的在運行整合 (E2E) 測試時 Debug 程式碼
+  - 可以驗證到 Database 的資料
+
+- 如果真的不想寫太多程式碼的話，我寫的 `Baymax.Tester` 都幫你封裝好了，請看 Github 的說明 [Baymax.Tester -> Integration Test](https://github.com/cashwu/Baymax#integration-test)

@@ -1,0 +1,195 @@
+---
+title: ASP.NET Core 軟體防火牆
+summary: 如果你有網站只限制特定的 IP 可以存取，或者只限定部份國家可以存取，除了從實體的防火牆阻檔之外，來看看這個套件怎麼作到軟體的防火牆
+date: 2018-12-25 10:30:34.679+08:00
+tags: [asp.net core, package]
+draft: false
+lastmod: '2024-08-16'
+layout: PostSimple
+---
+
+如果你有網站只限制特定的 IP 可以存取，或者只限定部份國家可以存取，除了從實體的防火牆阻檔之外，來看看這個套件怎麼作到軟體的防火牆
+
+> ASP.NET Core 2.2
+
+## 安裝套件
+
+- 使用 nuget 安裝套件 [Firewall](https://www.nuget.org/packages/Firewall/)
+
+## 基本設定
+
+- Firewall 的設定都是在 `Startup` 的 `Configure` 裡面
+  - 使用 `FirewallRulesEngine` 定義 Firewall 的規則，`DenyAllAccess` 就是 Deny 所有的存取
+  - 使用定義好的規則啟用 Firewall
+
+```csharp
+var rule = FirewallRulesEngine.DenyAllAccess();
+app.UseFirewall(rule);
+```
+
+> 記得在 `Configure` 裡面的設定是有先後順序的，要使用 Firewall 的話，記得要移到最前面使用
+
+- 設定完了之後基本上所有的連線都是 403 絕拒連線的 (如下圖)
+
+![](/static/images/404.webp)
+
+- 如果是把網站放在 `Nginx` 後面作反向代理的話，記得在啟用 Firewall 之前加入 Forwarded 的設定
+  - Forwarded 內建的所有 Header
+  - 限定只 Forwarded 一層，如果有多層的 Forwarded 記得要調整這個數字
+
+```csharp
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+	ForwardedHeaders = ForwardedHeaders.All,
+	ForwardLimit = 1
+});
+var rule = FirewallRulesEngine.DenyAllAccess();
+app.UseFirewall(rule);
+```
+
+- 如果看到相關的 Firewall Log，要把 appsetting Log 的層級調到 `Debug`
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    }
+  }
+}
+```
+
+## 設定本機開發
+
+- 有特別設定一個 Localhost 專用
+  - 把規則多加一個 `ExceptFromLocalhost`，這樣子本機就可以存取了
+
+```csharp
+var rule = FirewallRulesEngine.DenyAllAccess()
+							  .ExceptFromLocalhost();
+```
+
+## 設定 IP
+
+- 可以設定特定的 IP 才能存取
+  - 設定可以存取的 IP List
+  - 加入 `ExceptFromIPAddresses`，使用 IP 規則
+
+```csharp
+var allowIps = new List<IPAddress>
+{
+	IPAddress.Parse("10.211.55.2")
+};
+
+var rule = FirewallRulesEngine.DenyAllAccess()
+							  .ExceptFromIPAddresses(allowIps);
+```
+
+- 可以連線的情況
+
+![](/static/images/404.webp)
+
+- 拒絕連線的情況
+
+![](/static/images/404.webp)
+
+## 設定 IP Rang
+
+- 如果是辦公室的話，一個一個 IP 的設定實在是太麻煩了，就可以使用 IP Rang 的方式設定
+  - 設定可以存取的 IP Rang List
+    - 以下面的設定來看就是 10.211.55.1 ~ 10.211.55.254 這個範圍都可以存取
+  - 加入 `ExceptFromIPAddresses`，使用 IP Rang 規則
+
+```csharp
+var allowCidrNotations = new List<CIDRNotation>
+{
+	CIDRNotation.Parse("10.211.55.00/24")
+};
+
+var rule = FirewallRulesEngine.DenyAllAccess()
+                              .ExceptFromIPAddressRanges(allowCidrNotations);
+```
+
+- 可以連線的情況
+
+![](/static/images/404.webp)
+
+## 設定國家
+
+- Firewall 內建使用了 [GeoIP2](https://www.maxmind.com/en/geoip-demo) 服務，可以幫我們把 IP 轉成國家，進而限制
+  - 設定可以存取的國家 List
+    - 如果不知道國家代碼的話可以來這裡查詢 [GeoNames](http://www.geonames.org/)
+  - 加入 `ExceptFromCountries`，使用國家規則
+
+```csharp
+var allowCountryCodes = new List<CountryCode>
+{
+    CountryCode.JP
+};
+
+var rule = FirewallRulesEngine.DenyAllAccess()
+							  .ExceptFromCountries(allowCountryCodes);
+```
+
+- 在 local 測試的話，它會直接把 private IP 拿去查詢，然後查詢不到就直接拒絕連線
+
+![](/static/images/404.webp)
+
+- 為了測試，只好把程式碼上傳到 DigitalOcean 的主機測試
+  - 查詢出來的結果是 `Taiwan`，因為我設定的是 `Japan` 所以就拒絕連線了
+
+![](/static/images/404.webp)
+
+- 使用 VPN [Hotspot Shield](https://www.hotspotshield.com/) 設定 `Japan` 連線
+
+![](/static/images/404.webp)
+
+- 結果被偵測到 `Hong Kong`
+
+![](/static/images/404.webp)
+
+- 後來 VPN 改用 `Hong Kong`，就被偵測到 `Japan`，這個誤差實在有點大
+
+![](/static/images/404.webp)
+
+- 把 IP 拿去 [GeoIP2](https://www.maxmind.com/en/geoip-demo) 官網查詢的結果也是 `Japan`
+
+![](/static/images/404.webp)
+
+> 在使用國家時，請注意到它是有誤差的，不然就要換成自己的服務
+
+## 多個設定檔
+
+- Firewall 是可以設定多組的規則的，如果有一個規則通過就可以連線了，而且它的執行順序是由後往前執行，所以在設定多組的時候可以考慮一下先後的順序
+
+- 設定了 IP 和 IP Rang
+
+```csharp
+var rule = FirewallRulesEngine.DenyAllAccess()
+							  .ExceptFromIPAddresses(allowIps)
+							  .ExceptFromIPAddressRanges(allowCidrNotations);
+```
+
+- 可以看到 IP Rang 規則通過就過了，不會在執行 IP 的規則
+
+![](/static/images/404.webp)
+
+- 把 IP 和 IP Rang 的順序顛倒
+
+```csharp
+var rule = FirewallRulesEngine.DenyAllAccess()
+							  .ExceptFromIPAddressRanges(allowCidrNotations)
+							  .ExceptFromIPAddresses(allowIps);
+```
+
+- 可以看到 IP 的規則沒通過，會在執行下一個 IP Rang 的規則
+
+![](/static/images/404.webp)
+
+## 後記
+
+- 如果要用程式的方式來判斷 IP 的話，雖然 ASP.NET Core 內建有 [Client IP safe list](https://docs.microsoft.com/en-us/aspnet/core/security/ip-safelist?view=aspnetcore-2.1) 可以使用，不過功能相對來說就比較陽春一點，用 Firewall 套件的話，相對來說設定簡單，而且又有 IP Rang 和 國家可以使用，又或者可以寫自定的規則 (這裡沒有提到，可以看官方說明 [Custom Rules](https://github.com/dustinmoris/Firewall#custom-rules) 的部份)
+
+- 如果對 GeoIP2 有興趣的話，之前也有寫文章介紹 [GeoIP Search IP Location](/blog/geoip-search-ip-location/)，不過使用免費版本是有一定的誤差存在，如果要使用的話，要特別注意
+
+- 目前 Firewall 只能限制到整個網站，如果只要限制 Area 或者是部份網頁的話，這個套件是作不到的
