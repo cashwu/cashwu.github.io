@@ -1,0 +1,86 @@
+---
+layout: PostSimple
+title: Git Include：輕鬆管理多重身份的神奇魔法
+summary: '本文介紹了 Git Include 功能，解釋如何使用它來管理不同專案的 Git 配置。文章詳細說明了設置過程，包括在全局 .gitconfig 文件中使用 includeIf 指令，以及如何為特定目錄創建自定義配置。通過實際例子展示了如何在個人和公司專案中自動切換 Git 身份，並提供了進階使用技巧。這個強大的功能可以大大提高開發效率，幫助開發者更好地組織和管理多個 Git 身份。'
+date: '2024-08-17'
+lastmod: '2024-08-17'
+tags: [git]
+images: ['/static/images/git.webp']
+draft: false
+---
+
+![](/static/images/git.webp)
+
+你是否曾經遇到過在不同專案中需要使用不同的 Git 身份配置的情況？也許在個人專案中你想使用私人 Emial ，而在公司專案中則需要使用公司 Email。如果你厭倦了每次切換專案時都要手動更改 Git 配置，那麼 Git Include 功能就是為你量身打造的魔法工具！
+
+## Git Include 是什麼？
+
+Git Include 是一個強大的功能，允許你根據不同的目錄結構來包含特定的 Git 配置文件。這意味著你可以為不同的專案或目錄設置不同的 Git 配置，而無需每次都手動修改設定。
+
+## 如何設置 Git Include
+
+讓我們一步步來設置 Git Include：
+
+1, 首先，在你的 `Home` 目錄下建立或者編輯 `.gitconfig` 文件：
+
+```shell
+[user]
+  name = Cash
+  email = my@gmail.com
+  signingkey = <public key>
+
+[includeIf "gitdir:~/code/"]
+  path = ~/code/.gitconfig
+```
+
+這個配置告訴 Git：
+
+- 對於所有專案，默認使用名為 `Cash` 的名稱和 Email
+- 但是，如果專案位於 `~/code/` 目錄下，則包含 `~/code/.gitconfig` 中的配置。
+
+2, 接下來，在 `~/code/` 目錄下創建 `.gitconfig` 文件：
+
+```shell
+[user]
+  name = Cash
+  email = company@gmail.com
+  signingkey = <public key>
+```
+
+這個配置將覆蓋主 `.gitconfig` 中的用戶信息，但只適用於 `~/code/` 目錄下的專案。
+
+## 實際操作：見證奇蹟的時刻
+
+讓我們來測試一下這個配置是否真的有效：
+
+```shell
+# 在主目錄下創建一個測試專案
+mkdir ~/test_personal && cd ~/test_personal
+git init
+git config user.email  # 顯示：my@gmail.com
+
+# 在 ~/code/ 目錄下創建一個測試專案
+mkdir ~/code/test_company && cd ~/code/test_company
+git init
+git config user.email  # 顯示：company@gmail.com
+```
+
+## 進階技巧：條件性 Include
+
+Git 還允許你使用更複雜的條件來決定是否包含某個配置文件。例如：
+
+```shell
+[includeIf "gitdir:~/code/company-a/"]
+    path = ~/code/company-a/.gitconfig
+[includeIf "gitdir:~/code/company-b/"]
+    path = ~/code/company-b/.gitconfig
+```
+
+這樣，~你甚至可以為不同的公司專案設置不同的 Git 配置~！
+
+## 結語
+
+使用 Git Include，你可以輕鬆管理多個 Git 身份，再也不用擔心不小心用錯 Email 提交代碼了。這個小技巧不僅能提高你的工作效率，還能幫助你更好地組織和管理不同的專案配置。
+現在，你已經掌握了 Git Include 的魔法，快去嘗試一下吧！相信你會愛上這個功能的便利性。
+
+> Photo by [Yancy Min](https://unsplash.com/@yancymin?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/a-close-up-of-a-text-description-on-a-computer-screen-842ofHC6MaI?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
