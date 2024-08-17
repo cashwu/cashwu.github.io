@@ -1,19 +1,19 @@
 interface Project {
-  title: string,
-  summary: string,
-  href?: string,
-  imgSrc?: string,
+  title: string
+  summary: string
+  href?: string
+  imgSrc?: string
 }
 
 const projectsData: Project[] = [
-  {
-    title: 'Hello World',
-    summary: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
-  },
+  // {
+  //   title: 'Hello World',
+  //   summary: `What if you could look up any information in the world? Webpages, images, videos
+  //   and more. Google has many features to help you find exactly what you're looking
+  //   for.`,
+  //   imgSrc: '/static/images/google.png',
+  //   href: 'https://www.google.com',
+  // },
   // {
   //   title: 'The Time Machine',
   //   summary: `Imagine being able to travel back in time or to the future. Simple turn the knob
