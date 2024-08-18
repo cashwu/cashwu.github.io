@@ -1,0 +1,127 @@
+---
+layout: PostSimple
+title: '打造你的 React 神器：自定義 Hook 實現超強大的陣列操作！'
+summary: '介紹如何使用自定義 Hook useArrayState 來簡化 React 中的陣列操作，包括新增、刪除、更新等功能，並展示如何應用於待辦事項清單。'
+date: '2024-08-18'
+lastmod: '2024-08-18'
+tags: [react, custom-hook]
+draft: false
+images:
+  ['/static/images/2024/react-custom-hook-useArrayState-simplified-array-operations/cover.webp']
+---
+
+![](/static/images/2024/react-custom-hook-useArrayState-simplified-array-operations/cover.webp)
+
+你是不是經常在 React 專案中處理陣列狀態時感到頭痛？別擔心，今天我們要介紹一個超級實用的自定義 Hook - `useArrayState` ！
+
+這個小巧但功能強大的 Hook 將讓你的陣列操作變得輕鬆寫意，彷彿擁有了一支魔法棒！
+
+## useArrayState：你的陣列好幫手
+
+首先，讓我們來看看這個神奇的 useArrayState 是如何實現的：
+
+```javascript:useArrayState.js
+import { useState } from 'react';
+
+function useArrayState(initialArray = []) {
+  const [array, setArray] = useState(initialArray);
+
+  const push = (element) => {
+    setArray((a) => [...a, element]);
+  };
+
+  const remove = (index) => {
+    setArray((a) => a.filter((_, i) => i !== index));
+  };
+
+  const update = (index, newElement) => {
+    setArray((a) => a.map((el, i) => (i === index ? newElement : el)));
+  };
+
+  const clear = () => {
+    setArray([]);
+  };
+
+  return {
+    array,
+    setArray,
+    push,
+    remove,
+    update,
+    clear,
+  };
+}
+
+export default useArrayState;
+```
+
+這個 Hook 提供了四個超級實用的功能：
+
+1. `push`：往陣列尾端添加新元素
+2. `remove`：移除指定索引的元素
+3. `update`：更新指定索引的元素
+4. `clear`：清空整個陣列
+
+而且，它還保留了原始的 `array` 和 `setArray`，讓你可以靈活地進行其他操作。
+
+## 實戰應用：打造一個酷炫的待辦事項清單
+
+現在，讓我們來看看如何運用這個強大的 Hook 來創建一個簡單但功能齊全的待辦事項清單：
+
+```javascript:TodoList.js
+import React from 'react';
+import useArrayState from './useArrayState';
+
+function TodoList() {
+  const { array: todos, push, remove, update, clear } = useArrayState([]);
+
+  const addTodo = () => {
+    const newTodo = prompt('Enter a new todo:');
+    if (newTodo !== null) {
+      push(newTodo);
+    }
+  };
+
+  const editTodo = (index) => {
+    const updatedTodo = prompt('Update the todo:', todos[index]);
+    if (updatedTodo !== null) {
+      update(index, updatedTodo);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Todo List</h1>
+      <button onClick={addTodo}>Add Todo</button>
+      <button onClick={clear}>Clear All</button>
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>
+            {todo}
+            <button onClick={() => editTodo(index)}>Edit</button>
+            <button onClick={() => remove(index)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;
+```
+
+看到了嗎？使用 `useArrayState`，我們只需要幾行程式碼就實現了一個功能完整的待辦事項清單！
+
+你可以輕鬆地新增、編輯、刪除待辦事項，甚至一鍵清空所有項目。這簡直就是開發者的夢想啊！
+
+## 為什麼要使用 useArrayState？
+
+你可能會問：「我直接使用 `useState` 不就好了嗎？」沒錯，使用 `useState` 確實可以達到同樣的效果。但是，使用 `useArrayState` 有以下優點：1. 程式碼更簡潔：不需要每次都寫一大串的陣列操作邏輯。2. 邏輯復用：可以在不同的組件中重複使用相同的陣列操作邏輯。3. 降低錯誤風險：集中管理陣列操作，減少在不同地方重複編寫邏輯時可能產生的錯誤。4. 提高可讀性：push、remove、update 等方法名稱直觀明瞭，一眼就知道在做什麼。
+
+## 結語
+
+透過 `useArrayState` 這個強大的自定義 Hook，我們可以輕鬆地管理 React 中的陣列狀態。無論是簡單的待辦事項清單，還是複雜的數據管理，它都能派上用場。所以，下次當你需要在 React 中處理陣列時，不妨試試這個小巧但功能強大的 Hook 吧！
+
+現在，你已經掌握了這個 React 神器，快去創造出更多令人驚嘆的應用吧！記住，在 React 的世界裡，只有想不到，沒有做不到！
+
+> 圖片來源：AI 產生
