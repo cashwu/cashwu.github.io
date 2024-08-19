@@ -1,0 +1,173 @@
+---
+layout: PostSimple
+title: "打造你的神兵利器：React 共用 Input Hook"
+summary: "學習如何創建一個強大的 React 共用 input hook，使用純 JavaScript 簡化表單處理，提高代碼可重用性，並添加驗證功能。"
+date: '2024-08-19'
+lastmod: '2024-08-19'
+tags: [ react, js, hook ]
+draft: false
+images: ['/static/images/2024/react-custom-input-hook-for-easy-form-handling/cover.webp']
+---
+
+![](/static/images/2024/react-custom-input-hook-for-easy-form-handling/cover.webp)
+
+哈囉，React 冒險者們！今天我們要來打造一個超級厲害的武器 - 共用 input hook！
+
+這個小巧但威力十足的 hook 將讓你的表單處理變得輕鬆寫意，就像在炎炎夏日喝到一杯冰涼的珍珠奶茶那樣爽快。
+
+準備好了嗎？讓我們開始這場刺激的冒險吧！
+
+## 為什麼需要共用 Input Hook？
+
+想像一下，你正在開發一個複雜的表單，裡面有姓名、電子郵件、密碼等多個輸入欄位。
+
+如果為每個欄位都寫一遍狀態管理的程式碼，那簡直就是在折磨自己！
+
+而我們的共用 input hook 就是來拯救你於水火之中的超級英雄。
+
+## 開始打造我們的神兵利器
+
+首先，讓我們創建一個名為 `useInput` 的自定義 hook：
+
+```javascript:useInput.js
+import { useState } from 'react';
+
+function useInput(initialValue = '') {
+  const [value, setValue] = useState(initialValue);
+
+  const handleChange = (event) => {
+    setValue(event.target.value);
+  };
+
+  const reset = () => {
+    setValue(initialValue);
+  };
+
+  return {
+    value,
+    onChange: handleChange,
+    reset,
+  };
+}
+
+export default useInput;
+```
+
+哇！看起來很厲害，對吧？讓我來解釋一下這個神奇的 hook 是如何運作的：
+
+1. 我們使用 `useState` 來管理輸入值的狀態。
+2. `handleChange` 函數負責更新輸入值。
+3. `reset` 函數可以將輸入值重置為初始值。
+4. 最後，我們返回一個包含 `value`、`onChange` 和 `reset` 的物件。
+
+## 如何使用這個超強武器？
+
+現在，讓我們來看看如何在實際的組件中使用這個神兵利器：
+
+```jsx:form.js
+import React from 'react';
+import useInput from './useInput';
+
+function SuperForm() {
+  const nameInput = useInput('');
+  const emailInput = useInput('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('提交的資料：', {
+      name: nameInput.value,
+      email: emailInput.value,
+    });
+    nameInput.reset();
+    emailInput.reset();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="name">姓名：</label>
+        <input id="name" type="text" {...nameInput} />
+      </div>
+      <div>
+        <label htmlFor="email">電子郵件：</label>
+        <input id="email" type="email" {...emailInput} />
+      </div>
+      <button type="submit">提交</button>
+    </form>
+  );
+}
+
+export default SuperForm;
+```
+
+看到了嗎？使用我們的 `useInput` hook，表單處理變得如此簡單！
+
+我們只需要為每個輸入欄位調用 `useInput`，然後使用展開運算符 `{...nameInput}` 將 `value` 和 `onChange` 屬性傳遞給 `<input>` 元素。
+
+簡直是太神奇了！
+
+## 進階技巧：添加驗證功能
+
+如果你想讓這個 hook 更加強大，我們可以添加一個簡單的驗證功能：
+
+```javascript:useInput.js
+import { useState } from 'react';
+
+function useInput(initialValue = '', validate) {
+  const [value, setValue] = useState(initialValue);
+  const [isValid, setIsValid] = useState(true);
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setValue(newValue);
+    
+    if (validate) {
+      setIsValid(validate(newValue));
+    }
+  };
+
+  const reset = () => {
+    setValue(initialValue);
+    setIsValid(true);
+  };
+
+  return {
+    value,
+    onChange: handleChange,
+    reset,
+    isValid,
+  };
+}
+
+export default useInput;
+```
+
+現在，你可以在使用 hook 時添加驗證函數：
+
+```jsx
+const emailInput = useInput('', (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+
+// 在表單中使用
+<input
+  id="email"
+  type="email"
+  {...emailInput}
+  style={{ borderColor: emailInput.isValid ? 'initial' : 'red' }}
+/>
+```
+
+## 結語
+
+透過這個強大的 `useInput` hook，我們成功地簡化了 React 表單的處理過程。
+
+這不僅讓程式碼更加簡潔，還提高了可重用性。
+
+現在，你可以在任何需要處理輸入的地方使用這個 hook，讓表單處理變得輕而易舉！
+
+記住，好的工具能讓開發過程變得更加愉快。
+
+所以，下次當你面對複雜的表單時，別忘了祭出這個神兵利器！
+
+祝你在 React 的海洋中航行順利，表單處理無往不利！
+
+> 圖片來源：AI 產生
