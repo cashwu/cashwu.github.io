@@ -2,30 +2,41 @@
 layout: PostSimple
 title: "React Context Provider：輕鬆管理全局狀態的魔法工具"
 summary: "本文介紹了 React Context Provider 的使用方法和優點，包括如何創建 Context、Provider 組件和自定義 Hook，以及在實際應用中的使用示例和常見應用場景。"
-date: '2099-01-01'
-lastmod: '2099-01-01'
-tags: [react, js, hook, Context Provider ]
-draft: true
+date: '2024-08-20'
+lastmod: '2024-08-20'
+tags: [react, js, hook ]
+draft: false
 images: ['/static/images/2024/react-context-provider-tutorial/cover.webp']
 ---
 
 ![](/static/images/2024/react-context-provider-tutorial/cover.webp)
 
 
-你是否曾經在 React 專案中遇到過「狀態傳遞地獄」的問題？一層又一層的 props 傳遞，讓你的程式碼變得難以維護？別擔心，今天我們要介紹的 React Context Provider 就是來解決這個問題的超級英雄！
+你是否曾經在 React 專案中遇到過「狀態傳遞地獄」的問題？
+
+一層又一層的 props 傳遞，讓你的程式碼變得難以維護？
+
+別擔心，今天我們要介紹的 React Context Provider 就是來解決這個問題的超級英雄！
 
 ## 為什麼要用 Context Provider？
 
-想像一下，你正在開發一個複雜的應用程式，需要在多個組件之間共享一些全局狀態（例如用戶資訊、主題設置等）。如果使用傳統的 props 傳遞方式，你可能需要將這些狀態從最頂層的組件一路往下傳，經過許多中間組件，最終才能到達真正需要使用這些狀態的子組件。這不僅讓程式碼變得冗長，還增加了出錯的機會。
+想像一下，你正在開發一個複雜的應用程式，需要在多個組件之間共享一些全局狀態（例如用戶資訊、主題設置等）。
 
-Context Provider 的出現就是為了解決這個問題。它允許你創建一個「全局」的狀態容器，讓你能夠在組件樹中的任何地方訪問這些狀態，而不需要顯式地通過 props 傳遞。這大大簡化了程式碼結構，提高了可維護性。
+如果使用傳統的 props 傳遞方式，你可能需要將這些狀態從最頂層的組件一路往下傳，經過許多中間組件，最終才能到達真正需要使用這些狀態的子組件。
+
+這不僅讓程式碼變得冗長，還增加了出錯的機會。
+
+Context Provider 的出現就是為了解決這個問題。
+
+它允許你創建一個「全局」的狀態容器，讓你能夠在組件樹中的任何地方訪問這些狀態，而不需要顯式地通過 props 傳遞。
+
+這大大簡化了程式碼結構，提高了可維護性。
 
 ## 如何使用 Context Provider？
 
 讓我們通過一個簡單的例子來看看如何使用 Context Provider：
 
-```jsx
-// ThemeContext.js
+```js:ThemeContext.js
 import React, { createContext, useState, useContext } from 'react';
 
 // 創建 Context
@@ -56,16 +67,28 @@ export const useTheme = () => {
 };
 ```
 
-在這個例子中，我們創建了一個 `ThemeContext`，並定義了一個 `ThemeProvider` 組件。這個 Provider 組件管理了主題狀態（`theme`）和切換主題的函數（`toggleTheme`）。
+在這個例子中，我們創建了一個 `ThemeContext`，並定義了一個 `ThemeProvider` 組件。
 
-我們還創建了一個自定義 Hook `useTheme`，它使用 `useContext` 來獲取 context 的值。這個 Hook 不僅簡化了使用 context 的過程，還增加了一個錯誤檢查，確保 Hook 只在 Provider 內部使用。
+這個 Provider 組件管理了主題狀態（`theme`）和切換主題的函數（`toggleTheme`）。
+
+
+我們還創建了一個自定義 Hook `useTheme`，它使用 `useContext` 來獲取 context 的值。
+
+這個 Hook 不僅簡化了使用 context 的過程，還增加了一個錯誤檢查，確保 Hook 只在 Provider 內部使用。
+
+### Context Provider value
+
+在 React Context Provider 中，`value` 屬性是一個非常特殊的存在。 它是我們向 Context 消費者傳遞數據的橋樑。
+
+簡單來說，你可以把 `value` 想像成一個神奇的包裹，裡面裝著你想要在組件樹中共享的所有數據和函數。 
+
+在這個例子中，value 是一個包含 `theme` 和 `toggleTheme` 的對象。這意味著，任何使用這個 Context 的子組件都可以訪問到這兩個值。
 
 ## 如何在應用中使用？
 
 現在，讓我們看看如何在實際應用中使用這個 Context Provider：
 
-```jsx
-// App.js
+```js:App.js
 import React from 'react';
 import { ThemeProvider } from './ThemeContext';
 import Header from './Header';
@@ -81,8 +104,9 @@ const App = () => {
     </ThemeProvider>
   );
 };
+```
 
-// Header.js
+```js:Header.js
 import React from 'react';
 import { useTheme } from './ThemeContext';
 
@@ -95,8 +119,9 @@ const Header = () => {
     </header>
   );
 };
+```
 
-// Content.js
+```jsx:Content.js
 import React from 'react';
 import { useTheme } from './ThemeContext';
 
@@ -110,7 +135,9 @@ const Content = () => {
 };
 ```
 
-在這個例子中，我們將整個應用包裹在 `ThemeProvider` 中。這樣，`Header` 和 `Content` 組件就可以通過 `useTheme` Hook 輕鬆訪問和修改主題狀態，而不需要通過 props 層層傳遞。
+在這個例子中，我們將整個應用包裹在 `ThemeProvider` 中。
+
+這樣，`Header` 和 `Content` 組件就可以通過 `useTheme` Hook 輕鬆訪問和修改主題狀態，而不需要通過 props 層層傳遞。
 
 ## Context Provider 的應用場景
 
@@ -122,6 +149,14 @@ Context Provider 在許多場景下都非常有用，例如：
 4. 全局設置：管理應用的各種全局設置，如字體大小、顯示模式等。
 5. 購物車功能：在電商應用中管理購物車狀態。
 
-總之，Context Provider 是 React 中管理全局狀態的強大工具。它簡化了狀態傳遞的過程，讓你的程式碼更加清晰、易於維護。下次當你遇到需要在多個組件間共享狀態的情況時，別忘了考慮使用 Context Provider 哦！
+
+## 結語
+
+
+總之，Context Provider 是 React 中管理全局狀態的強大工具。
+
+它簡化了狀態傳遞的過程，讓你的程式碼更加清晰、易於維護。
+
+下次當你遇到需要在多個組件間共享狀態的情況時，別忘了考慮使用 Context Provider 哦！
 
 > 圖片來源：AI 產生
