@@ -1,0 +1,173 @@
+---
+layout: PostSimple
+title: "Spring Boot 中的 @Transactional：輕鬆駕馭資料庫交易"
+summary: "探索 Spring Boot 中 @Transactional 註解的使用方法和最佳實踐，學習如何有效管理資料庫交易，確保數據一致性和應用程序可靠性。"
+date: "2099-01-01"
+lastmod: "2099-01-01"
+tags: ["Spring Boot", "Java", "Transactional"]
+draft: true
+images: ['/static/images/2024/spring-boot-transactional-usage-and-best-practices/cover.webp']
+---
+
+![](/static/images/2024/spring-boot-transactional-usage-and-best-practices/cover.webp)
+
+ 'Spring Boot 中的 @Transactional：輕鬆駕馭資料庫交易'
+在 Spring Boot 中，`@Transactional` 註解是管理資料庫交易的重要工具。
+
+它能確保一系列的資料庫操作要麼全部成功，要麼全部失敗，維護資料的一致性。
+
+讓我們深入了解這個強大的註解，看看它如何讓你的資料庫操作變得更加安全可靠。
+
+## @Transactional 是什麼？
+
+`@Transactional` 就像是一個神奇的保護罩，確保你的一系列資料庫操作要麼全部成功，要麼全部失敗。
+
+這樣一來，你就不用擔心資料庫中出現不一致的狀態了。
+
+## 如何使用 @Transactional？
+
+使用 `@Transactional` 非常簡單，只需要在方法或類上加上這個註解 (annotation) 即可。例如：
+
+```java:UserService.java
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class UserService {
+    
+    @Transactional
+    public void createUser(User user) {
+        userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail());
+    }
+}
+```
+
+在這個例子中，如果建立使用者成功但發送郵件失敗，整個交易都會 rollback，確保資料的一致性。
+
+## @Transactional 的注意事項
+
+雖然 `@Transactional` 很強大，但使用時也要注意一些細節：
+
+1. **方法必須是 public**：
+
+
+   `@Transactional` 只能應用於 public 方法。這是因為 Spring 使用代理 (AOP) 來實現交易管理，而代理 (AOP)只能攔截 `public` 方法的調用。
+
+   ```java:UserService.java
+   @Transactional
+   public void correctMethod() { /* ... */ }
+
+   @Transactional
+   private void incorrectMethod() { /* ... */ } // 這不會生效！
+   ```
+
+2. **異常處理**：
+
+   默認情況下，只有遇到 RuntimeException 和 Error 時才會觸發 rollback。
+   
+   如果你想在遇到受檢異常時也回滾交易，可以使用 `rollbackFor` 屬性，然後指定 Exception 類型。
+
+   ```java:UserService.java
+   @Transactional(rollbackFor = Exception.class)
+   public void methodThatMightThrowException() throws Exception {
+       // 可能拋出異常的操作
+   }
+   ```
+
+3. **部分操作 rollback**：
+
+   有時候，你可能只想在某些特定情況下 rollback。
+   
+   這時可以使用 `TransactionAspectSupport`，採用半手動的方式，來觸發 `rollback`。
+
+   ```java:UserService.java
+   @Transactional
+   public void complexOperation() {
+       try {
+           // 一些資料庫操作
+           riskyOperation();
+       } catch (SomeSpecificException e) {
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+       }
+   }
+   ```
+
+4. **嵌套交易**：
+
+   當一個帶有 `@Transactional` 的方法調用另一個帶有 `@Transactional` 的方法時，默認情況下會使用同一個交易。
+   
+   如果你想創建一個新的交易，可以使用 propagation 屬性：
+
+   ```java:UserService.java
+   @Transactional(propagation = Propagation.REQUIRES_NEW)
+   public void newTransaction() {
+       // 這會在新的交易中執行
+   }
+   ```
+
+5. **選擇合適的位置**：
+
+   通常建議將 `@Transactional` 放在 Service 層，而不是 DAO 層。這樣可以更好地控制交易的邊界。
+
+6. **保持交易簡短**：
+
+   盡量讓交易保持簡短，只包含必要的操作。這樣可以提高性能，減少資源佔用。
+
+## 實戰示例
+
+讓我們看一個更實際的例子，假設我們要實現一個轉帳功能：
+
+```java
+@Service
+public class BankService {
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Transactional
+    public void transfer(String fromAccountId, String toAccountId, BigDecimal amount) {
+        Account fromAccount = accountRepository.findById(fromAccountId)
+            .orElseThrow(() -> new AccountNotFoundException("From account not found"));
+        Account toAccount = accountRepository.findById(toAccountId)
+            .orElseThrow(() -> new AccountNotFoundException("To account not found"));
+
+        if (fromAccount.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientFundsException("Insufficient funds in the account");
+        }
+
+        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
+        toAccount.setBalance(toAccount.getBalance().add(amount));
+
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+    }
+}
+```
+
+在這個例子中，`@Transactional` 確保了整個轉帳過程的原子性。
+
+如果在任何步驟發生異常（比如賬戶不存在或餘額不足），整個交易都會 rollback，保證了資金的安全。
+
+## 如何 Debug
+
+`@Transactional` Debug 相關的問題可能會有點棘手。以下是一些建議：
+
+1. **使用 Log**：在關鍵點添加日誌，記錄交易的開始、提交和 rollback。
+
+2. **使用 AOP**：創建一個切面來記錄所有帶有 `@Transactional` 註解的方法的執行情況。
+
+3. **使用資料庫日誌**：開啟資料庫的交易日誌，可以幫助你了解實際發生的 SQL 操作和交易行為。
+
+4. **使用調試工具**：像 IntelliJ IDEA 這樣的 IDE 提供了強大的調試功能，可以幫助你逐步執行代碼，觀察變量的變化。
+
+## 結語
+
+`@Transactional` 是 Spring Boot 中處理資料庫交易的利器。
+
+正確使用它，可以大大提高你的應用程序的可靠性和數據一致性。
+
+記住，交易管理就像是駕駛汽車，既要掌握好方向盤（正確使用註解），也要時刻注意交通規則（遵循最佳實踐）。
+
+現在，你已經準備好在你的 Spring Boot 項目中駕馭 `@Transactional` 了！
+
+> 圖片來源：AI 產生
