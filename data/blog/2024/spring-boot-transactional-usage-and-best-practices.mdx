@@ -2,16 +2,15 @@
 layout: PostSimple
 title: "Spring Boot 中的 @Transactional：輕鬆駕馭資料庫交易"
 summary: "探索 Spring Boot 中 @Transactional 註解的使用方法和最佳實踐，學習如何有效管理資料庫交易，確保數據一致性和應用程序可靠性。"
-date: "2099-01-01"
-lastmod: "2099-01-01"
+date: "2024-08-21"
+lastmod: "2024-08-21"
 tags: ["Spring Boot", "Java", "Transactional"]
-draft: true
+draft: false
 images: ['/static/images/2024/spring-boot-transactional-usage-and-best-practices/cover.webp']
 ---
 
 ![](/static/images/2024/spring-boot-transactional-usage-and-best-practices/cover.webp)
 
- 'Spring Boot 中的 @Transactional：輕鬆駕馭資料庫交易'
 在 Spring Boot 中，`@Transactional` 註解是管理資料庫交易的重要工具。
 
 它能確保一系列的資料庫操作要麼全部成功，要麼全部失敗，維護資料的一致性。
@@ -51,7 +50,7 @@ public class UserService {
 1. **方法必須是 public**：
 
 
-   `@Transactional` 只能應用於 public 方法。這是因為 Spring 使用代理 (AOP) 來實現交易管理，而代理 (AOP)只能攔截 `public` 方法的調用。
+   `@Transactional` 只能應用於 `public` 方法。這是因為 Spring 使用代理 (AOP) 來實現交易管理，而代理 (AOP)只能攔截 `public` 方法的調用。
 
    ```java:UserService.java
    @Transactional
@@ -63,9 +62,9 @@ public class UserService {
 
 2. **異常處理**：
 
-   默認情況下，只有遇到 RuntimeException 和 Error 時才會觸發 rollback。
+   默認情況下，只有遇到 `RuntimeException` 和 `Error` 時才會觸發 rollback。
    
-   如果你想在遇到受檢異常時也回滾交易，可以使用 `rollbackFor` 屬性，然後指定 Exception 類型。
+   如果你想在遇到受檢異常時也 rollback 交易，可以使用 `rollbackFor` 屬性，然後指定 Exception 類型。
 
    ```java:UserService.java
    @Transactional(rollbackFor = Exception.class)
@@ -107,7 +106,7 @@ public class UserService {
 
 5. **選擇合適的位置**：
 
-   通常建議將 `@Transactional` 放在 Service 層，而不是 DAO 層。這樣可以更好地控制交易的邊界。
+   通常建議將 `@Transactional` 放在 `Service` 層，而不是 `DAO` 層。這樣可以更好地控制交易的邊界。
 
 6. **保持交易簡短**：
 
@@ -159,6 +158,13 @@ public class BankService {
 3. **使用資料庫日誌**：開啟資料庫的交易日誌，可以幫助你了解實際發生的 SQL 操作和交易行為。
 
 4. **使用調試工具**：像 IntelliJ IDEA 這樣的 IDE 提供了強大的調試功能，可以幫助你逐步執行代碼，觀察變量的變化。
+
+5. **設定 Spring 日誌級別**：通過在 `application.properties` 或 `application.yml` 文件中添加以下配置，可以查看更詳細的 JPA 和交易相關日誌 
+
+```properties
+logging.level.org.springframework.orm.jpa=DEBUG
+logging.level.org.springframework.transaction=TRACE
+```
 
 ## 結語
 
