@@ -1,0 +1,134 @@
+---
+layout: PostSimple
+title: "Lombok @Data 的魔法與陷阱：深入探討 @EqualsAndHashCode"
+summary: "探討 Java Lombok 的 @Data 注解，特別是其中包含的 @EqualsAndHashCode 注解的默認實現和限制，包括繼承時的問題和如何排除特定field的比較。"
+date: "2024-08-22"
+lastmod: "2024-08-22"
+tags: ["Java", "Lombok", "EqualsAndHashCode"]
+draft: false
+images: ["/static/images/2024/java-lombok-data-annotation-equals-and-hashcode/cover.webp"]
+---
+
+![](/static/images/2024/java-lombok-data-annotation-equals-and-hashcode/cover.webp)
+
+你是否曾經厭倦了在 Java 類中反覆編寫 getter、setter、equals、hashCode 和 toString 方法？
+
+如果是的話，`Lombok` 的 `@Data` 注解就像是一個神奇的魔法棒，只需揮一揮，就能解決這些煩人的瑣事。
+
+但是，就像所有的魔法一樨，使用時需要小心謹慎，特別是當涉及到 `@EqualsAndHashCode` 時。
+
+## @Data 的神奇力量
+
+@Data 注解是 Lombok 提供的一個強大工具，它自動為你的類添加以下內容：
+
+1. 所有 field的 getter 方法
+2. 所有非 final field的 setter 方法
+3. toString() 方法
+4. equals() 方法
+5. hashCode() 方法
+6. 所有 field 的 constructor
+
+看起來很棒，對吧？
+
+只需一行代碼，就能搞定這麼多事情！但是，魔鬼藏在細節中，尤其是在 equals() 和 hashCode() 方法的實現上。
+
+## @EqualsAndHashCode：隱藏的驚喜
+
+@Data 注解默認包含了 `@EqualsAndHashCode` ，這個注解自動生成 equals() 和 hashCode() 方法。
+
+聽起來很方便，但是它可能會帶來一些意想不到的問題。
+
+### 默認行為
+
+默認情況下，`@EqualsAndHashCode` 會使用類中的所有非 static、非 transient field 來生成 equals() 和 hashCode() 方法。
+
+例如：
+
+```java
+import lombok.Data;
+
+@Data
+public class User {
+    private Long id;
+    private String name;
+    private int age;
+}
+```
+
+在這個例子中，生成的 equals() 和 hashCode() 方法會考慮 id、name 和 age 這三個 field。
+
+### 繼承時的陷阱
+
+當涉及到繼承時，事情就變得棘手了。考慮以下情況：
+
+```java
+@Data
+public class Person {
+    private String name;
+    private int age;
+}
+
+@Data
+public class Employee extends Person {
+    private String employeeId;
+}
+```
+
+這裡有一個潛在的問題：Employee 類的 equals() 方法只會比較 employeeId，而忽略了從 Person 類繼承的 name 和 age field。
+
+這可能導致意外的相等性比較結果。
+
+### 解決方案：callSuper
+
+為了解決這個問題，你可以使用 @EqualsAndHashCode 的 `callSuper` 參數：
+
+```java
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class Employee extends Person {
+    private String employeeId;
+}
+```
+
+這樣，生成的 equals() 和 hashCode() 方法就會考慮父類的 field。
+
+## 排除不想比較的 field
+
+有時候，你可能不想將某些 field 納入 equals() 和 hashCode() 的計算中。
+
+例如，一個用戶類中的密碼 field：
+
+```java
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+// 寫在 class 上面可以控制整個 class 裡面的 field
+@EqualsAndHashCode(exclude = "password")
+public class User {
+    private Long id;
+    private String username;
+
+    // 也可以寫在單獨的 field 上面
+    @EqualsAndHashCode.exclude
+    private String password; 
+}
+```
+
+使用 exclude 參數，我們可以輕鬆地排除不想參與比較的 field，有兩種不同的用法，看需要而決定要使用那一種。
+
+其實還有比較進階的設定方法(用法)，在這裡就先不談了 XD
+
+## 結論
+
+Lombok 的 @Data 注解確實是一個強大的工具，可以大大減少樣板代碼。然而，它的 @EqualsAndHashCode 部分需要特別注意，尤其是在處理繼承和敏感數據時。
+
+記住以下幾點：
+
+1. 在繼承情況下，考慮使用 `@EqualsAndHashCode(callSuper = true)`
+2. 對於不應參與相等性比較的 field，使用 `exclude` 參數
+3. 始終仔細考慮你的類的相等性語義，不要盲目依賴自動生成的方法
+
+通過謹慎使用這些注解，你可以享受 Lombok 帶來的便利，同時避免潛在的陷阱。記住，即使是魔法也需要智慧來駕馭！
