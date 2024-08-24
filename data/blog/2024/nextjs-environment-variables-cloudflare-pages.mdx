@@ -1,0 +1,110 @@
+---
+layout: PostSimple
+title: 'Next.js 環境變數設定大冒險！'
+summary: '本文介紹了如何在 Next.js 中使用環境變數，以及如何在 Cloudflare Pages 上設定和使用這些變數。文章以輕鬆幽默的方式解釋了環境變數的概念，並提供了實用的代碼示例和步驟說明'
+date: '2024-08-24'
+lastmod: '2024-08-24'
+tags: ['Next.js', 'Cloudflare Pages', 'env']
+draft: false
+images: ['/static/images/2024/nextjs-environment-variables-cloudflare-pages/cover.webp']
+---
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/cover.webp)
+
+你是否曾經為了在不同環境中管理各種設定而頭痛不已？
+
+別擔心，Next.js 和 Cloudflare Pages 來拯救你了！
+
+讓我們一起來探索如何輕鬆駕馭環境變數的世界吧！
+
+## Next.js 中的環境變數魔法
+
+在 Next.js 中，環境變數就像是隱藏在帽子裡的兔子，隨時準備跳出來幫助你！
+
+以下是如何使用這個魔法的步驟：
+
+1. 創建一個神奇的 `.env` 文件：
+
+   ```
+   API_KEY=abracadabra123
+   DATABASE_URL=mysql://username:password@localhost:3306/my_db
+   ```
+
+2. 在你的 Next.js 代碼中，使用 `process.env` 來召喚這些變數：
+
+   ```javascript
+   const apiKey = process.env.API_KEY
+   const dbUrl = process.env.DATABASE_URL
+
+   console.log(`我的神奇 API 鑰匙是：${apiKey}`)
+   ```
+
+3. 如果你想要在瀏覽器中使用環境變數，記得加上 `NEXT_PUBLIC_` 前綴：
+
+   ```
+   NEXT_PUBLIC_WEBSITE_NAME=我的超酷網站
+   ```
+
+   然後你就可以在任何地方使用它了：
+
+   ```javascript
+   const siteName = process.env.NEXT_PUBLIC_WEBSITE_NAME
+   ```
+
+## 環境變數的多重宇宙
+
+Next.js 允許你為不同的環境創建專屬的設定檔，就像是打開了平行宇宙的大門！
+
+- `.env.local`：本地開發環境的秘密基地
+- `.env.development`：開發環境的專屬領地
+- `.env.production`：生產環境的堅固堡壘
+
+Next.js 會自動根據你的運行環境選擇正確的設定檔，就像是有了一個聰明的管家！
+
+## Cloudflare Pages 上的環境變數派對
+
+在 Cloudflare Pages 上設定環境變數就像是在雲端開派對，簡單又有趣！
+
+1. 登入 Cloudflare 儀表板，進入到你的 Pages 專案，點擊 `設定`，然後選擇 `環境變數`
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/01.webp)
+
+2. 點擊 `新增變數` 按鈕，就可以輸入你的變數名稱和值，填完後點擊 `加密` 按鈕
+
+> 注意畫面上的提示，在 dashboard 中，所有的環境變數都是 `加密變數`，其它的可以放在 `wrangler.toml`，它就不是加密的了
+
+> 另外，要注意的是，設定後要等到下次 deploy 才會生效
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/02.webp)
+
+3. 加密後，畫面上就會提示你，儲存後就看不到這個變數值了，要注意
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/03.webp)
+
+4. 儲存後，變數值就變成 `Value encrypted` 了，就算按 `編輯變數` 也看不到，只有刪除的功能
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/04.webp)
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/05.webp)
+
+5. 可以比較一下，dashboard 新增環境變數的前後，在 `部署詳細資料` 頁面中的差異
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/06.webp)
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/07.webp)
+
+6. 另外一個比較 ~雷~ 奇怪的地方是，如果環境變數是在瀏覽器中使用 (也就是有 `NEXT_PUBLIC_` 前綴的)，在 deploy 時，`Cloudflare` 會自動把 `.env` 裡面的環境變數，在畫面上換成固定的值 ...
+
+> 不確定這個行為到底是 `Next.js` 的問題，還是 `Cloudflare` 的問題，這裡我試了蠻久的
+
+![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/08.webp)
+
+更深入的 `Cloudflare Pages` 設定，可以參考 [Cloudflare Pages Configuration 官方文件](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)
+
+## 結語
+
+透過這些簡單的步驟，你就可以輕鬆管理 Next.js 應用的環境變數，並在 Cloudflare Pages 上部署時使用它們。
+
+環境變數不再是可怕的怪獸，而是你的得力助手！現在，去征服那些配置難題吧，勇敢的開發者！
+
+> 圖片來源：AI 產生
