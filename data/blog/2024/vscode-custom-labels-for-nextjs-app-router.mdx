@@ -1,0 +1,105 @@
+---
+layout: PostSimple
+title: 'VS Code 自定義標籤：讓你的 Next.js 專案更有條理！'
+summary: '學習如何使用 VS Code 的自定義標籤功能來改善 Next.js app 路由開發體驗，提高效率並減少錯誤。'
+date: '2024-08-25'
+lastmod: '2024-08-25'
+tags: ['VSCode', 'Next.js']
+draft: false
+images: ['/static/images/2024/vscode-custom-labels-for-nextjs-app-router/cover.webp']
+---
+
+![](/static/images/2024/vscode-custom-labels-for-nextjs-app-router/cover.webp)
+
+你是否曾經在 VS Code 中開啟多個檔案時，感到一頭霧水？
+
+特別是在使用 Next.js 的 app 路由時，那些重複的 `page.js` 檔案名稱簡直讓人抓狂！
+
+別擔心，VS Code 有一個超酷的功能可以解決這個問題 - `自定義標籤（Custom Labels）`。
+
+## 什麼是自定義標籤？
+
+自定義標籤允許你改變 VS Code 編輯器標籤中顯示的檔案名稱格式。
+
+這意味著你可以讓檔案名稱更具描述性，更容易識別。
+
+對於 Next.js 的 app 路由來說，這簡直是救星！
+
+## 如何設定？
+
+設定自定義標籤非常簡單。只需要在你的 VS Code 設定檔中加入以下內容：
+
+```json
+{
+  "workbench.editor.customLabels.enabled": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/*.*": "${dirname} -> ${filename}.${extname}"
+  }
+}
+```
+
+這段設定做了什麼呢？讓我們一起來解析：
+
+1. `"workbench.editor.customLabels.enabled": true`: 這行啟用了自定義標籤功能。
+2. `"workbench.editor.customLabels.patterns"`: 這裡定義了自定義標籤的模式。
+3. `"**/app/**/*.*"`: 這是一個 glob 模式，表示它會匹配 `app` 資料夾下的所有檔案。
+4. `"${dirname} -> ${filename}.${extname}"`: 這定義了新的標籤格式。
+
+## 實際效果如何？
+
+想像你有以下的檔案結構：
+
+```
+app/
+  dashboard/
+    page.js
+  settings/
+    page.js
+  profile/
+    page.js
+```
+
+在沒有自定義標籤的情況下，你的編輯器標籤可能看起來像這樣：
+
+```
+page.js | page.js | page.js
+```
+
+但是有了自定義標籤後，它們會變成：
+
+```
+dashboard -> page.js | settings -> page.js | profile -> page.js
+```
+
+是不是瞬間清晰了許多？你可以一眼就知道每個 `page.js` 屬於哪個路由！
+
+下圖就是設定後的實際效果：
+
+![](/static/images/2024/vscode-custom-labels-for-nextjs-app-router/01.webp)
+
+在全站搜尋時，也會有一樣效果：
+
+![](/static/images/2024/vscode-custom-labels-for-nextjs-app-router/02.webp)
+
+## 為什麼這很重要？
+
+1. **提高效率**：快速找到你要編輯的檔案，不用再猜測哪個 `page.js` 是哪個了。
+2. **減少錯誤**：清楚的標籤可以幫助你避免在錯誤的檔案中進行修改。
+3. **心情愉悅**：相信我，當你的工作環境變得更有組織性時，你的心情也會變好！
+
+## 結語
+
+VS Code 的自定義標籤功能可能看起來是個小細節，但它確實能大大提升你的開發體驗。
+
+特別是對於使用 Next.js app 路由的開發者來說，這簡直是必備的小技巧！
+
+所以，還在等什麼？立即設定你的 VS Code，讓你的開發環境變得更加清晰有序吧！
+
+誰說寫程式就不能既有效率又有樂趣呢
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- [How's the ecosystem of app router as of today? is it useful?](https://www.reddit.com/r/nextjs/comments/1ey6h7r/comment/ljdz64n/)
+- [vscode 自訂索引標籤標籤](https://vscode.dev.org.tw/docs/getstarted/userinterface#_customize-tab-labels)

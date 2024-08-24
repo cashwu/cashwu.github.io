@@ -1,9 +1,10 @@
 {
   "mindset": 1,
   "rider": 8,
-  "nextjs": 1,
+  "nextjs": 2,
   "cloudflare-pages": 1,
   "env": 1,
+  "vs-code": 1,
   "java": 6,
   "lombok": 1,
   "equalsandhashcode": 1,
