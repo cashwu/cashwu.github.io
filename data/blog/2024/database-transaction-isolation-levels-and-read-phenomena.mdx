@@ -1,0 +1,426 @@
+---
+layout: PostSimple
+title: '資料庫交易隔離級別與讀取現象：髒讀、不可重複讀和幻讀'
+summary: '探討資料庫中的三大讀取問題：髒讀、不可重複讀和幻讀。通過簡單的比喻和 C# 和 Java 程式碼範例，幫助讀者理解這些概念及其在資料庫交易中的重要性'
+date: '2024-08-27'
+lastmod: '2024-08-27'
+tags: ['database', 'transaction', 'sql']
+draft: true
+images: ['/static/images/2024/database-transaction-isolation-levels-and-read-phenomena/cover.webp']
+---
+
+![](/static/images/2024/database-transaction-isolation-levels-and-read-phenomena/cover.webp)
+
+在資料庫世界中，交易隔離級別是一個非常重要的概念。它決定了在多個交易同時進行時，資料的可見性和一致性。
+
+今天，我們將探討三種常見的讀取現象：髒讀、不可重複讀和幻讀，並通過簡單的 C# 和 Java 程式碼範例來理解它們。
+
+## 交易隔離級別
+
+首先，讓我們快速回顧一下四種標準的交易隔離級別：
+
+1. 讀取未提交（Read Uncommitted）
+2. 讀取已提交（Read Committed）
+3. 可重複讀（Repeatable Read）
+4. 序列化（Serializable）
+
+這些級別從上到下，隔離程度逐漸增加，但同時也可能影響性能。
+
+> 注意：範例裡面的相關程式碼，是為了說明問題而產生，請勿直接使用。
+
+> 注意：範例裡面的相關程式碼，是為了說明問題而產生，請勿直接使用。
+
+> 注意：範例裡面的相關程式碼，是為了說明問題而產生，請勿直接使用。
+
+## 髒讀（Dirty Read）
+
+髒讀發生在一個交易讀取了另一個未提交交易修改過的資料。如果那個未提交的交易最後回滾，那麼第一個交易讀到的就是髒資料。
+
+### C# 範例
+
+```csharp
+using System;
+using System.Data.SqlClient;
+
+class DirtyReadExample
+{
+    static void Main()
+    {
+        string connectionString = "Your_Connection_String_Here";
+
+        // 交易 1：更新資料但不提交
+        using (SqlConnection conn1 = new SqlConnection(connectionString))
+        {
+            conn1.Open();
+            SqlTransaction transaction1 = conn1.BeginTransaction();
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("UPDATE Accounts SET Balance = 1000 WHERE AccountId = 1", conn1, transaction1))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+
+                // 故意暫停，不提交交易
+                System.Threading.Thread.Sleep(5000);
+
+                // 最後回滾交易
+                transaction1.Rollback();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction1.Rollback();
+            }
+        }
+
+        // 交易 2：讀取可能的髒資料
+        using (SqlConnection conn2 = new SqlConnection(connectionString))
+        {
+            conn2.Open();
+            SqlTransaction transaction2 = conn2.BeginTransaction(System.Data.IsolationLevel.ReadUncommitted);
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("SELECT Balance FROM Accounts WHERE AccountId = 1", conn2, transaction2))
+                {
+                    object result = cmd.ExecuteScalar();
+                    Console.WriteLine($"讀取到的餘額：{result}"); // 可能讀到髒資料 1000
+                }
+
+                transaction2.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction2.Rollback();
+            }
+        }
+    }
+}
+```
+
+### Java 範例
+
+```java
+import java.sql.*;
+
+public class DirtyReadExample {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        // 交易 1：更新資料但不提交
+        new Thread(() -> {
+            try (Connection conn1 = DriverManager.getConnection(url, user, password)) {
+                conn1.setAutoCommit(false);
+                try (Statement stmt = conn1.createStatement()) {
+                    stmt.executeUpdate("UPDATE Accounts SET Balance = 1000 WHERE AccountId = 1");
+
+                    // 故意暫停，不提交交易
+                    Thread.sleep(5000);
+
+                    // 最後回滾交易
+                    conn1.rollback();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // 交易 2：讀取可能的髒資料
+        try (Connection conn2 = DriverManager.getConnection(url, user, password)) {
+            conn2.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+            conn2.setAutoCommit(false);
+
+            try (Statement stmt = conn2.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT Balance FROM Accounts WHERE AccountId = 1")) {
+                if (rs.next()) {
+                    System.out.println("讀取到的餘額：" + rs.getInt("Balance")); // 可能讀到髒資料 1000
+                }
+            }
+
+            conn2.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+## 不可重複讀（Non-repeatable Read）
+
+不可重複讀發生在一個交易內多次讀取同一筆資料，但每次讀取的結果不同。這通常是因為其他交易在兩次讀取之間修改了資料。
+
+### C# 範例
+
+```csharp
+using System;
+using System.Data.SqlClient;
+
+class NonRepeatableReadExample
+{
+    static void Main()
+    {
+        string connectionString = "Your_Connection_String_Here";
+
+        // 交易 1：多次讀取資料
+        using (SqlConnection conn1 = new SqlConnection(connectionString))
+        {
+            conn1.Open();
+            SqlTransaction transaction1 = conn1.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+
+            try
+            {
+                // 第一次讀取
+                using (SqlCommand cmd = new SqlCommand("SELECT Balance FROM Accounts WHERE AccountId = 1", conn1, transaction1))
+                {
+                    object result = cmd.ExecuteScalar();
+                    Console.WriteLine($"第一次讀取餘額：{result}");
+                }
+
+                // 暫停一下，讓其他交易有機會修改資料
+                System.Threading.Thread.Sleep(5000);
+
+                // 第二次讀取
+                using (SqlCommand cmd = new SqlCommand("SELECT Balance FROM Accounts WHERE AccountId = 1", conn1, transaction1))
+                {
+                    object result = cmd.ExecuteScalar();
+                    Console.WriteLine($"第二次讀取餘額：{result}"); // 可能與第一次不同
+                }
+
+                transaction1.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction1.Rollback();
+            }
+        }
+
+        // 交易 2：在兩次讀取之間修改資料
+        using (SqlConnection conn2 = new SqlConnection(connectionString))
+        {
+            conn2.Open();
+            SqlTransaction transaction2 = conn2.BeginTransaction();
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("UPDATE Accounts SET Balance = Balance + 100 WHERE AccountId = 1", conn2, transaction2))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+
+                transaction2.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction2.Rollback();
+            }
+        }
+    }
+}
+```
+
+### Java 範例
+
+```java
+import java.sql.*;
+
+public class NonRepeatableReadExample {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        // 交易 1：多次讀取資料
+        new Thread(() -> {
+            try (Connection conn1 = DriverManager.getConnection(url, user, password)) {
+                conn1.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+                conn1.setAutoCommit(false);
+
+                try (Statement stmt = conn1.createStatement()) {
+                    // 第一次讀取
+                    ResultSet rs = stmt.executeQuery("SELECT Balance FROM Accounts WHERE AccountId = 1");
+                    if (rs.next()) {
+                        System.out.println("第一次讀取餘額：" + rs.getInt("Balance"));
+                    }
+
+                    // 暫停一下，讓其他交易有機會修改資料
+                    Thread.sleep(5000);
+
+                    // 第二次讀取
+                    rs = stmt.executeQuery("SELECT Balance FROM Accounts WHERE AccountId = 1");
+                    if (rs.next()) {
+                        System.out.println("第二次讀取餘額：" + rs.getInt("Balance")); // 可能與第一次不同
+                    }
+                }
+
+                conn1.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // 交易 2：在兩次讀取之間修改資料
+        try (Connection conn2 = DriverManager.getConnection(url, user, password)) {
+            conn2.setAutoCommit(false);
+
+            try (Statement stmt = conn2.createStatement()) {
+                stmt.executeUpdate("UPDATE Accounts SET Balance = Balance + 100 WHERE AccountId = 1");
+            }
+
+            conn2.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+## 幻讀（Phantom Read）
+
+幻讀發生在一個交易執行兩次查詢，但第二次查詢返回了第一次查詢中未出現的行。這通常是因為其他交易在兩次查詢之間插入了新的資料。
+
+### C# 範例
+
+```csharp
+using System;
+using System.Data.SqlClient;
+
+class PhantomReadExample
+{
+    static void Main()
+    {
+        string connectionString = "Your_Connection_String_Here";
+
+        // 交易 1：執行範圍查詢
+        using (SqlConnection conn1 = new SqlConnection(connectionString))
+        {
+            conn1.Open();
+            SqlTransaction transaction1 = conn1.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
+
+            try
+            {
+                // 第一次查詢
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Accounts WHERE Balance > 1000", conn1, transaction1))
+                {
+                    int count = (int)cmd.ExecuteScalar();
+                    Console.WriteLine($"第一次查詢結果：{count}筆記錄");
+                }
+
+                // 暫停一下，讓其他交易有機會插入資料
+                System.Threading.Thread.Sleep(5000);
+
+                // 第二次查詢
+                using (SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM Accounts WHERE Balance > 1000", conn1, transaction1))
+                {
+                    int count = (int)cmd.ExecuteScalar();
+                    Console.WriteLine($"第二次查詢結果：{count}筆記錄"); // 可能與第一次不同
+                }
+
+                transaction1.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction1.Rollback();
+            }
+        }
+
+        // 交易 2：在兩次查詢之間插入新資料
+        using (SqlConnection conn2 = new SqlConnection(connectionString))
+        {
+            conn2.Open();
+            SqlTransaction transaction2 = conn2.BeginTransaction();
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand("INSERT INTO Accounts (AccountId, Balance) VALUES (999, 2000)", conn2, transaction2))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+
+                transaction2.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                transaction2.Rollback();
+            }
+        }
+    }
+}
+```
+
+### Java 範例
+
+```java
+import java.sql.*;
+
+public class PhantomReadExample {
+    public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "your_username";
+        String password = "your_password";
+
+        // 交易 1：執行範圍查詢
+        new Thread(() -> {
+            try (Connection conn1 = DriverManager.getConnection(url, user, password)) {
+                conn1.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+                conn1.setAutoCommit(false);
+
+                try (Statement stmt = conn1.createStatement()) {
+                    // 第一次查詢
+                    ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Accounts WHERE Balance > 1000");
+                    if (rs.next()) {
+                        System.out.println("第一次查詢結果：" + rs.getInt(1) + "筆記錄");
+                    }
+
+                    // 暫停一下，讓其他交易有機會插入資料
+                    Thread.sleep(5000);
+
+                    // 第二次查詢
+                    rs = stmt.executeQuery("SELECT COUNT(*) FROM Accounts WHERE Balance > 1000");
+                    if (rs.next()) {
+                        System.out.println("第二次查詢結果：" + rs.getInt(1) + "筆記錄"); // 可能與第一次不同
+                    }
+                }
+
+                conn1.commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // 交易 2：在兩次查詢之間插入新資料
+        try (Connection conn2 = DriverManager.getConnection(url, user, password)) {
+            conn2.setAutoCommit(false);
+
+            try (Statement stmt = conn2.createStatement()) {
+                stmt.executeUpdate("INSERT INTO Accounts (AccountId, Balance) VALUES (999, 2000)");
+            }
+
+            conn2.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+通過這些範例，我們可以看到不同的交易隔離級別如何影響資料的讀取結果。
+
+在實際應用中，我們需要根據業務需求和性能考量來選擇適當的隔離級別。
+
+記住，越高的隔離級別提供越好的資料一致性，但也可能帶來更多的性能開銷。
+
+希望這篇文章能幫助你更好地理解資料庫交易隔離級別和常見的讀取現象！
+
+> 圖片來源：AI 產生
+
+## 參考資料
+
+- [資料密集型應用系統設計 (Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems)](https://www.tenlong.com.tw/products/9789865028350)

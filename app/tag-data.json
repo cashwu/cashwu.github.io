@@ -1,7 +1,9 @@
 {
   "mindset": 1,
   "rider": 8,
-  "javascript": 1,
+  "database": 1,
+  "transaction": 1,
+  "js": 13,
   "function": 1,
   "composition": 1,
   "vscode": 3,
@@ -14,7 +16,6 @@
   "spring-boot": 1,
   "transactional": 1,
   "react": 7,
-  "js": 12,
   "hook": 3,
   "git": 6,
   "warp": 1,
