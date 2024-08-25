@@ -1,0 +1,119 @@
+---
+layout: PostSimple
+title: '揭秘 JavaScript 的 compose 函數：從 0 到 1'
+summary: '深入探討 JavaScript 中 compose 函數的魔力，通過淺顯易懂的例子，從基礎到高級，展示如何優雅地組合多個函數，提升代碼的可讀性和可維護性'
+date: '2024-08-26'
+lastmod: '2024-08-26'
+tags: ['js', 'function', 'composition']
+draft: true
+images: ['/static/images/2024/javascript-function-composition-tutorial/cover.webp']
+---
+
+![](/static/images/2024/javascript-function-composition-tutorial/cover.webp)
+
+## 什麼是函數組合 (function composition)？
+
+想像一下，你有一堆神奇的魔法盒子。
+
+每個盒子都能做一件特別的事情：有的可以把東西變大，有的可以把東西變色，有的可以把東西倒過來。
+
+函數組合 (function composition) 就是把這些魔法盒子連在一起，創造出一個超級魔法盒子！
+
+在 `JavaScript` 中，我們可以用這樣的程式碼來創造我們的超級魔法盒子：
+
+```javascript
+const compose =
+  (...fns) =>
+  (arg) =>
+    fns.reduce((composed, f) => f(composed), arg)
+```
+
+這看起來有點複雜，對吧？別擔心，讓我們一步步來解開這個神奇的咒語：
+
+    1.	`(...fns)` 是我們的魔法盒子收集器，它可以收集任意數量的魔法盒子（function）。
+    2.	`arg =>` 是我們放入初始物品的地方。
+    3.	`fns.reduce(...)` 就是我們的魔法流水線，把物品依次通過每個魔法盒子。
+
+它的魔力在於能夠將一系列的 function 串聯起來，讓數據像是在一條生產線上流動，每經過一個 function就被處理一次。
+
+這樣做不僅讓代碼更簡潔，還能提高代碼的可讀性和可維護性。
+
+## 來玩玩看吧！
+
+來看看幾個範例，讓我們從淺入深地理解 `compose` 的威力：
+
+1. 字串處理
+
+```javascript
+const toUpperCase = (str) => str.toUpperCase()
+const addExclamation = (str) => `${str}!`
+const shout = compose(addExclamation, toUpperCase)
+
+console.log(shout('hello world')) // 輸出：HELLO WORLD!
+```
+
+在這個例子中，我們將字串轉大寫，然後加上驚嘆號。
+
+`compose` 幫我們把這兩個操作組合在一起，形成一個新的 `shout function` 。
+
+2. 數學計算
+
+```javascript
+const double = (x) => x * 2
+const square = (x) => x * x
+const addOne = (x) => x + 1
+
+const complexCalc = compose(addOne, square, double)
+
+console.log(complexCalc(3)) // 輸出：32
+// 計算過程：3 + 1 = 4, 4 * 4 = 16, 16 * 2 = 32
+```
+
+這個例子展示了如何將多個數學運算組合起來。`compose` 讓我們可以輕鬆地創建複雜的計算邏輯。
+
+3. 數據處理管道
+
+```javascript
+const users = [
+  { name: 'Alice', age: 25 },
+  { name: 'Bob', age: 30 },
+  { name: 'Charlie', age: 35 },
+  { name: 'Cash', age: 18 },
+]
+
+const filterAdults = (users) => users.filter((user) => user.age > 20)
+const sortByAge = (users) => users.sort((a, b) => a.age - b.age)
+const getNames = (users) => users.map((user) => user.name)
+
+const getAdultNamesSortedByAge = compose(filterAdults, sortByAge, getNames)
+
+console.log(getAdultNamesSortedByAge(users)) // 輸出：["Alice", "Bob", "Charlie"]
+```
+
+在這個範例中，我們創建了一個數據處理管道。它先過濾出成年人，接著按年齡排序，最後只返回名字。
+
+`compose` 讓這一系列操作變得非常優雅和直觀。
+
+## 注意事項
+
+雖然函數組合很有趣，但使用時也要小心一些陷阱：
+
+    1.	順序很重要：就像疊樂高一樣，順序錯了可能會造成意想不到的結果。
+    2.	類型要匹配：確保每個 function 的輸出能被下一個 function 正確處理，否則可能會發生"魔法失靈"。
+    3.	保持簡單：不要試圖在一個組合中塞入太多 function，否則可能會變得難以理解和維護。
+
+## 結語
+
+`函數組合 (function composition)` 就像是程式界的樂高積木，讓我們可以用簡單的積木（function）搭建出複雜有趣的作品。
+
+它不僅能讓我們的程式碼更加整潔有序，還能激發我們的創意，創造出各種有趣的"魔法"。
+
+下次當你在寫程式時，不妨試試這個有趣的技巧。
+
+誰知道呢，你可能會發現編程變得比以往更加有趣！
+
+> 圖片來源：AI 產生
+
+## 參考資料
+
+- [React 學習手冊, 2/e](https://www.tenlong.com.tw/products/9789865027568)
