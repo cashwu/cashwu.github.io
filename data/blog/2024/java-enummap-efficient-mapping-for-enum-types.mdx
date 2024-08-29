@@ -1,0 +1,184 @@
+---
+layout: PostSimple
+title: "Java EnumMap：高效處理 Enum 類型的映射"
+summary: "深入探討 Java EnumMap 的特點、用法和優勢，包括基本操作、分組計數、替代 switch 語句等實例，幫助開發者更好地利用這一強大工具"
+date: "2024-08-29"
+lastmod: "2024-08-29"
+tags: ["Java", "EnumMap", "Enum"]
+draft: false
+images: ["/static/images/2024/java-enummap-efficient-mapping-for-enum-types/cover.webp"]
+---
+
+![](/static/images/2024/java-enummap-efficient-mapping-for-enum-types/cover.webp)
+
+
+在 Java 集合框架中，EnumMap 是一個特殊的 Map 實現，專門用於存儲以 Enum 類型作為鍵的映射。
+
+它提供了高效的記憶體使用和性能優勢，特別適合於使用 Enum 類型作為鍵的場景。
+
+## EnumMap 的主要特點
+
+1. 高效性：EnumMap 內部使用 Array 實現，因此比 HashMap 更高效。
+
+
+- HashMap
+    - 插入（put）：平均 O(1)，最壞情況 O(n)
+    - 查詢（get）：平均 O(1)，最壞情況 O(n)
+    - 刪除（remove）：平均 O(1)，最壞情況 O(n)
+- EnumMap
+    - 插入（put）：O(1)
+    - 查詢（get）：O(1)
+    - 刪除（remove）：O(1)
+
+> EnumMap 的所有基本操作都是真正的 O(1) 時間複雜度，不存在最壞情況
+
+2. 類型安全：鍵必須是同一個 Enum 類型，提供了類型安全。
+3. 有序性：EnumMap 中的元素按照 Enum 常量的定義順序排序。
+4. 不允許 null Key：但允許 null Value。
+
+## 基本用法
+
+### 1. 創建 EnumMap
+
+首先，定義一個 Enum 類型：
+
+```java
+enum DayOfWeek {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
+```
+
+然後，創建並使用 EnumMap：
+
+```java
+import java.util.EnumMap;
+
+public class EnumMapExample {
+
+    public static void main(String[] args) {
+
+        // 創建 EnumMap
+        EnumMap<DayOfWeek, String> scheduleMap = new EnumMap<>(DayOfWeek.class);
+
+        // 添加元素
+        scheduleMap.put(DayOfWeek.MONDAY, "工作");
+        scheduleMap.put(DayOfWeek.TUESDAY, "會議");
+        scheduleMap.put(DayOfWeek.WEDNESDAY, "健身");
+        scheduleMap.put(DayOfWeek.THURSDAY, "在家工作");
+        scheduleMap.put(DayOfWeek.FRIDAY, "電影之夜");
+
+        // 獲取元素
+        System.out.println("星期三的安排：" + scheduleMap.get(DayOfWeek.WEDNESDAY));
+
+        // 遍歷 EnumMap
+        for (DayOfWeek day : scheduleMap.keySet()) {
+            System.out.println(day + ": " + scheduleMap.get(day));
+        }
+    }
+}
+```
+
+### 2. 使用 EnumMap 進行分組或計數
+
+EnumMap 非常適合用於對Enum值進行分組或計數：
+
+```java
+import java.util.EnumMap;
+
+enum Fruit {
+    APPLE, BANANA, ORANGE, GRAPE
+}
+
+public class EnumMapGroupingExample {
+
+    public static void main(String[] args) {
+
+        Fruit[] fruits = {Fruit.APPLE, Fruit.BANANA, Fruit.APPLE, Fruit.ORANGE, Fruit.GRAPE, Fruit.APPLE};
+
+        EnumMap<Fruit, Integer> fruitCount = new EnumMap<>(Fruit.class);
+
+        // 計數
+        for (Fruit fruit : fruits) {
+            fruitCount.put(fruit, fruitCount.getOrDefault(fruit, 0) + 1);
+        }
+
+        // 遍歷 EnumMap
+        for (Fruit fruit : Fruit.values()) {
+            System.out.println(fruit + ": " + fruitCount.getOrDefault(fruit, 0));
+        }
+    }
+}
+```
+
+### 3. 在 switch 語句中使用 EnumMap
+
+EnumMap 可以用來替代 switch 語句，特別是在處理複雜邏輯時：
+
+```java
+import java.util.EnumMap;
+import java.util.function.Consumer;
+
+enum Operation {
+    ADD, SUBTRACT, MULTIPLY, DIVIDE
+}
+
+public class EnumMapSwitchExample {
+
+    private static final EnumMap<Operation, Consumer<Integer>> operationMap = new EnumMap<>(Operation.class);
+
+    static {
+        operationMap.put(Operation.ADD, x -> System.out.println("加法：" + (x + x)));
+        operationMap.put(Operation.SUBTRACT, x -> System.out.println("減法：" + (x - x)));
+        operationMap.put(Operation.MULTIPLY, x -> System.out.println("乘法：" + (x * x)));
+        operationMap.put(Operation.DIVIDE, x -> System.out.println("除法：" + (x / x)));
+    }
+
+    public static void main(String[] args) {
+        performOperation(Operation.ADD, 5);
+        performOperation(Operation.MULTIPLY, 3);
+    }
+
+    private static void performOperation(Operation operation, int value) {
+
+        Consumer<Integer> action = operationMap.get(operation);
+        if (action != null) {
+            action.accept(value);
+        } else {
+            System.out.println("不支持的操作");
+        }
+    }
+}
+```
+
+## 優勢
+
+1. 性能：EnumMap 比 HashMap 更高效，特別是在處理 Enum 鍵時。
+2. 類型安全：編譯時類型檢查可以防止錯誤的鍵類型。
+3. 記憶體效率：EnumMap 內部使用陣列，比 HashMap 更節省記憶體。
+4. 有序性：元素按Enum常量的定義順序排序，便於遍歷和處理。
+
+## 注意事項
+
+1. 只能使用 Enum 作為鍵：EnumMap 的鍵必須是同一個 Enum 類型。
+2. 不允許 null Key：嘗試插入 null Key 會拋出 NullPointerException。
+3. 初始化：創建 EnumMap 時必須指定 Enum 類型。
+
+## C# 的 EnumMap 型別
+
+在 C# 中，可以使用 `Dictionary<TEnum, TValue>` 來實現類似 EnumMap 的功能，其中 `TEnum` 是 Enum 類型。
+
+這種方法雖然不如 Java 的 EnumMap 專門優化，但可以達到相似的效果
+
+## 總結
+
+EnumMap 是一個強大的工具，特別適合於使用 Enum 作為鍵的場景。
+
+它提供了類型安全、高效的性能和記憶體使用，以及自然的元素排序。
+
+在處理 Enum 相關的映射時，EnumMap 通常是比 HashMap 更好的選擇。
+
+通過合理使用 EnumMap，可以使代碼更加清晰、高效和易於維護。
+
+
+> 圖片來源：AI 產生
+
