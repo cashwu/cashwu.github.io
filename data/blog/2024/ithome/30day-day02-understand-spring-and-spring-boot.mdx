@@ -1,0 +1,94 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 02 理解 Spring 和 Spring Boot'
+summary: '本文介紹了 Spring 和 Spring Boot 兩個 Java 生態系統中重要的框架。Spring 是一個開源 Java 平台，提供依賴注入、AOP、事務管理等功能。Spring Boot 則建立在 Spring 之上，提供自動配置、獨立運行、內嵌服務器等特性，大大簡化了 Spring 應用的開發過程。文章比較了兩者在配置複雜度、依賴管理、應用服務器等方面的區別，總結 Spring Boot 讓 Spring 開發變得更加簡單和便捷。'
+date: '2024-09-02'
+lastmod: '2024-09-02'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day02-understand-spring-and-spring-boot/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day02-understand-spring-and-spring-boot/cover.webp)
+
+Java 開發者們經常會遇到 Spring 和 Spring Boot 這兩個名詞 (框架)。
+
+它們都是 Java 生態系統中非常重要的部分，為開發者提供了強大的工具來創建企業級的應用。不過，也常常讓人不知道這兩者的關係，今天，就讓我們來了解一下，看看它們是什麼，它們之間有什麼不同和它們的關係。
+
+## Spring
+
+Spring 是一個開源的 Java 平台，最初由 Rod Johnson 在 2003 年創建。它的主要目標是簡化企業級 Java 應用的開發。Spring 透過提供一系列的工具和功能，幫助開發者更容易地創建穩健、可維護的應用程式。
+
+### Spring 框架的主要特點包括：
+
+- 依賴注入（DI）：這是 Spring 的核心特性之一。它允許開發者定義對象之間的依賴關係，而不需要在代碼中硬編碼這些關係。Spring 容器負責創建物件，並注入它們的相依性。
+- 面向切面編程（AOP）：AOP 允許將橫切關注點（如日誌、事務管理、安全）與業務邏輯分離。這提高了程式碼的模組化程度，使得應用更容易維護和擴展。
+- 事務管理：Spring 提供了一個一致的事務管理抽象，支持聲明式事務和編程式事務。這簡化了數據庫事務的處理過程。
+- MVC 框架：Spring MVC 是一個用於建構 Web 應用程式的框架。它基於 MVC 的設計模式，提供了清晰的程式碼組織結構。
+- 數據訪問：Spring 提供了統一的數據訪問抽象，支持 JDBC、ORM 框架（如 Hibernate）、NoSQL 數據庫等。
+- 安全性：Spring Security 是一個強大的安全框架，提供了身份驗證和授權功能。
+- 測試支持：Spring 無縫的整合許多工具，使得單元測試和整合測試變得更加容易。
+
+## Spring Boot
+
+Spring Boot 是 Spring 團隊在 2014 年推出的一個項目，旨在簡化 Spring 應用的初始搭建和開發過程。它建立在 Spring 框架之上，提供了更多的自動配置選項，大大減少了開發者需要處理的配置量。
+
+### Spring Boot 的主要特點包括：
+
+- 自動配置：Spring Boot 能夠根據路徑上的 JAR 檔、類別和配置，自動配置 Spring 應用程式。這大大減少了手動配置的需求。
+- 獨立運行：Spring Boot 可以創建獨立的 Spring 應用，這些應用可以通過 Java 的 main() 方法啟動，不需要部署到外部的 Web 服務器。
+- 內嵌服務器：Spring Boot 預設包含了內嵌的 Tomcat、Jetty 或 Undertow 伺服器，無需部署 WAR 檔案。
+- starter 依賴：Spring Boot 提供了一系列的 "starter" 相依性，這些相依性是預先配置的一組套件集合，大大簡化了專案的相依性管理。
+  - 我覺得用 套件 的角度來理解 starter 會比較簡單一點，大部分會翻譯成 啟動器 後面的文章也會談到
+- 外部化配置：Spring Boot 允許你在外部配置文件中定義配置，這些配置可以輕易地在不同環境中切換。
+- 無代碼生成和 XML 配置：Spring Boot 避免了程式碼生成，也不需要 XML 配置。
+
+在 `Spring Boot：建置與執行` 這本書裡面提到 Spring Boot 的特性主要為以下三點，所有的功能都是建立在這三個基礎之上
+
+- 簡化的依存性管理（dependency management）
+- 簡化的部署 （deployment）
+- 自動組態（auto configuration）
+
+## Spring 和 Spring Boot 的區別
+
+雖然 Spring Boot 是建立在 Spring 框架之上的，但它們之間還是有一些重要的區別：
+
+### 配置複雜度：
+
+- Spring 需要大量的配置，通常通過 XML 文件或 Java 配置類完成。
+- Spring Boot 採用「約定優於配置」的方式，大大減少了所需的配置量。
+
+### 依賴管理：
+
+- Spring 大部分需要手動管理每個依賴的版本。
+- Spring Boot 提供了 starter，可以比較簡單的管理依賴版本，確保兼容性。
+
+### 應用服務器：
+
+- Spring 應用通常需要部署到外部的應用服務器。
+- Spring Boot 包含內嵌的應用程式伺服器，可以直接執行。
+
+### Production ready：
+
+- Spring 需要額外的工作來準備 production 環境。
+- Spring Boot 提供了許多開箱即用的正式環境就緒特性。
+
+### 靈活性與約定：
+
+- Spring 提供了更多的靈活性，允許細部的控制。
+- Spring Boot 採用更多的默認配置，犧牲了一些靈活性，但提高了開發效率。
+
+## 總結
+
+總而言之，我覺得 「Spring Boot 讓 Spring 更加的簡單和方便的開發」，而大部分在開發 Web 相關的應用程式的時候，
+我想應該都是直接用 Spring Boot，相對來說會簡單許多，而不會用 Spring 再自己刻，所以我覺得，大多數人在講 Sping 的話，蠻有可能是在說 Sping Boot 也說不一定 XDD
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 02 理解 Spring 和 Spring Boot]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://springone.io/history-of-spring
+- https://en.wikipedia.org/wiki/Spring_Framework
+- https://en.wikipedia.org/wiki/Spring_Boot

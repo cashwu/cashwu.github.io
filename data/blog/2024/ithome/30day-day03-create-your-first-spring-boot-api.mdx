@@ -1,0 +1,125 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 03 建立你的第一個 Spring Boot API'
+summary: '本文介紹如何使用 Spring Initializr 或 IntelliJ IDEA 建立第一個 Spring Boot API 專案。文章詳細說明了專案設置過程，包括使用 Gradle、Java 17 和最新版 Spring Boot。通過創建一個簡單的 HelloController，展示了如何實現基本的 API 端點'
+date: '2024-09-03'
+lastmod: '2024-09-03'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/cover.webp)
+
+我們將先建立一個 Spring Boot 專案，再用它來做說明
+
+在這裡我們會使用最新版本的 Spring Boot，目前應該是 3.3.3， 並且搭配 Gradle 和 Java 17 來建立
+
+> 這裡 Java 的版本用 17 還是比較新的版本，其實沒有什麼差別，只是因為我的電腦剛好有 17，所以就用 17 來建立
+
+## 準備工作
+
+開發 Java 的第一步，基本上要先有 JDK (Java Development Kit)，這裡我就不花篇幅來講解安裝的部分，可以參考我之前寫過的文章 [使用 SDKMAN 來管理 JDK 的版本](https://blog.cashwu.com/blog/sdkman-management-java-sdk) 來進行安裝
+
+另外，在開發工具的部分，會使用 JetBrains 的 IntelliJ IDEA 來開發，你可以選擇你順手的就好
+
+## 建立 Spring Boot 專案
+
+在建立 Spring Boot 的部份，我也有寫過幾篇文章，有興趣的話，可以參考
+
+- [Spring Boot Hello World 從 0 到 1 建立專案 - maven](https://blog.cashwu.com/blog/spring-boot-hello-world-maven)
+- [Spring Boot Hello World 從 0 到 1 建立專案 - gradle](https://blog.cashwu.com/blog/spring-boot-hello-world-gradle)
+- [Spring Boot 使用官方 spring initializr 建立專案](https://blog.cashwu.com/blog/spring-boot-spring-initializr-generate-project)
+
+為了方便，這裡只會說我使用的相關建立參數
+
+### 使用 Spring Initializr
+
+- Project: Gradle - Groovy
+- Language: Java
+- Spring Boot: 3.3.3
+- Project Metadata:
+  - Group: com.demo
+  - Artifact: todolist
+  - Name: todolist
+  - Description: 30 day spring boot api
+  - Package name: com.demo.todolist
+  - Packaging: Jar
+  - Java: 17
+
+![](/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/01.webp)
+
+### 使用 IDE（以 IntelliJ IDEA 為例）
+
+基本上，相關的資訊和使用官方工具一樣
+
+![](/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/02.webp)
+
+![](/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/03.webp)
+
+無論你選擇哪種方法，應該都會得到一個類似這樣的項目結構：
+
+![](/static/images/2024/ithome/30day-day03-create-your-first-spring-boot-api/04.webp)
+
+## 建立第一個 API 
+
+- 在 com.demo.todolist 下面建立一個 package `controller` ，並且建立一個 Java class `HelloController`
+- 不懂裡面的內容沒有關係，後面會講解，先跟著打，或者複製貼上就好
+
+```java
+package com.demo.todolist.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/")
+    public String hello() {
+        return "Hello World";
+    }
+}
+```
+
+直接執行程式，運行成功後，在瀏覽器打開 http://localhost:8080 ，應該就可以看到 `Hello World`
+
+> Spring Boot 預設都是在 8080 port 運行。
+
+恭喜你完成了第一個 Spring Boot API XDD
+
+## 同場加映： Spring Boot 的 annotation
+
+在 Spring Boot 中，annotation (註解) 是一種特殊的標記，註解是一種 metadata (中繼資料)，它們給程式提供額外的信息，告訴 Spring Boot 如何處理特定的程式碼。
+
+我們剛才在範例裡面使用了兩個重要註解：@RestController 和 @GetMapping。
+
+### @RestController
+
+@RestController 是一個組合註解，結合了 @Controller 和 @ResponseBody 兩個註解。在類別上面使用 @RestController 時，Spring Boot 將這個類識別為處理 HTTP 請求的控制器，且方法的返回值直接作為 HTTP 響應的內容。主要使用在 Controller 上面。
+
+### @GetMapping 
+
+@GetMapping 是 @RequestMapping(method = RequestMethod.GET) 的簡化版本。它用於將 HTTP GET 請求映射到特定的處理方法。在方法上使用 @GetMapping 時，指定這個方法處理發送到特定 URL 的 GET 請求。
+
+這些註解簡化了非常多的程式碼。沒有這些註解，需要編寫更多的配置程式碼來實現相同功能。
+
+使用這些註解，Spring Boot 會自動完成許多背景的工作，開發者可以專注於實現業務邏輯。
+
+在 C# / .NET 裡面，相對的就是 attribute，雖然在語言的實作上可能不完全一樣，不過可以視為同一個東西
+
+## 總結
+
+今天，我們成功建立了一個 Spring Boot 專案，並且實現了第一個 Spring Boot API。
+
+後續的文章就會以這個專案為基礎，來建立更多的應用。
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 03 建立你的第一個 Spring Boot API]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://spring.io/quickstart
+- https://start.spring.io
+- https://docs.spring.io/spring-boot/
