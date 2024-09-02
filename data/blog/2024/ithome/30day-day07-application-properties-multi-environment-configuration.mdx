@@ -1,0 +1,219 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 07 application.properties 多環境配置"
+summary: "文章詳細說明了 Profile 的概念、設置方法、命名規則，以及如何啟用特定 Profile。同時，文章還解釋了 Profile 的運作原理、多個 Profile 同時啟用時的處理順序，以及 Spring Boot 配置的優先順序。最後，文章提供了 Profile 使用的最佳實踐建議，強調了 Profile 機制在提高開發效率和簡化部署維護方面的重要性"
+date: "2024-09-07"
+lastmod: "2024-09-07"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp)
+
+
+上次我們談到了相關的 application.properties 設定，而今天我們要來聊聊 Spring Boot 中的 Profile 機制
+
+它能夠在不同的環境中方便的切換配置，無論是開發、測試還是生產環境，Profile 都能幫你輕鬆應對。
+
+## 什麼是 Profile？
+
+Profile 是 Spring Framework 提供的一種條件式配置機制
+
+簡單來說，它允許你根據不同的執行環境來啟用或停用一組 Bean 或配置屬性
+
+這就像是給你的應用程序準備了多套衣服，根據不同場合來穿戴
+
+
+## 如何設定不同環境的 Profile？
+
+在 Spring Boot 中，我們通常使用 application.properties 或 application.yml 文件來配置應用程序
+
+要為不同環境設定 Profile，我們可以建立多個配置檔案，每個檔案對應一個特定的環境
+
+> 為了方便，後面的範例都使用 application.properties 來舉例，就不再列出 application.yml 相關的設定
+
+### 命名規則
+
+配置檔案的命名遵循以下規則：
+
+- application-[`profile`].properties
+    - 其中 profile 是環境的名稱，比如 dev、uat、prod 等。
+
+讓我們來看一個例子：
+
+- application.properties（基本配置）
+
+```properties
+spring.application.name=todolist
+```
+
+- application-dev.properties（開發環境）
+
+```properties
+todo.reminder.threshold=7
+todo.reminder.message=任務在 ${todo.reminder.threshold} 天內未完成！
+
+logging.level.root=DEBUG
+```
+
+- application-uat.properties（用戶驗收測試環境）
+
+```properties
+todo.reminder.threshold=5
+todo.reminder.message=任務在 ${todo.reminder.threshold} 天內未完成！
+
+logging.level.root=INFO
+```
+
+- application-prod.properties（生產環境）
+
+```properties
+todo.reminder.threshold=3
+todo.reminder.message=任務在 ${todo.reminder.threshold} 天內未完成！
+
+logging.level.root=WARN
+```
+
+### 如何啟用 Profile
+
+有幾種方式可以啟用特定的 Profile
+
+- 在 application.properties 中設置：
+
+```properties
+spring.profiles.active=uat
+```     
+
+- 在程式碼中設置：
+
+```java
+@SpringBootApplication
+public class TodolistApplication {
+
+    public static void main(String[] args) {
+
+        SpringApplication application = new SpringApplication(TodolistApplication.class);
+        application.setAdditionalProfiles("uat");
+        application.run(args);
+    }
+}
+```
+
+> 運行時就可以看到有相關的 Profile 被啟用的 log
+
+![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/02.webp)
+
+
+- 通過命令行參數：
+
+```bash
+java -jar todolist-0.0.1-SNAPSHOT.jar --spring.profiles.active=uat
+```
+
+> 在 `IntelliJ IDEA` 中，可以很方便的在啟動的 configuration 中設定，指定要啟用的 Profile
+
+![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/03.webp)
+
+- 通過環境變量：
+
+```bash
+export SPRING_PROFILES_ACTIVE=uat
+java -jar todolist-0.0.1-SNAPSHOT.jar
+```
+
+> 如果沒有啟用任何 Profile 時，Spring Boot 會使用名為 `default` 的 Profile。
+
+![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/01.webp)
+
+
+### 多 Profile 啟用
+
+假設我們同時啟用了 `dev` 和 `uat` Profile
+
+![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/04.webp)
+
+```bash
+spring.profiles.active=uat,dev
+```
+
+Spring Boot 會按照以下順序載入配置
+
+1. application.properties
+2. application-uat.properties
+3. application-dev.properties
+
+如果存在衝突的配置，dev 的配置會覆蓋 uat 的配置
+
+## Profile 的運作原理
+
+當 Spring Boot 應用程式啟動時，它會按照以下順序載入配置
+
+1. 加載 `application.properties`（基礎配置）
+2. 根據啟用的 Profile，加載對應的 `application-[profile].properties`
+3. 如果有多個 Profile 被啟用，後面啟用的 Profile 會覆蓋掉前面的配置
+
+
+這就像是穿衣服的順序：先穿基礎款 application.properties，然後根據場合（啟用的 Profile）
+
+再穿上對應的外套 application-profile.properties
+
+>  比較專業的說法可以用 decorator XD
+
+## Spring Boot 配置的優先順序：
+
+Spring Boot 使用一個非常明確的順序來載入配置
+
+從最高優先級到最低優先級，順序如下：
+
+1. 命令行參數
+2. Java 系統屬性（System.getProperties()）
+3. 操作系統環境變量
+4. 來自 application.properties 和 application.yaml 的配置文件（外部）
+5. 來自 application.properties 和 application.yaml 的配置文件（打包在 JAR 內）
+6. @PropertySource 注解在 @Configuration 類上
+7. SpringApplication.setDefaultProperties 指定的默認屬性
+
+> 這裡只寫了大部分比較常見(常用)的流程，實際的流程會有更多步驟
+
+## Profile 特定配置的優先順序：
+
+當涉及到 Profile 特定的配置時，情況會稍微複雜一些
+
+Profile 特定的配置文件（如 application-dev.properties）的優先級高於非 Profile 特定的配置文件（application.properties）
+
+具體順序如下：
+
+1. Profile 特定的配置文件（外部） application-[profile].properties
+2. 非 Profile 特定的配置文件（外部） application.properties
+3. Profile 特定的配置文件（打包在 JAR 內） application-[profile].properties
+4. 非 Profile 特定的配置文件（打包在 JAR 內） application.properties
+
+> 這裡的 application.properties 指的是打包在 JAR 內的 application.properties
+
+> YAML 和 Properties 具有相同的優先級，可以互換使用。
+> 如果同時存在 YAML 和 Properties，Properties 會優先，不過先前說過了，不建議兩個檔案同時存在
+
+
+## Profile 最佳實踐：
+
+1. 使用版本控制的配置檔案，儲存預設值和開發環境配置。
+2. 使用外部配置文件或環境變量存儲環境特定的配置。
+3. 使用命令行參數進行臨時覆蓋或快速測試。
+
+## 結論
+
+Profile 機制為 Spring Boot 應用程序提供了強大的環境適應能力
+
+通過合理使用 Profile，我們可以輕鬆地在不同環境間切換配置，而無需修改代碼或重新編譯應用程序
+
+這不僅提高了開發效率，也大大降低了部署和維護的複雜度
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 07 application.properties 多環境配置](https://ithelp.ithome.com.tw/articles/10347476)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/reference/features/external-config.html
+- https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html
