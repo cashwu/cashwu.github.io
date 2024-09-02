@@ -1,0 +1,184 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 11 請求參數處理深入探討'
+summary: '文章詳細介紹了 @RequestParam、@PathVariable、@RequestHeader、@CookieValue 和 @RequestBody 等註解的使用，並提供了實際的程式碼。此外，文章還討論了如何設置參數的必要性和默認值，以增加 API 的靈活性和健壯性。最後，文章提供了一些實踐建議，幫助開發者設計更好的 API'
+date: '2024-09-11'
+lastmod: '2024-09-11'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day11-in-depth-request-parameter-handling/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day11-in-depth-request-parameter-handling/cover.webp)
+
+上一篇我們已經建立了基本的 RESTful API 內容
+
+今天我們將深入探討如何來處理各種類型的請求參數
+
+## Query String
+
+查詢參數是 URL 中 ? 後面的鍵值對（key-value pair）
+
+Spring Boot 提供了多種方式來處理這些參數
+
+- 基本用法
+
+```java
+@GetMapping("/query01")
+public String query01(String name) {
+    return String.format("query string - %s", name);
+}
+```
+
+- 使用 @RequestParam
+
+```java
+// 比較常用
+@GetMapping("/query02")
+public String query02(@RequestParam String name) {
+    return String.format("query string - %s", name);
+}
+```
+
+- @RequestParam 註解提供了更多控制選項。例如，我們可以設置參數是否必填，以及提供默認值
+
+```java
+@GetMapping("/query03")
+public String query03(@RequestParam(required = false, defaultValue = "Guest") String name) {
+    return String.format("query string - %s", name);
+}
+```
+
+在這個例子中，name 參數不是必填的，如果沒有提供，將使用默認值 "Guest"
+
+## Path
+
+路徑變數是 URL 路徑的一部分。使用 @PathVariable 註解來捕獲這些值：
+
+```java
+@GetMapping("/path01/{name}")
+public String path01(@PathVariable String name) {
+    return String.format("path - %s", name);
+}
+```
+
+同樣，我們可以設置路徑變數是否必填，不過，如果只是這樣設定的話，它是沒有意義的
+
+因為這樣子的設定，path 一定是必填的，所以會發生 `404` 的錯誤
+
+```java
+@GetMapping("/path02/{name}")
+public String path02(@PathVariable(required = false) String name) {
+    return String.format("path - %s", name != null ? name : "Unknown");
+}
+```
+
+需要改成下面這種方式，它才有意義
+
+```java
+@GetMapping({"/path03/{name}", "/path03"})
+public String path03(@PathVariable(required = false) String name) {
+    return String.format("path - %s", name != null ? name : "Unknown");
+}
+```
+
+## Header 和 Cookie
+
+Spring Boot 也允許我們輕鬆獲取 Request Header 和 Cookie 的值：
+
+```java
+@GetMapping("/header")
+public String header(@RequestHeader(required = false) String name) {
+    return String.format("header - %s", name);
+}
+
+@GetMapping("/cookie")
+public String cookie(@CookieValue(required = false) String name) {
+    return String.format("cookie - %s", name);
+}
+```
+
+## Form Data
+
+對於 POST 請求中的表單資料，我們有多種處理方式：
+
+```java
+@PostMapping("/form01")
+public String form01(String title) {
+    return String.format("form01 - %s", title);
+}
+
+@PostMapping("/form02")
+public String form02(@RequestParam String title) {
+    return String.format("form02 - %s", title);
+}
+
+// 比較常用
+@PostMapping("/form03")
+public String form03(Todo todo) {
+    return String.format("form03 - %s", todo);
+}
+
+@PostMapping("/form04")
+public String form04(@RequestParam Map<String, Object> map) {
+    String title = map.get("title").toString();
+    return String.format("form04 - %s", name);
+}
+```
+
+## Request Body
+
+對於 JSON 格式的請求體，我們可以使用 @RequestBody 註解
+
+```java
+
+// 比較常用
+@PostMapping("/body01")
+public String body01(@RequestBody Todo todo) {
+    return String.format("body01 - %s", todo);
+}
+
+@PostMapping("/body02")
+public String body02(@RequestBody Map<String, Object> map) {
+    String title = map.get("title").toString();
+    return String.format("body02 - %s", title);
+}
+```
+
+## File
+
+對於檔案上傳，我們可以使用 MultipartFile
+
+```java
+@PostMapping("/file")
+public String file(@RequestParam("file") MultipartFile uploadFile) throws IOException {
+    String filename = uploadFile.getOriginalFilename();
+    String content = new String(uploadFile.getBytes(), StandardCharsets.UTF_8);
+    return String.format("file name - %s, file content - %s", filename, content);
+}
+```
+
+## 實踐建議
+
+- 始終為重要參數提供清晰的文件說明。
+- 合理使用必填參數和可選參數，提高 API 的靈活性。
+- 為可選參數提供合適的默認值，簡化 API 的使用。
+
+## 總結
+
+Spring Boot 提供了豐富的工具來處理各種類型的請求參數
+
+通過使用 @PathVariable、@RequestParam、@RequestHeader、@CookieValue 和 @RequestBody 等註解，我們可以輕鬆地獲取和處理來自不同來源的數據
+
+在處理參數時，我們可以設置參數是否必填（required 屬性），以及提供默認值（defaultValue 屬性），
+這樣可以增加我們的 API 的靈活性和健壯性
+
+記住，選擇正確的參數處理方式取決於你的 API 設計和具體需求。合理使用這些工具可以讓你的程式碼更加清晰、易於維護。
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 11 請求參數處理深入探討](https://ithelp.ithome.com.tw/articles/10347512)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods.html
