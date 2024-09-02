@@ -1,0 +1,193 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 05 Spring Boot Starter"
+summary: "本文深入解析了 Spring Boot Starter 的概念和重要性。文章首先分析了 build.gradle 文件的結構，然後詳細介紹了 Starter 的作用和優勢，包括簡化依賴管理、確保版本兼容性、快速啟動項目等。文章還比較了 Spring Boot Starter 與 C# NuGet Packages 的異同，並簡要對比了 Maven 和 Gradle 這兩種常用的構建工具"
+date: "2024-09-05"
+lastmod: "2024-09-05"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day05-spring-boot-starter/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day05-spring-boot-starter/cover.webp)
+
+上一篇我們看完了專案結構，今天主要要來了解 Starter (啟動器) 的部分
+而在深入了解 Starter 之前，我們先來看專案中的 build.gradle 檔案，這個檔案在 Spring Boot 中扮演著至關重要的角色
+
+## build.gradle 解析
+
+```groovy
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.demo'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+```
+
+這個 build.gradle 檔案看起來可能有點複雜,但別擔心,讓我們一起來解析它
+
+- plugins (插件)：我們使用了 Java、Spring Boot 和 Spring 依賴管理 plugins。這些 plugin 為我們的專案提供了 Spring Boot 的核心功能和依賴管理能力
+  - Gradle 的相關指令也都跟 plugins 相關
+- 專案相關資訊：設定了專案的 group 和版本號
+  - 主要用於標識和管理建置的重要屬性
+- Java 版本：指定使用 Java 17
+- repositories (倉庫)：使用 Maven Central 倉庫來下載相關的套件依賴
+- dependencies (依賴)：這裡是重點！
+  - 我們目前有兩個 starter (啟動器)：spring-boot-starter-web 和 spring-boot-starter-test
+- 測試配置：使用 JUnit Platform 來運行測試
+
+看完一遍,應該不會覺得很難吧?
+看起來只有兩個套件(依賴)，我們的 Web 應用就能運行！這就是 Spring Boot Starter 的魔力所在
+
+## 什麼是 Spring Boot Starter？
+
+Spring Boot Starter 是一組方便的套件依賴描述，你可以將它們包含在你的應用程式中。
+簡單來說，它們就像是預先打包好的"配方"，包含了開始使用某項技術所需的所有依賴。
+
+想像一下，你正在準備一頓豐盛的晚餐。與其單獨購買每一種食材和調味料，你可以直接買一個「晚餐套餐」，裡面包含了你需要的一切。Spring Boot Starter 就是這樣的「套餐」！
+
+> ~就像麥當勞的套餐一樣~（誤）
+
+## Starter 的重要性
+
+1. 簡化依賴管理：不需要手動新增和管理一大堆相互依賴的套件
+2. 版本兼容性：Starter 會自動管理所有依賴的版本，確保它們相互兼容。
+3. 快速啟動：只需添加一個 Starter，就能快速開始使用某項技術。
+4. 標準化：為專案提供一致、可預測的依賴組合。
+5. 減少錯誤：避免因遺漏必要依賴或版本不相容導致的錯誤
+
+### 一些常用的 Starter
+
+- spring-boot-starter-web：用於構建 Web 應用，包括 RESTful API
+- spring-boot-starter-test：用於測試 Spring Boot 應用
+- spring-boot-starter-data-jpa：使用 Spring Data JPA 進行相關的 db 操作，後面的文章會使用到
+- spring-boot-starter-security：相關的 Spring Security 安全性，後面的文章會使用到
+
+## 實際應用
+
+讓我們回到我們的 build.gradle 文件
+
+注意到我們只添加了 spring-boot-starter-web，但這個小小的依賴為我們帶來了什麼呢？
+
+- Tomcat：一個嵌入式的 Web 服務器
+- Spring MVC：用於構建 Web 應用的框架
+- Jackson：用於 JSON 處理的庫
+- 以及更多...
+
+所有這些，只需要一行程式碼！這就是 Spring Boot Starter 的強大之處。
+
+## 尋找 Spring Boot Starter
+
+在 Spring Boot 中，雖然沒有像 .NET 的 `NuGet` 那樣方便的搜尋套件功能，不過我們還是可以使用 [Maven Repository](https://mvnrepository.com) 這個網站來搜尋相關的 Java 套件和 Spring Boot Starter。
+
+使用 Maven Repository 尋找 Starter 的步驟：
+
+1. 訪問 https://mvnrepository.com
+
+2. 在搜索欄輸入 `spring-boot-starter`
+
+3. 你會看到一長串的 Starter 列表
+
+![](/static/images/2024/ithome/30day-day05-spring-boot-Starter/01.webp)
+
+4. 點擊你感興趣的 Starter，就可以看到它的詳細信息和使用方法，這裡以 `Spring Boot Starter` 為例，可以看到相關的詳細說明
+
+5. 點選相關的版本 version 後，就可以看到不同的套件管理的相關寫法，
+
+![](/static/images/2024/ithome/30day-day05-spring-boot-Starter/02.webp)
+
+6. 點選相關的輸入框，就可以快速地直接複製內容
+
+![](/static/images/2024/ithome/30day-day05-spring-boot-Starter/03.webp)
+
+![](/static/images/2024/ithome/30day-day05-spring-boot-Starter/04.webp)
+
+
+## Spring Boot Starter vs C# NuGet Packages
+
+現在，讓我們來比較一下 Spring Boot Starter 和 C# 的 NuGet packages
+這兩者都是用來管理依賴的工具，但它們有一些相同點和不同點。
+
+### 相同點：
+- 依賴管理：兩者都用於簡化依賴管理，讓開發者更容易添加和使用第三方套件。
+- 版本控制：都提供了版本管理功能，幫助開發者使用特定版本的庫。
+- 中央倉庫：都有中央倉庫（Maven Central 和 NuGet Gallery）來儲存和分發套件。
+- 命令行工具：兩者都可以通過命令行工具（如 Gradle、Maven 或 NuGet CLI）來管理。
+- IDE 集成：主流 IDE 都對這兩種包管理系統提供了良好的支持。
+
+### 不同點：
+- 預配置性：Spring Boot Starter 通常包含預配置的 Spring 組件，而 NuGet packages 通常只包含套件本身，需要更多的手動配置。
+  > 不過我覺得有越來越多的 NuGet 套件，都具有安裝後就可以直接使用的特性
+- 範圍：Starter 主要只針對 Spring 生態系統，而 NuGet packages 覆蓋了整個 .NET 生態系統。
+- 自動配置：Spring Boot Starter 利用 Spring Boot 的自動配置特性，可以自動設置很多東西。NuGet packages 通常需要更多的手動設置。
+- 組合性：Starter 經常被設計成可以協同工作的"套餐"，而 NuGet packages 更像是單獨的"配料"。
+- 約定優於配置：Spring Boot Starter 大量使用"約定優於配置" 的原則，而 NuGet packages 通常需要更多的顯式配置。
+
+## 同場加映：Maven 與 Gradle 比較
+
+在 Spring 開發中，Maven 和 Gradle 都是非常流行的構建工具和依賴管理系統，我們大概來看一下它們兩個的主要差別。
+
+- Maven：使用 XML 格式的 pom.xml 
+- Gradle：使用 Groovy 或 Kotlin DSL 的 build.gradle
+    - 在這個專案，我們用的是 Groovy
+
+在 Maven 中添加 Spring Boot Web Starter 看起來是這樣的：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
+
+而在 Gradle 中，則是這樣：
+
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-web'
+```
+
+我覺得 Gradle 在寫法上會比較簡單一點（不是很喜歡 XML 的結構 XD）
+
+
+雖然一開始初學者的門檻會高了一點，不過我覺得它是值得的，Gradle 在客製上也會比較靈活，如果你什麼都不知道，那就用 Gradle 就對了
+
+缺點就是，網路上大部分查到的範例都是 Maven 居多，就要自己轉換一下
+
+
+## 總結
+
+Spring Boot Starter 就像是開發中的瑞士軍刀，大大簡化了項目的依賴管理
+
+它們不僅節省了時間，還減少了錯誤，讓我們能夠更專注於業務邏輯的開發
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 05 Spring Boot Starter](https://ithelp.ithome.com.tw/articles/10347453)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://gradle.org
+- https://docs.spring.io/spring-boot/gradle-plugin/managing-dependencies.html
