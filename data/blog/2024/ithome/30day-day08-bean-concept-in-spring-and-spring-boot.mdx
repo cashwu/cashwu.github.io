@@ -1,0 +1,235 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 08 Spring 和 Spring Boot 中 Bean 的概念"
+summary: "文章介紹了 Bean 的定義方式，包括 XML 配置、Java 程式配置和注解方式。同時，詳細解釋了 Bean 的作用域，如 singleton、prototype 等。文章還闡述了依賴注入（DI）的三種主要方式：構造函數注入、Setter 注入和 field 注入，並討論了它們的優缺點。最後，文章概述了 Bean 的生命週期，並提供了如何通過實現特定接口來干預 Bean 生命週期的示例。這些知識對於理解 Spring Boot 應用程式的開發和提高代碼質量至關重要"
+date: "2024-09-08"
+lastmod: "2024-09-08"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day08-bean-concept-in-spring-and-spring-boot/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day08-bean-concept-in-spring-and-spring-boot/cover.webp)
+
+## Bean 的相關概念
+
+在 Spring 框架中，Bean 是構成應用程式主要的概念和核心
+
+它們由 Spring `IoC（Inversion of Control）`容器管理
+
+簡單來說，Bean 就是一個被 Spring 容器初始化、組裝和管理的 Java 對象
+
+## Bean 的定義方式
+
+- 使用 XML 配置（傳統方式，在 Spring Boot 中幾乎不使用）
+
+```xml
+<bean id="myBean" class="com.example.MyBean"/>
+```
+
+- Java 程式配置（推薦方式）
+
+```java
+@Configuration
+public class AppConfig {
+    @Bean
+    public MyBean myBean() {
+        return new MyBean();
+    }
+}
+```
+
+- 注解方式（元件和物件最常用）
+
+```java
+@Component
+public class TodoConfig {
+}
+```
+
+## Bean 的作用域
+
+Spring 定義了幾種 Bean 的作用域，注意到有幾個是 `web` 相關的 (專用的)
+
+- application：為整個 ServletContext 建立一個 Bean 實例，僅適用於 Web 應用程式
+- prototype：每次請求都會建立新的實例。
+- request：每個 HTTP 請求都會建立一個新的實例，僅適用於 web 應用程式
+- session：每個 HTTP Session 都會建立一個新的實例，僅適用於 web 應用程式
+- singleton（默認作用域）：每個 Spring IoC 容器 (整個應用程式) 僅建立一個 Bean 實例
+
+
+在程式碼裡面可以使用 `@Scope` 來指定作用域，而且 IDE 會有提示
+
+![](/static/images/2024/ithome/30day-day08-bean-concept-in-spring-and-spring-boot/01.webp)
+
+
+```java
+@Component
+@Scope("singleton")
+public class TodoConfig {
+
+}
+```
+
+## 常用的 Bean annotation
+
+- @Component
+  - 標註類別為 Spring 管理的 Bean
+
+- @Service
+  - @Component 的專用化，用於標註服務層的 Bean
+
+- @Repository
+  - @Component 的專用化，用於標註數據訪問層的 Bean
+
+- @Controller
+  - @Component 的專用化，用於標註控制器層的 Bean，處理 Web 請求
+
+- @RestController
+  - @Controller 和 @ResponseBody 的組合，用於 RESTful Web 服務
+
+- @Autowired
+  - 用於自動注入依賴，可以放在構造函數、屬性或方法上
+
+- @Configuration
+  - 定義配置類別，包含一個或多個 @Bean 註解的方法，這些方法的返回值將被 Spring 容器管理
+
+- @Bean
+  - 定義一個 Bean，通常放在 @Configuration 類別的方法上，方法的返回值將被註冊為 Spring 容器中的 Bean
+
+> `@Bean` 只是建立 Spring Bean 的一種方式，並不是等於 Spring 裡面的 Bean，要小心不要誤會了 XD
+
+
+## 依賴注入（DI）
+
+Spring 的核心功能之一是依賴注入。它允許我們聲明組件之間的依賴關係，而不是在程式碼中建立這些依賴
+
+簡單來說，可以把 Bean 註冊到 Spring 容器中，然後在其它地方注入使用
+
+- 構造函數注入 (基本上推薦使用)
+
+```java
+@RestController
+public class HelloController {
+
+    private final TodoConfig todoConfig;
+
+    public HelloController(TodoConfig todoConfig) {
+        this.todoConfig = todoConfig;
+    }
+
+    @GetMapping("/randomNumber")
+    public String getRandomNumber() {
+        return String.valueOf(todoConfig.getRandomNumber());
+    }
+}
+```
+
+- setter 注入（不推薦）
+
+
+```java
+@RestController
+public class HelloController {
+    private TodoConfig todoConfig;
+
+    @GetMapping("/randomNumber")
+    public String getRandomNumber() {
+        return String.valueOf(todoConfig.getRandomNumber());
+    }
+
+    @Autowired
+    public void setTodoConfig(TodoConfig todoConfig) {
+        this.todoConfig = todoConfig;
+    }
+}
+```
+
+- field 注入（不推薦，不過因為太方便，所以常被拿來使用，而且範例大多使用這個）
+
+```java
+@RestController
+public class HelloController {
+
+    @Autowired
+    private TodoConfig todoConfig;
+
+    @GetMapping("/randomNumber")
+    public String getRandomNumber() {
+        return String.valueOf(todoConfig.getRandomNumber());
+    }
+}
+```
+
+
+## Bean 的生命週期
+
+Spring 管理 Bean 的整個生命週期
+
+主要階段包括
+
+1. 實例化
+2. 填充屬性
+3. 調用 BeanNameAware 的 setBeanName() 方法
+4. 調用 BeanFactoryAware 的 setBeanFactory() 方法
+5. 調用 ApplicationContextAware 的 setApplicationContext() 方法（如果適用）
+6. 預初始化（BeanPostProcessor 的 postProcessBeforeInitialization() 方法）
+7. 調用 @PostConstruct 註解的方法
+8. 初始化（InitializingBean 的 afterPropertiesSet() 方法）
+9. 調用自定義的 init-method（如果在 bean 配置中指定）
+10. 後初始化（BeanPostProcessor 的 postProcessAfterInitialization() 方法）
+11. Bean 就緒，可以使用
+12. 當容器關閉時：
+    - 調用 @PreDestroy 註解的方法
+    - 調用 DisposableBean 的 destroy() 方法
+    - 調用自定義的 destroy-method（如果在 bean 配置中指定）
+
+> 不過基本上，大部分情況下都不太需要了解或關注這些流程，會使用就好
+
+我們可以通過實現特定的 inteface 來干預 Bean 的生命週期：
+
+```java
+@Component
+@Scope("singleton")
+public class TodoConfig implements InitializingBean, DisposableBean {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("Bean is going through init.");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("Bean's properties are set.");
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        System.out.println("Bean will destroy now.");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("Bean is destroying.");
+    }
+}
+```
+
+![](/static/images/2024/ithome/30day-day08-bean-concept-in-spring-and-spring-boot/02.webp)
+
+## 結論
+
+理解 Spring 的 Bean 管理是開發 Spring Boot 應用程式的基礎，Bean 管理也是 Spring 依賴注入和控制反轉的核心
+
+掌握這些概念將幫助你更好地設計和實現 Spring Boot 應用程式，提高程式碼的可維護性和可測試性
+
+在實際開發中，合理利用這些特性可以大大提高開發效率和應用靈活性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 08 Spring 和 Spring Boot 中 Bean 的概念](https://ithelp.ithome.com.tw/articles/10347486)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/core/beans/java/bean-annotation.html
+- https://docs.spring.io/spring-framework/reference/core/beans/introduction.html
