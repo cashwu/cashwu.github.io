@@ -1,0 +1,83 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 04 剖析 Spring Boot 專案結構"
+summary: "本文詳細剖析了 Spring Boot 專案的結構，包括根目錄、src 目錄（main 和 test）的內容及其作用。重點解釋了關鍵檔案如 TodolistApplication.java、application.properties 和 build.gradle 的功能。文章還闡述了 Spring Boot 專案結構的設計理念，包括關注點分離、約定優於配置、模組化、測試友好和配置集中化。這種結構設計不僅使專案易於理解和維護，還為擴展和測試提供了良好的基礎，有助於提高開發效率和團隊協作。"
+date: "2024-09-04"
+lastmod: "2024-09-04"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day04-analyze-spring-boot-project-structure/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day04-analyze-spring-boot-project-structure/cover.webp)
+
+
+根據上一次建立的相關專案，我們來看每個資料夾和檔案的相關作用
+
+  
+![](/static/images/2024/ithome/30day-day04-analyze-spring-boot-project-structure/01.webp)
+
+## 根目錄
+
+在根目錄中，我們可以看到以下內容：
+
+- .gradle：Gradle 的暫存目錄，通常不需要直接操作
+- .idea：IntelliJ IDEA 的專案配置目錄，包含了 IDE 的相關專案設定
+- gradle：包含 Gradle Wrapper 檔案，主要用於確保所有人使用相同版本的 Gradle
+- src：主要程式碼和(靜態)資源的地方
+- .gitignore：Git 忽略檔案
+- build.gradle：Gradle 相關的 script，主要定義相關套件依賴和專案建置的配置
+- gradlew 和 gradlew.bat：Gradle Wrapper Script，用於在未安裝 Gradle 的環境中執行 Gradle 命令
+- settings.gradle：Gradle 設定檔案，定義專案名稱和包含的子模組。
+
+## src 目錄
+
+src 目錄是專案的核心，包含了所有的程式碼和靜態資源檔案。
+
+它分為兩個主要部分：main 和 test。
+
+### main 目錄  
+
+main 目錄包含應用程式的主要程式碼和資源：
+
+- java：Java 程式碼的根目錄
+    - com.demo.todolist：主要的 packages，包含了 TodolistApplication.java，這是應用程序的進入點
+    - 任何相關的套件都會建立在這個目錄下面，例如：controller、service、repository 等，然後才是相關的程式碼"
+
+- resources：資源目錄
+    - static：靜態資源目錄，用於存放 HTML、CSS、JavaScript 等靜態檔案
+    - templates：範本檔案目錄，用於存放 View 的範本（如 Thymeleaf 套件範本）
+    - application.properties：應用程式的主要設定檔案，用於設置各種屬性
+
+### test 目錄
+
+test 目錄包含測試程式碼
+
+- java：測試程式碼資料夾
+- com.demo.todolist：測試 package，包含了 TodolistApplicationTests.java，
+    - 這是應用程式的主要測試類別。
+
+## 重要檔案解析
+
+- TodolistApplication.java：這是 Spring Boot 應用程式的主要類別，包含 main 方法，用於啟動應用程式
+- application.properties：用於配置應用程式的各種屬性，如資料庫相關設定和相關程式的設定
+- build.gradle：定義了專案的套件依賴關係和建置過程。它指定了使用的 Spring Boot 版本、專案依賴的套件等。
+- settings.gradle：定義了 Gradle 的主要設定，主要用於多模組的配置
+
+## 專案結構的設計理念
+  
+- 關注點分離：將程式碼、資源和測試分開，使專案結構更加清晰
+- 約定優於配置：遵循 Spring Boot 的標準目錄結構，減少配置的需要。
+- 模組化：透過 package 結構組織程式碼，便於管理和擴展。
+- 測試友好：專門的測試目錄，鼓勵編寫和組織測試程式碼。
+- 配置集中化：使用 application.properties 集中管理配置。
+
+## 總結
+
+今天主要講解了專案的相關結構，這種結構不僅使得專案易於理解和維護，還為擴展和測試提供了良好的基礎。
+
+好的專案結構是開發高品質應用程式的第一步，它幫助你保持程式碼的組織性，提高開發效率，並使團隊協作變得更加順暢。
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 04 剖析 Spring Boot 專案結構]()
+
+> 圖片來源：AI 產生
