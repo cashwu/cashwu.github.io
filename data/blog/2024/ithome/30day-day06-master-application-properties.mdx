@@ -1,0 +1,238 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 06 掌握 application.properties"
+summary: "文章介紹了配置文件的格式選擇（Properties vs YAML），展示了如何定義和使用自定義屬性，並比較了 @Value 注入和 @ConfigurationProperties 綁定兩種方法的優缺點。同時，文章還討論了第三方 Starter 的配置方式，並將 Spring Boot 的 application.properties 與 .NET Core 的 appsettings.json 進行了比較，突出了它們的相似點和差異。通過實例說明，本文為讀者提供了全面掌握 Spring Boot 配置管理的指南"
+date: "2024-09-06"
+lastmod: "2024-09-06"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day06-master-application-properties/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day06-master-application-properties/cover.webp)
+
+今天我們要深入探討 Spring Boot 的設定檔 `application.properties`，並學習如何在實際應用中使用這些配置。
+
+## application.properties 設定檔的用途
+
+`application.properties` 是 Spring Boot 應用程式的核心設定檔，它的主要用途包括：
+
+- 定義應用程式相關的配置（如服務相關的 port、log level 等）
+- 資料庫相關的連線設定
+- 自定義應用程式行為
+- 外部化配置
+- 環境特定配置
+
+而預設的 application.properties 在專案建立完成後，裡面只會有一個相關的應用程式的名稱
+
+```
+spring.application.name=todolist
+```
+
+## 配置檔格式：Properties vs YAML
+
+  
+Spring Boot 支持兩種主要的配置文件格式：`Properties` 和 `YAML`，預設的專案是使用 properties 的格式
+
+如果要使用 yaml 的格式，就把 application.properties 改為 application.yaml，然後修改內容的格式即可
+
+或是要保留 properties 的格式，也可以新增一個 application.yml 的檔案，這樣就可以同時使用兩種格式了，不過，這樣子應該會有衝突，所以不建議這樣做。
+
+### Properties 格式
+
+```
+server.port=8080
+spring.datasource.url=jdbc:mysql://localhost/db
+spring.datasource.username=user
+spring.datasource.password=pass
+```
+
+### YAML 格式
+
+```
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost/db
+    username: user
+    password: pass
+```
+
+YAML 格式提供了更好的可讀性，特別是對於嵌套配置，不過，為了簡化專案說明，我們在所有的範例中我們仍然使用 `application.properties`
+
+
+## 自定義 properties 和 SpEL
+
+Spring Boot 允許我們定義自己的屬性，並使用 `Spring Expression Language` (`SpEL`) 來靈活地使用這些屬性
+
+讓我們透過一個簡單的例子來說明
+
+### 基本配置
+
+首先，在 `application.properties` 中添加
+
+```
+todo.reminder.threshold=7
+todo.reminder.message=任務在 ${todo.reminder.threshold} 天內未完成！
+```
+
+有幾種方式可以使用到這些值
+
+### 使用 @Value 注入
+
+較為簡單的方式是使用 `@Value` annotation (註解)來注入這些值：
+
+```
+package com.demo.todolist.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HomeController {
+
+    @Value("${todo.reminder.threshold}")
+    private int reminderThreshold;
+
+    @Value("${todo.reminder.message}")
+    private String reminderMessage;
+
+    @GetMapping("/reminder-config")
+    public String getReminderConfig() {
+        return "Threshold: " + reminderThreshold + ", Message: " + reminderMessage;
+    }
+}
+```
+
+### 使用中文請注意 !!
+
+application.properties 預設應該為 `ISO-8859-1` 編碼，如果要在裡面寫中文的話，需要在設定裡面 (Editor > File Encodings) 把 properties 的 `encoding` 改為 `UTF-8` ，然後把下面的 `Transparent native-to-ascii conversion` 打勾
+
+請參考下圖
+
+![](/static/images/2024/ithome/30day-day06-master-application-properties/01.webp)  
+  
+### 使用 @ConfigurationProperties
+
+更好的方式是使用 `@ConfigurationProperties` 將相關的配置綁定到一個 class 或 record 上：
+
+```
+package com.demo.todolist.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix = "todo.reminder")
+public class TodoReminderProperties {
+
+    private int threshold;
+    private String message;
+
+    // getters and setters
+    public int getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(int threshold) {
+        this.threshold = threshold;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
+```
+
+然後，直接使用這個類別，並注入使用
+
+```
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TodoListController {
+
+    private final TodoReminderProperties reminderProperties;
+
+    public TodoListController(TodoReminderProperties reminderProperties) {
+        this.reminderProperties = reminderProperties;
+    }
+
+    @GetMapping("/reminder-config")
+    public String getReminderConfig() {
+        return "Threshold: " + reminderProperties.getThreshold() + 
+               ", Message: " + reminderProperties.getMessage();
+    }
+}
+```
+
+使用 @ConfigurationProperties 的好處是它可以將相關的配置組織在一起，提高代碼的可讀性和可維護性。
+
+## 第三方 Starter 和套件的配置
+
+Spring Boot Starter 大多是預先配置的相依性描述符，可以大幅簡化專案設置，每個 starter 通常都有自己的配置屬性。
+
+例如，如果你使用 `spring-boot-starter-data-jpa`，你可以在配置設定中設置 JPA 相關的屬性
+
+在檔案中，IDE 會有相關的提示功能
+
+![](/static/images/2024/ithome/30day-day06-master-application-properties/02.webp)
+
+另外大多數的 starter 都有預設的配置設定，即使不進行配置，也可以開箱即用
+
+當然，如果沒有安裝（設定）相關的 starter，而只寫設定的配置的話，自然也是沒有用的。
+
+
+## 與 .NET Core 的 appsettings.json 比較
+
+Spring Boot 的 application.properties 和 .NET Core 的 appsettings.json 在功能上有許多相似之處，但也有一些區別
+
+### 相同點
+
+- 作為應用程序的主要配置源
+
+-  支持環境特定配置
+
+- 允許外部化配置
+
+- 支持分層的配置結構
+
+### 不同點
+
+- 文件格式：
+  - application.properties 使用鍵值對格式，或是 yaml 格式
+  - appsettings.json 使用 JSON 格式
+
+- 動態重載：
+  - Spring Boot 支援動態重載配置（使用 @RefreshScope）
+    - 這個部分不會在這裡解說
+  - .NET Core 需要額外設置
+
+- 表達式語言：
+  - Spring Boot 使用 SpEL
+  - .NET Core 沒有內置的表達式語言支持
+
+## 結論
+
+application.properties 是 Spring Boot 應用程式中非常強大的配置工具
+
+透過本文的範例，我們學習了如何定義自訂屬性、使用 SpEL，以及如何透過 @ConfigurationProperties 將設定綁定到 Java 的物件上
+
+這些技術可以幫助我們更好地管理應用程序的配置，提高代碼的可讀性和可維護性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 06 掌握 application.properties](https://ithelp.ithome.com.tw/articles/10347461)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/how-to/properties-and-configuration.html
+- https://docs.spring.io/spring-boot/appendix/application-properties/index.html
+- https://docs.spring.io/spring-boot/reference/features/external-config.html
