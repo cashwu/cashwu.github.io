@@ -1,0 +1,283 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 12 統一 API 回應格式'
+summary: '文章首先介紹了 RFC 7807 Problem Details for HTTP APIs 標準，然後詳細說明了如何建立一個通用的 ApiResponse 類別來封裝 API 回應。此外，文章比較了自定義設計與 RFC 7807 標準的異同，並討論了使用統一 API 返回結構的優缺點。最後，文章強調了統一 API 回應格式在提高 API 可用性和一致性方面的重要性，特別是對於大型或長期維護的項目'
+date: '2024-09-12'
+lastmod: '2024-09-12'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day12-unified-api-response-format/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day12-unified-api-response-format/cover.webp)
+
+在設計 RESTful API 時，提供一致且資訊豐富的回應結構對於提高 API 的可用性和可維護性至關重要
+
+今天，我們將探討如何設計一個統一的 API 回應結構，並基於之前的 Todo List API 範例進行改寫
+
+## RFC 7807 Problem Details for HTTP APIs
+
+RFC 7807 定義了一種用於在 HTTP API 中傳遞問題詳情的標準格式，稱為「問題詳情（Problem Details）」
+
+這個標準旨在提供一個一致的方法來描述 API 中發生的錯誤情況，使得客戶端能夠更好地理解錯誤的性質和處理方法
+
+### 主要特點
+
+- 結構化格式
+
+  - 使用 JSON 或 XML 格式回傳錯誤訊息，而不僅僅是純文字
+
+- 主要內容
+
+  - type: 錯誤的URI，指向問題的類型或描述
+  - title: 一個簡短的描述，說明錯誤的類型
+  - status: HTTP狀態碼
+  - detail: 更詳細的錯誤訊息，幫助開發者理解問題
+  - instance: 錯誤發生的具體實例URI，方便進一步查詢
+
+- 擴展性
+  - 可以自定義其他字段，以提供額外的上下文信息，根據需要擴展問題詳情結構
+
+## 通用的 Response 類別
+
+讓我們建立一個 ApiResponse 類別來封裝我們的 API 回應格式
+
+```java
+public class ApiResponse<T> {
+    private boolean success;
+    private T data;
+    private ErrorDetails error;
+
+    // 建構函式、getter 和 setter 省略
+
+    public static class ErrorDetails {
+        private String type;
+        private String title;
+        private int status;
+        private String detail;
+        private String instance;
+
+        // 建構函式、getter 和 setter 省略
+    }
+}
+```
+
+這個 ApiResponse 類別主要包含三個部分：
+
+- success：表示操作是否成功
+- data：實際的回應資料
+- error：包含錯誤相關的資訊
+
+## 修改程式碼，使用 ApiResponse
+
+現在，讓我們修改 TodoController 以使用這個新的 API 回應格式
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private static final List<Todo> todos = new ArrayList<>();
+    private static final AtomicLong idCounter = new AtomicLong();
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+        long id = idCounter.incrementAndGet();
+        todo.setId(id);
+        todos.add(todo);
+        return ResponseEntity.ok(new ApiResponse<>(true, todo, null));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Todo>>> getAllTodos() {
+        return ResponseEntity.ok(new ApiResponse<>(true, todos, null));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> getTodo(@PathVariable Long id) {
+        Optional<Todo> todo = todos.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+
+        if (todo.isPresent()) {
+            return ResponseEntity.ok(new ApiResponse<>(true, todo.get(), null));
+        } else {
+            ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                    "https://example.com/errors/not-found",
+                    "Todo not found",
+                    HttpStatus.NOT_FOUND,
+                    MessageFormat.format("Todo with id {0} does not exist", id),
+                    MessageFormat.format("/api/todos/{0}", id)
+            );
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, null, error));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Object>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+        for (int i = 0; i < todos.size(); i++) {
+            if (todos.get(i).getId().equals(id)) {
+                updatedTodo.setId(id);
+                todos.set(i, updatedTodo);
+
+                return ResponseEntity.ok(new ApiResponse<>(true, updatedTodo, null));
+            }
+        }
+
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/not-found",
+                "Todo not found",
+                HttpStatus.NOT_FOUND,
+                MessageFormat.format("Todo with id {0} does not exist", id),
+                MessageFormat.format("/api/todos/{0}", id)
+        );
+
+        return ResponseEntity.status(404).body(new ApiResponse<>(false, null, error));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Object>> deleteTodo(@PathVariable Long id) {
+        boolean isSuccess = todos.removeIf(todo -> todo.getId().equals(id));
+
+        if (isSuccess) {
+            return ResponseEntity.ok(new ApiResponse<>(true, null, null));
+        }
+
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/not-found",
+                "Todo not found",
+                HttpStatus.NOT_FOUND,
+                MessageFormat.format("Todo with id {0} does not exist", id),
+                MessageFormat.format("/api/todos/{0}", id)
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, null, error));
+    }
+}
+```
+
+- 所有方法現在都返回 `ResponseEntity<ApiResponse<T>>`，這允許我們設置 HTTP 狀態碼和回應的數據
+- 成功的操作返回 `200 OK` 狀態碼，並在 ApiResponse 中設置 success 為 true
+- 失敗的操作（如沒有找到 Todo）返回 `404 Not Found` 狀態碼，並在 ApiResponse 中設置 success 為 false
+- 實際的數據（Todo 相關資料）被封裝在 ApiResponse 的 data 中
+- 所有錯誤的相關訊息，都被包含在 error，也就是 ErrorDetails 物件中
+
+另外，可以看到 not found 的部分已經重複了，可以再把一樣的部分拉出變共用的 method
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private static final List<Todo> todos = new ArrayList<>();
+    private static final AtomicLong idCounter = new AtomicLong();
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+        long id = idCounter.incrementAndGet();
+        todo.setId(id);
+        todos.add(todo);
+        return ResponseEntity.ok(new ApiResponse<>(true, todo, null));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Todo>>> getAllTodos() {
+        return ResponseEntity.ok(new ApiResponse<>(true, todos, null));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> getTodo(@PathVariable Long id) {
+        Optional<Todo> todo = todos.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+
+        if (todo.isPresent()) {
+            return ResponseEntity.ok(new ApiResponse<>(true, todo.get(), null));
+        } else {
+            return createNotFoundError(id);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+        for (int i = 0; i < todos.size(); i++) {
+            if (todos.get(i).getId().equals(id)) {
+                updatedTodo.setId(id);
+                todos.set(i, updatedTodo);
+                return ResponseEntity.ok(new ApiResponse<>(true, updatedTodo, null));
+            }
+        }
+
+        return createNotFoundError(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> deleteTodo(@PathVariable Long id) {
+        boolean isSuccess = todos.removeIf(todo -> todo.getId().equals(id));
+
+        if (isSuccess) {
+            return ResponseEntity.ok(new ApiResponse<>(true, null, null));
+        }
+
+        return createNotFoundError(id);
+    }
+
+    private ResponseEntity<ApiResponse<Todo>> createNotFoundError(Long id) {
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/not-found",
+                "Todo not found",
+                HttpStatus.NOT_FOUND,
+                MessageFormat.format("Todo with id {0} does not exist", id),
+                MessageFormat.format("/api/todos/{0}", id)
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, null, error));
+    }
+}
+```
+
+> 其實程式碼還有蠻多可以重構的，這邊只是示範概念，有興趣可以再自行研究
+
+> 例如使用 Java 常用的 `of` 方法來建立 ApiResponse 物件
+
+## 與 RFC 7807 的比較
+
+我們的設計與 RFC 7807 有以下相同點和差異點
+
+### 相同點
+
+- 包含了 type、title、status、detail 和 instance 的部分
+- 提供了結構化的錯誤訊息
+
+### 差異點
+
+- 我們的設計封裝了成功和失敗兩種情況，而 RFC 7807 主要關注在錯誤情況
+- 我們添加了一個 success 來明確指示操作是否成功
+- 我們的設計允許在成功的情況下回傳資料
+
+## 使用統一 API 返回結構的優缺點
+
+### 優點
+
+- 一致性：客戶端可以期望所有 API 回傳相同的結構
+- 豐富的錯誤訊息：提供詳細的錯誤訊息有助於除錯和問題解決
+- 靈活性：可以輕鬆擴展以包含更多中繼資料或信息
+- 可讀性：結構化的格式使 API 更容易理解和使用
+- 版本控制：可以輕鬆地在不破壞向後兼容性的情況下擴展返回格式
+
+### 缺點
+
+- 冗餘：對於簡單的 API，這種結構可能顯得過於複雜
+- 增加大小：統一的回應格式可能增加每個請求的回應大小
+- 學習曲線：新的開發人員可能需要時間來適應這種結構
+- 實現複雜性：需要額外的程式碼來處理這種統一的結構
+
+## 結論
+
+整體來說，設計一個統一的 API 回應格式可以顯著提高 API 的可用性和一致性
+
+雖然它可能增加一些複雜性，但長期來看，這種方法通常會帶來更多好處，特別是在大型或長期維護的項目中
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 12 統一 API 回應格式](https://ithelp.ithome.com.tw/articles/10347516)
+
+> 圖片來源：AI 產生
