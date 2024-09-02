@@ -1,0 +1,203 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 09 探討 Spring Boot 自動配置"
+summary: "文章解釋了自動配置的概念、工作原理和流程，包括類別路徑掃描、條件評估、配置類別加載和 Bean 建立。通過 Redis 配置的例子，文章展示了自動配置的實際應用。此外，文章還介紹了如何自定義和覆蓋自動配置，包括使用屬性配置、自定義配置類別和排除特定自動配置的方法。最後，文章提供了自動配置除錯的技巧，幫助開發者更好地理解和控制 Spring Boot 的自動配置過程。這些知識對於充分利用 Spring Boot 的便利性和靈活性至關重要"
+date: "2024-09-09"
+lastmod: "2024-09-09"
+tags: ["Spring Boot", "Java", "ithome2024"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/cover.webp)
+
+在上一篇文章中，說明了 Bean 的基本概念，今天我們要探討 Spring Boot 的自動配置機制。
+
+這個功能就像是一個超級智能的管家，能夠自動為你的應用程式加入所需的配置，讓你專注於業務邏輯的開發，而不是被繁瑣的配置所困擾。
+
+## 什麼是自動配置？
+
+自動配置是 Spring Boot 的一個核心特性，它能夠根據你的專案相依性和一些預定義的條件，自動配置 Spring 應用程式
+
+簡單來說，它就是一個聰明的助手，能夠猜測你可能需要的配置，並自動為你設定好。
+
+想像一下，你正在準備一場派對。自動配置就像是一個超級管家，它會根據派對的主題（你的專案依賴），自動準備好所需的食物、飲料和裝飾（配置），而你只需要專注於邀請朋友和享受派對（開發核心業務邏輯）。
+
+
+## 自動配置是如何工作的？
+
+自動配置主要來自於 `@EnableAutoConfiguration` 註解，這個註解通常包含在 `@SpringBootApplication` 註解中。
+
+當 Spring Boot 啟動時，它會掃描你的類別路徑(classpath)，尋找所有的自動配置類別。
+
+```java
+@SpringBootApplication
+public class TodolistApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TodolistApplication.class, args);
+    }
+}
+```
+
+在這個過程中，Spring Boot 會檢查你的項目依賴，並根據這些依賴決定要啟用哪些自動配置
+
+例如，如果你的 classpath 中包含 `spring-boot-starter-web`，Spring Boot 就會自動配置一個嵌入式的 Tomcat 服務器，並設定 Spring MVC。
+
+如果我們在 IDE 裡面，點進 @SpringBootApplication 的定義，就可以看到這個註解上面還有更多的註解
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/01.webp)
+
+在專案裡面，就可以看到預設 Spring Boot 載入的所有 `AutoConfigure` 類別
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/02.webp)
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/03.webp)
+
+
+## 條件化配置
+
+自動配置的一個關鍵特性是條件化配置。Spring Boot 使用 `@Conditional` 註解及其衍生註解來決定是否應該建立某個 bean 或啟用某個配置。
+
+例如 `@ConditionalOnClass` 註解會檢查某個類別是否存在於 classpath 中
+
+以這段程式碼為例，只有當 RedisOperations 類別存在於 classpath 中時，這個配置類別才會被啟用。
+
+```java
+@AutoConfiguration
+@ConditionalOnClass(RedisOperations.class)
+public class RedisAutoConfiguration {
+}
+```
+
+## 自動配置的工作流程
+
+讓我們來看看當你引入一個第三方套件時，Spring Boot 是如何判斷是否要自動配置的
+
+- 類別路徑掃描
+    - 當 Spring Boot 啟動時，它會掃描你的類別路徑（classpath），尋找所有的 JAR 檔和類別。
+
+- 條件評估
+    - Spring Boot 會檢查每個自動配置類別上的條件注解（如 @ConditionalOnClass, @ConditionalOnBean 等）。
+
+- 配置類別加載
+    - 如果條件滿足，相應的配置類別就會被加載。
+
+- Bean 建立
+    - 配置類別中定義的 Bean 會被創建並加入到 Spring 容器中。
+
+
+### 讓我們通過一個例子來說明這個過程
+
+假設你在項目中添加了 `spring-boot-starter-data-redis` 依賴
+
+```groovy
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+}
+```
+
+Spring Boot 會執行以下步驟
+
+- 掃描類別路徑，發現 Redis 相關的類別
+- 檢查 `RedisAutoConfiguration` 類別的條件
+
+```java
+@AutoConfiguration
+@ConditionalOnClass(RedisOperations.class)
+@EnableConfigurationProperties(RedisProperties.class)
+@Import({ LettuceConnectionConfiguration.class, JedisConnectionConfiguration.class })
+public class RedisAutoConfiguration {
+
+}
+```
+
+- 由於 RedisOperations 類別存在於類別路徑中，條件滿足，RedisAutoConfiguration 被啟用
+- Spring Boot 建立 Redis 相關的 Bean，如 RedisTemplate
+
+
+## 自定義和覆蓋自動配置
+
+雖然自動配置很方便，但有時你可能需要自定義某些配置
+
+Spring Boot 提供了多種方式來實現這一點
+
+- 屬性配置
+
+在 application.properties 中設定相關的屬性來覆蓋預設配置
+
+```properties
+spring.data.redis.host=my-redis-server
+spring.data.redis.password=1234
+spring.data.redis.port=6600
+```
+
+- 自定義配置類別
+
+創建自己的 `@Configuration` 類別來替換或擴展自動配置
+
+```java
+@Configuration
+public class MyRedisConfig {
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        var config = new RedisStandaloneConfiguration();
+        config.setHostName("my-redis-server");
+        config.setPort(6600);
+        config.setPassword("1234");
+        return new LettuceConnectionFactory(config);
+    }
+}
+```
+
+- 排除自動配置
+
+使用 `@EnableAutoConfiguration` 的 exclude 屬性來排除特定的自動配置
+
+```java
+@SpringBootApplication(exclude = {RedisAutoConfiguration.class})
+public class TodolistApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TodolistApplication.class, args);
+    }
+}
+```
+
+
+## 自動配置除錯
+
+要了解 Spring Boot 到底應用了哪些自動配置，你可以在啟動應用程式時加入 `--debug` 標誌，或在 `application.properties` 中設定
+
+```properties
+debug=true
+```
+
+這將輸出一個自動配置報告，顯示哪些自動配置被應用，哪些沒有被應用，以及原因
+
+也可以看到 `not match` 和 `exclude` 的部分
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/04.webp)
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/05.webp)
+
+![](/static/images/2024/ithome/30day-day09-explore-spring-boot-auto-configuration/06.webp)
+
+
+## 結論
+
+Spring Boot 的自動配置機制大大簡化了 Spring 應用的開發過程
+
+它就像一個聰明的助手，幫你處理了大部分的配置工作，讓你可以專注於真正重要的業務邏輯開發。
+
+理解自動配置的工作原理不僅能幫助你更好地使用 Spring Boot，還能在需要時輕鬆地進行自訂配置，讓你的應用程式更加靈活和高效
+
+不過，雖然自動配置很強大，但掌握如何自定義它同樣重要，這樣你就可以在需要時靈活地控制你的應用配置。
+
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 09 探討 Spring Boot 自動配置](https://ithelp.ithome.com.tw/articles/10347492)
+
+> 圖片來源：AI 產生
+
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/reference/using/auto-configuration.html#using.auto-configuration.replacing
