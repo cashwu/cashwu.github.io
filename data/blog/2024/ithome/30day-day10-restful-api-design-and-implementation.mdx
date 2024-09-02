@@ -1,0 +1,219 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 10 RESTful API 設計與實作'
+summary: '文章介紹了如何使用 Spring Boot 建立一個簡單的 Todo List RESTful API，實現基本的 CRUD（創建、讀取、更新、刪除）操作。最後，文章介紹了如何使用 JetBrains HTTP Client 來測試這些 API 端點。這個實例為讀者提供了一個實用的 RESTful API 設計和實現的指南，適合初學者學習 Spring Boot API 開發'
+date: '2024-09-10'
+lastmod: '2024-09-10'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/cover.webp)
+
+前面花了蠻長的時間（篇幅），講解了 Spring Boot 相關的基本知識，現在終於要進入寫程式的環節了
+
+本文將介紹如何使用 Spring Boot 建立一個簡單的 Todo List RESTful API，實現基本的 CRUD 操作
+
+我們將直接在 Controller 中使用一個靜態 List 來存儲 Todo 項目，並使用 JetBrains HTTP Client 來測試 API
+
+## 前置作業
+
+### 建立 Todo 類別
+
+我們需要先有一個 Todo 類別來代表我們的 Todo
+
+```java
+public class Todo {
+    private Long id;
+    private String title;
+    private boolean completed;
+
+    // 構造函數、getter 和 setter 方法省略
+}
+```
+
+我們可以使用 IDE 的 Generate 功能，來幫我們產生 Getter 和 Setter
+
+![](/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/01.webp)
+
+### 建立 TodoController
+
+我們需要一個 TodoController
+
+```java
+import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private static final List<Todo> todos = new ArrayList<>();
+    private static final AtomicLong idCounter = new AtomicLong();
+
+    // 我們的 CRUD 操作將在這裡實現
+}
+```
+
+在 Controller 使用了一個靜態 `List` 來存儲 Todo 項目，並使用 `AtomicLong` 來生成唯一的 ID。
+
+標示為 `@RestController`，這個已經在前面解說過了
+
+在 controller 上面標示 `@RequestMapping("/api/todos")`，代表這個Controller 裡面的基本 url 路徑為 `/api/todos`，裡面的每個方法，就不用再寫一次
+
+## 實現 CRUD 操作
+
+### 建立 Todo (Create)
+
+```java
+@PostMapping
+public Todo createTodo(@RequestBody Todo todo) {
+    long id = idCounter.incrementAndGet();
+    todo.setId(id);
+    todos.add(todo);
+    return todo;
+}
+```
+
+- @RequestBody 註解用於將 HTTP Request body 中的 JSON 資料自動綁定到 Todo 物件中
+
+相對應的 RESTful 的相關動作，對應到 Spring Boot 就是
+
+- @PostMapping ↔ Create
+- @GetMapping ↔ Read
+- @PutMapping ↔ Update
+- @DeleteMapping ↔ Delete
+
+### 取得所有 Todo (Read)
+
+```java
+@GetMapping
+public List<Todo> getAllTodos() {
+    return todos;
+}
+```
+
+### 使用 id 取得單一 Todo (Read)
+
+```java
+@GetMapping("/{id}")
+public Todo getTodo(@PathVariable Long id) {
+    return todos.stream()
+                .filter(todo -> todo.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+}
+```
+
+- `@PathVariable` 指的是，可以從 path 裡面，取得相對應的資料，binding 到 id
+
+### 更新 Todo (Update)
+
+```java
+@PutMapping("/{id}")
+public Todo updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+    for (int i = 0; i < todos.size(); i++) {
+        if (todos.get(i).getId().equals(id)) {
+            updatedTodo.setId(id);
+            todos.set(i, updatedTodo);
+            return updatedTodo;
+        }
+    }
+    return null;
+}
+```
+
+### 刪除 Todo (Delete)
+
+```java
+@DeleteMapping("/{id}")
+public void deleteTodo(@PathVariable Long id) {
+    todos.removeIf(todo -> todo.getId().equals(id));
+}
+```
+
+## 使用 JetBrains HTTP Client 測試 API
+
+我們將使用 JetBrains IDE 內置的 HTTP Client 來測試我們的 API。
+
+首先，在你的專案中建立一個 HTTP Request，命名為 `api-test.http`
+
+![](/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/02.webp)
+
+### 創建 Todo
+
+```http
+### 創建一個新的 Todo
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+  "title": "學習 Spring Boot",
+  "completed": false
+}
+```
+
+### 獲取所有 Todo
+
+```http
+### 獲取所有 Todo
+GET http://localhost:8080/api/todos
+```
+
+### 獲取單個 Todo
+
+```http
+### 獲取 ID 為 1 的 Todo
+GET http://localhost:8080/api/todos/1
+```
+
+### 更新 Todo
+
+```http
+### 更新 ID 為 1 的 Todo
+PUT http://localhost:8080/api/todos/1
+Content-Type: application/json
+
+{
+  "title": "精通 Spring Boot",
+  "completed": true
+}
+```
+
+### 刪除 Todo
+
+```http
+### 刪除 ID 為 1 的 Todo
+DELETE http://localhost:8080/api/todos/1
+```
+
+要執行這些請求，只需點擊每個請求旁邊的綠色播放按鈕。
+
+![](/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/03.webp)
+
+JetBrains HTTP Client 會顯示 Response 結果，包括狀態碼、Header 和回應內容 (Response Body)
+
+在 Service 視窗裡面就可以看到之前測試過的相關 API，也有用不同顏色來表示不同的動作
+
+![](/static/images/2024/ithome/30day-day10-restful-api-design-and-implementation/04.webp)
+
+## 總結
+
+就這樣，我們完成了一個簡單但功能齊全的 Todo List RESTful API！
+
+我們不僅實現了基本的 CRUD 操作，還學會了如何使用 JetBrains HTTP Client 來測試 API
+
+這個 API 設計遵循了 RESTful 原則，使用了適當的 HTTP 方法和路徑
+
+雖然我們使用了 List 來儲存資料，但這個簡單的實現已經足以幫助我們理解 RESTful API 相關的設計原則
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 10 RESTful API 設計與實作]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
