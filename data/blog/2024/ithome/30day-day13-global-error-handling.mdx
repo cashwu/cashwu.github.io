@@ -1,0 +1,289 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 13 - 全域錯誤處理'
+summary: '文章介紹了三種主要的實現方式：使用 @ExceptionHandler 註解（控制器級別）、使用 @ControllerAdvice（全域級別）和使用 ResponseEntityExceptionHandler（Spring MVC 特定異常處理），文章還討論了全域異常處理的整體優缺點，最後，文章強調了全域異常處理在構建健壯 API 中的重要性，特別是對於大型或長期維護的項目'
+date: '2024-09-13'
+lastmod: '2024-09-13'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day13-global-error-handling/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/cover.webp)
+
+在 Spring Boot 應用程序中，有效的錯誤處理對於提供良好的用戶體驗和便於除錯至關重要
+
+現在，讓我們更進一步，實現全域錯誤處理，以確保我們的 API 能夠優雅地處理各種可能發生的錯誤
+
+## 使用 @ExceptionHandler 註解（控制器級別）
+
+### 實現方式
+
+首先，我們可以在 TodoController 中添加一個異常處理方法
+
+在 method 上面加上 `@ExceptionHandler` annotation
+
+參數是要補捉的異常類型，為了簡單，這裡使用 `Exception`
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    // 其他程式碼保持不變
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+            "https://example.com/errors/internal-error",
+            "Internal Server Error",
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            e.getMessage(),
+            "/api/todos"
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(false, null, error));
+    }
+}
+```
+
+### 優點
+
+- 簡單直接，易於實現
+- 可以針對特定控制器定制錯誤處理邏輯
+
+### 缺點
+
+- 只能處理特定控制器中的異常
+- 如果有多個控制器，可能導致代碼重複
+
+### 測試
+
+我們可以在另一個 method 裡面寫會 throw exception 的程式碼
+
+```java
+var a  = 0;
+var b = 1;
+var r = b / a;
+```
+
+可以看到呼叫 API 後，收到的錯誤訊息
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/01.webp)
+
+## 使用 @ControllerAdvice（全域級別）
+
+### 實現方式
+
+為了示範方便，我們先為 todo not found 建立一個自定義的 Exception
+
+```java
+public class TodoNotFoundException extends Exception {
+
+    public TodoNotFoundException(Long id) {
+        super("Todo not found with id: " + id);
+    }
+}
+```
+
+建立一個 全域的異常處理類
+
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(TodoNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTodoNotFoundException(TodoNotFoundException e) {
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/not-found",
+                "Todo not found",
+                HttpStatus.NOT_FOUND,
+                e.getMessage(),
+                apiPath()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, null, error));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+
+        String apiPath = apiPath();
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/internal-error",
+                "Internal Server Error",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                e.getMessage(),
+                apiPath
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(false, null, error));
+    }
+
+    private static String apiPath() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        return request.getRequestURI();
+    }
+}
+```
+
+另外，有寫了一個共用的方式 `apiPath()`，來取得目前呼叫的 API path，方便出錯時，讓使用者知道是那個 path 有問題
+
+當然，都可以根據自己的需求來客制化調整
+
+### 優點
+
+- 可以處理所有控制器中的異常
+- 集中管理異常處理邏輯，減少程式碼重複
+- 可以為不同類型的異常定義不同的處理方法
+
+### 缺點
+
+- 相比第一種方法，設置稍微複雜一些
+- 可能需要建立自定義異常類別
+
+### 測試
+
+在其它的 controller 寫測試的程式碼試試
+
+```java
+@GetMapping("/ex")
+public String ex() {
+    var a = 0;
+    var b = 1;
+    var c = b / a;
+    return "";
+}
+```
+
+可以看到，這裡的錯誤訊息，會是全域的錯誤處理類別 `Exception` 裡面的訊息
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/02.webp)
+
+然後我們可以修改 Todo 中一個處理 not found 情況的程式碼，改為 throw `TodoNotFoundException` 來測試
+
+```java
+ @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> getTodo(@PathVariable Long id) throws
+                                                                            TodoNotFoundException {
+        Optional<Todo> todo = todos.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst();
+
+        if (todo.isPresent()) {
+            return ResponseEntity.ok(new ApiResponse<>(true, todo.get(), null));
+        } else {
+            throw new TodoNotFoundException(id);
+        }
+    }
+```
+
+可以看到，這裡的錯誤訊息，會是全域的錯誤處理類別 `TodoNotFoundException` 裡面的訊息
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/03.webp)
+
+## 使用 ResponseEntityExceptionHandler（Spring MVC 特定異常處理）
+
+### 實現方式
+
+繼承 Spring 提供的 `ResponseEntityExceptionHandler` 類，可以處理更多 Spring 特定的異常
+
+我們調整上一個 `GlobalExceptionHandler` 的範列
+
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status,
+                                                                  WebRequest request) {
+
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/invalid-json",
+                "無法解析請求內容",
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, null, error));
+    }
+}
+```
+
+這種方法提供了最大的靈活性和控制，可以處理各種 Spring 特定的異常
+
+在 IDE 可以看到 override 的 method 類型非常多
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/04.webp)
+
+### 優點
+
+- 提供最大的靈活性和控制
+- 可以處理 Spring MVC 特定的異常
+- 允許更細粒度的異常處理
+
+### 缺點
+
+- 設置最複雜
+- 需要對 Spring MVC 的異常處理機制有深入了解
+
+### 測試
+
+以這裡的 `handleHttpMessageNotReadable` 為例
+
+我們可以傳送一個不正確的 JSON，這個錯誤就可以被捕捉到了
+
+```http
+### 創建一個新的 Todo
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+  "title":
+  "completed": false
+}
+```
+
+可以看到，這裡的錯誤訊息，會是 `handleHttpMessageNotReadable` 裡面的訊息
+
+![](/static/images/2024/ithome/30day-day13-global-error-handling/05.webp)
+
+## 全域異常處理的優缺點
+
+### 優點
+
+- 集中管理：所有的異常處理邏輯都集中在一個地方，便於維護和修改
+- 程式碼清晰：業務邏輯和錯誤處理分離，使得 Controller 代碼更加簡潔
+- 一致性：確保所有的異常都以統一的格式返回給客戶端
+- 可擴展性：易於添加新的異常類型和處理方法
+- 減少重複程式碼：避免在每個 Controller 中重複編寫異常處理邏輯
+
+### 缺點
+
+- 學習曲線：需要對 Spring 的異常處理機制有一定了解
+- 過度抽象：對於簡單的應用來說，可能顯得有些過度設計
+- 除錯難度：集中處理可能使得錯誤的來源不那麼容易定位
+- 性能影響：全域異常處理可能會略微增加請求的處理時間
+
+## 總結
+
+- 控制器級別（ `@ExceptionHandler` ）：適用於只需要在特定控制器中處理異常的簡單場景
+- 全域級別（ `@ControllerAdvice` ）：適用於需要統一處理多個控制器異常的中等複雜度場景
+- Spring MVC 特定（ `ResponseEntityExceptionHandler` ）：適用於需要精細控制 Spring MVC 異常處理的複雜場景
+
+選擇哪種方法取決於你的應用程序的複雜度和特定需求
+
+對於大多數應用程序，使用 `@ControllerAdvice` 通常是一個很好的平衡點，它提供了足夠的靈活性和全域控制，同時保持相對簡單的實現
+
+全域異常處理是構建健壯 API 的重要組成部分，它能夠大大提高代碼的可維護性和一致性
+
+雖然實現起來可能稍顯複雜，但長遠來看，這種投資是值得的，特別是在大型項目或需要長期維護的 API 中，全域異常處理的優勢會更加明顯
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 13 - 全域錯誤處理](https://ithelp.ithome.com.tw/articles/10347713)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-exceptionhandler.html
+- https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-advice.html
+- https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet/exceptionhandlers.html
