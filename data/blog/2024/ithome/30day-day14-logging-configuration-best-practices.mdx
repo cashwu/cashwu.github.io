@@ -1,0 +1,202 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 14 日誌配置與最佳實踐'
+summary: '文章首先介紹了 SLF4J 作為日誌抽象層和 Logback 作為具體實現的角色，然後展示了如何在 Todo List API 中實現日誌記錄。文章還詳細說明了 Logback 的文件配置，包括如何實現每日日誌文件切割和大小控制。最後，文章提供了一系列日誌記錄的最佳實踐建議，包括適度記錄、使用適當的日誌級別、避免記錄敏感信息等'
+date: '2024-09-14'
+lastmod: '2024-09-14'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: true
+images: ['/static/images/2024/ithome/30day-day14-logging-configuration-best-practices/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day14-logging-configuration-best-practices/cover.webp)
+
+今天我們要探討一個常被忽視，但卻至關重要的話題：日誌記錄
+
+我們將聚焦於 SLF4J 和 Logback 這對強大的組合，看看如何讓它們在我們的 Todo List API 中大顯身手
+
+## SLF4J 與 Logback
+
+### SLF4J（Simple Logging Facade for Java）
+
+SLF4J 是一個抽象層（Facade Pattern），它提供了一個統一的接口，允許你在寫程式時使用統一的日誌 API
+
+讓你的程式碼可以與各種日誌實現框架溝通，使用 SLF4J，你就不用擔心將來可能需要更換日誌框架的問題了。
+
+### Logback
+
+Logback 則是實際執行日誌記錄的實現。它是 log4j 創始人設計的新一代日誌框架，擁有更高的性能和更豐富的功能
+
+Logback 負責將日誌寫入檔案或輸出到控制台
+
+### Spring 框架的日誌
+
+Spring 框架本身使用 SLF4J 作為其日誌抽象層，當你在 Spring 項目中配置 Logback 時，它會作為 SLF4J 的底層實現
+
+Spring Boot 3.3 已經使用 `spring-boot-starter-logging` 作為預設的日誌啟動器，其中已經包含了 SLF4J 和 Logback，所以不用再額外添加任何的依賴
+
+```shell
++-------------------+
+|  Spring Framework |
++-------------------+
+           |
+           | 使用
+           v
++-------------------+
+|       SLF4J       |
+|  (日誌抽象層)       |
++-------------------+
+           |
+           | 實現
+           v
++-------------------+
+|      Logback      |
+|  (具體日誌實現)     |
++-------------------+
+```
+
+## 改造 Todo List API
+
+我們來修改 TodoController
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+        logger.info("create new todo: {}", todo);
+
+        long id = idCounter.incrementAndGet();
+        todo.setId(id);
+        todos.add(todo);
+
+        return ResponseEntity.ok(new ApiResponse<>(true, todo, null));
+    }
+
+    // 其他方法類似，可以參考 Github 上 repository 的 commit ...
+}
+```
+
+然後，修改全局異常處理器：
+
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+
+        logger.error("Unhandled exception occurred", e);
+
+        String apiPath = apiPath();
+        ApiResponse.ErrorDetails error = new ApiResponse.ErrorDetails(
+                "https://example.com/errors/internal-error",
+                "Internal Server Error",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                e.getMessage(),
+                apiPath
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(false, null, error));
+    }
+
+    // 其他方法類似，可以參考 Github 上 repository 的 commit ...
+}
+```
+
+必須注意，匯入（import）時要選擇正確的套件（package），因為有相當多的選項
+
+![](/static/images/2024/ithome/30day-day14-logging-configuration-best-practices/01.webp)
+
+實際呼叫 API 進行測試，可以看到 log 有輸出到 console
+
+![](/static/images/2024/ithome/30day-day14-logging-configuration-best-practices/02.webp)
+
+## Logback 寫入檔案配置
+
+現在，讓我們來配置 Logback，實現每天一個日誌文件，並在文件大小超過 5MB 時進行切分。在 src/main/resources 目錄下創建 logback-spring.xml
+
+```xml
+<configuration>
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/todo-api.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/todo-api-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ROLLING_FILE" />
+    </root>
+</configuration>
+```
+
+### 配置分析
+
+- 將日誌寫入名為 `logs/todo-api.log` 的檔案
+- 使用滾動策略管理日誌檔案，具體如下：
+  - 每天建立一個新的日誌檔案，檔名包含日期（例如：`todo-api-2024-09-03.0.log`）
+  - 當單個日誌檔案大小超過 5MB 時，會建立一個新檔案
+  - 新檔案的檔名會包含一個遞增的索引號（例如：`todo-api-2024-09-03.1.log`）
+- 保留最近 30 個日誌檔案
+- 限制所有日誌檔案的總大小不超過 1GB
+- 記錄 INFO 級別及以上的日誌訊息
+- 日誌格式包含：時間、執行緒、日誌級別、logger 名稱和訊息內容
+
+呼叫 API 測試一下，可以在資料夾內看到有產生了 log 檔案，而且相關的 log 有輸出到檔案裡面
+
+![](/static/images/2024/ithome/30day-day14-logging-configuration-best-practices/03.webp)
+
+Logback 的設定檔可以設定的參數非常多，可以參考[官網的說明](https://logback.qos.ch/manual/configuration.html)
+
+另外，現在大多數應用程式可能都不會將日誌寫入自己的伺服器了，以 sentry 為例，可以參考[官方文件](https://docs.sentry.io/platforms/java/guides/spring-boot/)
+
+## 日誌最佳實踐
+
+- 適度記錄：根據實際需求決定記錄的級別和內容。
+- 在系統邊界記錄：在 API 的入口和出口處記錄日誌，追踪請求的完整生命週期。
+- 使用佔位符：使用 SLF4J 的 {} 語法，而不是字串串接
+
+```java
+// 推薦
+logger.debug("Processing request for user: {}", username);
+
+// 不推薦
+logger.debug("Processing request for user: " + username);
+```
+
+- 使用適當的日誌級別
+  - ERROR：嚴重問題，需要立即關注。
+  - WARN：潛在問題，需要注意。
+  - INFO：重要的業務流程信息。
+  - DEBUG：調試用的詳細信息。
+  - TRACE：最詳細的信息，通常只在開發環境使用。
+- 包含前後的相關資訊：記錄足夠的資訊以便問題定位，如用戶 ID、請求 ID 等
+- 避免記錄敏感資訊：永遠不要記錄密碼、信用卡號碼等敏感資料
+
+## 結語
+
+通過今天的文章，我們不僅掌握了如何使用 SLF4J 和 Logback 來改進 Todo List API，還學會了如何配置 Logback 來管理日誌文件
+
+記住，良好的日誌記錄就像是給未來的自己或其他開發者留下的路標，能夠在錯綜複雜的程式碼中指明方向
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 14 日誌配置與最佳實踐]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/reference/features/logging.html
+- https://docs.spring.io/spring-boot/how-to/logging.html
+- https://logback.qos.ch
