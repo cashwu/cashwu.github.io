@@ -1,0 +1,178 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 15 API 文件自動化"
+summary: "本文介紹了如何在 Spring Boot 項目中整合 Swagger 來自動生成 API 文件。文章首先簡要介紹了 Swagger 及其主要功能，然後詳細說明了在 Spring Boot 中整合 Swagger 的步驟，包括添加依賴、配置 Swagger、在控制器中添加 Swagger 註解等。文章還介紹了常用的 Swagger 註解及其用途，以及如何查看生成的 API 文件。此外，文章還提供了一些額外的 Swagger 配置選項。最後，文章總結了整合 Swagger 的好處，強調了它對提高開發效率、改善團隊協作和增強 API 可用性的重要性。這篇文章為 Spring Boot 開發者提供了一個全面的 API 文檔自動化指南"
+date: "2024-09-15"
+lastmod: "2024-09-15"
+tags: ['Spring Boot', 'Java', 'ithome2024', 'API', 'Swagger']
+draft: true
+images: ["/static/images/2024/ithome/30day-day15-api-documentation-automation/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day15-api-documentation-automation/cover.webp)
+
+
+我們將介紹如何在 Spring Boot 項目中整合 Swagger 來自動生成 API 文件
+
+這將有助於提高開發效率並改善 API 的可用性
+
+## Swagger 簡介
+
+Swagger 是一個開源的 API 文件框架。它可以自動生成 API 文件，提供一個 UI 界面來展示和測試 API，並幫助前後端開發人員更好地溝通
+
+Swagger 的主要功能包括
+
+- 自動生成 API 文件
+- 提供 UI 展示 API
+- 允許直接在界面上測試 API
+- 簡化 API 的使用和理解
+
+
+## 在 Spring Boot 中整合 Swagger
+
+
+### 添加套件依賴
+
+相關的套件位置
+- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+
+```groovy
+// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+```
+
+> 注意：這裡使用的是 springdoc-openapi 的套件
+- Swagger 3 使用 springdoc-openapi 套件，而 Swagger 2 使用 springfox 套件
+- Swagger 3 遵循 OpenAPI 3.0 規範，而 Swagger 2 遵循舊版的 Swagger 2.0 規範
+
+## 配置 Swagger
+
+建立一個配置類別來自訂 Swagger 的行為
+
+> 注意 import 的 package 不要選錯了
+
+```java
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+<!-- 這裡只列出了和 swagger 相關的 import -->
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Todo List API")
+                        .version("1.0")
+                        .description("一個簡單但功能強大的待辦事項 API")
+                        .contact(new Contact()
+                                .name("Cash")
+                                .email("cash@cashwu.com")))
+                .servers(List.of(
+                        new Server().url("http://localhost:8080").description("開發環境"),
+                        new Server().url("https://api.example.com").description("生產環境")
+                ));
+    }
+}
+```
+
+### 添加 Swagger 註解
+
+在控制器類中添加 Swagger 註解：
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+@Tag(name = "Todo", description = "待辦事項管理 API")
+public class TodoController {
+
+    @PostMapping
+    @Operation(summary = "建立新的待辦事項", description = "建立一個新的待辦事項並將其加入清單中",
+    responses = {
+            @ApiResponse(responseCode = "200", description = "成功創建待辦事項",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @ApiResponse(responseCode = "400", description = "無效的輸入")
+    })
+    public ResponseEntity<MyApiResponse<Todo>> createTodo(
+        @Parameter(description = "待辦事項")
+        @RequestBody Todo todo) {
+        // 實現邏輯
+    }
+
+    @GetMapping
+    @Operation(summary = "取得所有待辦事項", description = "取得所有待辦事項的清單")
+    public ResponseEntity<MyApiResponse<List<Todo>>> getAllTodos() {
+        // 實現邏輯
+    }
+
+    // 其他方法類似，可以參考 Github 上 repository 的 commit ...
+}
+```
+
+> 注意：因為前面範例中自定義的 ApiResponse，會跟 swagger 裡面定義的 ApiResponse 名稱有衝突，所以在這個範例裡面把自定義的 ApiResponse 改名為 MyApiResponse
+
+常用的 Swagger 註解
+- `@Tag` : 用於為 API 控制器分類
+- `@Operation` : 描述 API 端點的操作
+- `@ApiResponse` : 描述 API 操作的回應
+- `@Parameter` : 描述 API 操作的參數
+- `@Schema` : 定義模型 (model) 相關參數
+- `@Hidden` : 在 Swagger 文件中隱藏特定的 API 操作或字段
+
+### 查看生成的文件
+
+啟動 Spring Boot 應用後，在瀏覽器中訪問
+
+- http://localhost:8080/swagger-ui/index.html
+
+就可以看到 Swagger UI，其中包含我們設定的相關參數和所有的 API 端點資訊
+
+![](/static/images/2024/ithome/30day-day15-api-documentation-automation/01.webp)
+
+下面是在 Swagger UI 中測試 API 的情況
+
+![](/static/images/2024/ithome/30day-day15-api-documentation-automation/02.webp)
+
+![](/static/images/2024/ithome/30day-day15-api-documentation-automation/03.webp)
+
+## 額外的 Swagger 配置
+
+可以在 `application.properties` 中添加以下常用的配置  
+
+```properties
+# 這個參數用來設定 Swagger UI 的訪問路徑。預設情況下，Swagger UI 的路徑是 /swagger-ui/index.html
+springdoc.swagger-ui.path=/my-custom-swagger-ui
+
+# 這個參數用來設定生成的 OpenAPI 文檔的訪問路徑。預設情況下，這個路徑是 /v3/api-docs
+springdoc.api-docs.path=/my-api-docs
+
+# 這個參數用來指定 SpringDoc 應該掃描哪些包來生成 API 文檔。如果不指定，SpringDoc 會掃描所有的包
+springdoc.packages-to-scan=com.demo.todolist.controller
+
+# 這個參數用來指定哪些路徑應該包含在生成的 OpenAPI 文檔中。這在你只想要生成特定路徑的 API 文檔時非常有用。
+springdoc.paths-to-match=/api/todos/**
+
+# 這個參數用來設定是否在 Swagger UI 中顯示每個 API 請求的持續時間
+springdoc.swagger-ui.display-request-duration=true
+```
+
+> 經測試後發現，即使配置了自訂路徑，瀏覽時仍會導向到 /swagger-ui/index.html，原因尚待確認
+
+## 結論
+
+整合 Swagger 後，API 文件會自動產生和更新，開發者可以直接在 UI 上面查看和測試 API
+
+這提高了開發效率，改善了團隊協作，並增強了 API 的可用性。自動產生的文件確保了文件與實際 API 實現的一致性，減少了手動維護文件的工作量。
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 15 API 文件自動化](https://ithelp.ithome.com.tw/articles/10347859)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://springdoc.org
