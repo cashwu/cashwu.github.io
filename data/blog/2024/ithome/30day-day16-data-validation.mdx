@@ -1,0 +1,332 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 16 資料驗證'
+summary: '這篇文章介紹了如何在 Java 和 Spring Boot 中使用 Bean Validation 和 Spring Validator 進行資料驗證。文章首先簡介了 Bean Validation，並提供了在 Spring Boot 專案中添加和使用這些驗證的步驟。接著，文章展示了如何修改 Todo 類別和控制器以加入驗證，並提供了測試方法。文章還介紹了 Spring Validator 的使用方法，包括如何建立自定義驗證邏輯。最後，文章比較了 Bean Validation 和 Spring Validator 的優缺點，並建議在實際應用中結合使用兩者來實現全面的數據驗證'
+date: '2024-09-16'
+lastmod: '2024-09-16'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'validation']
+draft: true
+images: ['/static/images/2024/ithome/30day-day16-data-validation/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day16-data-validation/cover.webp)
+
+## Bean Validation
+
+Bean Validation 是 Java EE 和 Java SE 的一個規範，它提供了一種標準化的方法來驗證 Java Bean 的屬性
+
+這個框架使用`註解`來定義驗證規則，大大簡化了數據驗證的過程
+
+## 使用 Bean Validation
+
+### 添加套件依賴
+
+相關的套件位置
+
+- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+
+```groovy
+// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+```
+
+> 大多數 Spring Boot 的 starter 都不需要明確指定版本。這是因為 Spring Boot 使用了「依賴管理」機制，所有的 starter 都會自動繼承 Spring Boot 的版本號
+
+### 增加 Todo 驗證
+
+在這裡增加了 title 的驗證，後面會有 annotation 的相關說明
+
+```java
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+<!-- 這裡只列出了 validation 相關的 import -->
+
+public class Todo {
+
+    private Long id;
+
+    @NotBlank(message = "標題不能為空")
+    @Size(min = 1, max = 100, message = "標題長度必須在1到100個字符之間")
+    private String title;
+
+    private boolean completed;
+
+    // 構造函數、getter 和 setter
+}
+```
+
+### 修改 TodoController
+
+我們只先修改了 create，另外為了方便，這裡只列出和 validation 相關的程式碼
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    <!-- 為了方便，這裡只列出和 validation 相關的程式碼 -->
+
+    @PostMapping
+    public ResponseEntity<MyApiResponse<Todo>> createTodo(@Valid @RequestBody Todo todo) {
+        // 原本的程式碼
+    }
+}
+```
+
+- @Valid 註解放在 `@RequestBody` 參數前面，而不是 Todo 類別的定義上
+- 當請求進來時，Spring 會在綁定 JSON 數據到 Todo 對象時執行驗證
+- 如果驗證失敗，Spring 會自動拋出 `MethodArgumentNotValidException`
+
+> 對於大多數基本的驗證需求，只要使用 @Valid 就足夠了
+
+> 另外可以用 @Validated 在更複雜的驗證場景，如分組驗證或在非控制器類中進行方法級別的驗證
+
+### 測試
+
+發送一個沒有 title 的 request 來測試
+
+```http
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+  "completed": false
+}
+```
+
+可以看到返回了 400 `Invalid request content`
+
+![](/static/images/2024/ithome/30day-day16-data-validation/01.webp)
+
+看一下 debug log，可以發現，我們之前的範例，使用了 GlobalExceptionHandler 繼承 `ResponseEntityExceptionHandler`，所以被它的方法給捕捉到
+
+![](/static/images/2024/ithome/30day-day16-data-validation/02.webp)
+
+我們可以 override 它，來返回比較詳細的資訊
+
+```java
+@Override
+protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                HttpHeaders headers,
+                                                                HttpStatusCode status,
+                                                                WebRequest request) {
+
+    List<String> validationErrors = ex.getBindingResult()
+                            .getFieldErrors()
+                            .stream()
+                            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                            .collect(Collectors.toList());
+
+
+    MyApiResponse.ErrorDetails error = new MyApiResponse.ErrorDetails(
+            "https://example.com/errors/validation-error",
+            "Validation Error",
+            HttpStatus.BAD_REQUEST,
+            "請求參數驗證失敗",
+            request.getDescription(false)
+    );
+
+    error.setValidationErrors(validationErrors);
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MyApiResponse<>(false, null, error));
+}
+```
+
+還要修改 ErrorDetails 加上 `validationErrors` 的部分
+
+```java
+public static class ErrorDetails {
+    private List<String> validationErrors;
+
+    // getter 和 setter
+    // 其它程式碼
+}
+```
+
+重新測試一下，就可以看到錯誤訊息比較容易理解了
+
+![](/static/images/2024/ithome/30day-day16-data-validation/03.webp)
+
+### 常見的 Java Bean Validation
+
+- `@NotNull` ：確保值不為 null
+- `@NotEmpty` ：確保字串、集合或數組不為 null 且長度大於 0
+- `@NotBlank`：確保字串不為 null 且去除前後空白後長度大於 0
+- `@Size`：限制字串、集合或數組的大小
+- `@Min` 和 `@Max`：限制數值的最小值和最大值
+- `@Email`：驗證字串是否為有效的電子郵件地址格式
+- `@Past` 和 `@Future`：驗證日期是否在當前日期之前或之後
+- `@Positive` 和 `@Negative`：驗證數值是否為正數或負數
+- `@DecimalMin` 和 `@DecimalMax`：限制小數的最小值和最大值
+- `@AssertTrue` 和 `@AssertFalse`：驗證 bool 是否為 true 或 false
+
+## Spring Validator
+
+Spring Validator 是 Spring 框架提供的另一種驗證方式，它允許開發者建立自定義的驗證邏輯，特別適用於複雜的驗證場景
+
+Spring Validator 的用途
+
+- 實現特定業務邏輯的驗證
+- 跨不同屬性驗證
+- 需要訪問外部資源（如資料庫）的驗證
+
+### 客製 TodoValidator
+
+注意這裡要 import 的是 `springframework.validation`
+
+```java
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+<!-- 這裡只列出了 validation 相關的 import -->
+
+@Component
+public class TodoValidator implements Validator {
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Todo.class.equals(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        Todo todo = (Todo) target;
+        if (todo.getTitle() != null && todo.getTitle().contains("urgent") && !todo.isCompleted()) {
+            errors.rejectValue("completed", "urgent.not.completed", "Urgent todos must be completed");
+        }
+    }
+}
+```
+
+- 這個類別實現了 Spring 框架中的 `Validator` 介面，該介面定義了兩個方法
+
+- `supports(Class<?> clazz)` 方法
+  - 這個方法用來檢查 TodoValidator 是否支援驗證特定類別的物件
+  - 在這個例子中，它只支援驗證 Todo 類別的物件
+- `validate(Object target, Errors errors)` 方法
+  - 這是執行實際驗證邏輯的方法
+  - target 參數是要驗證的物件
+  - errors 參數用於收集驗證錯誤
+- 驗證邏輯
+  - todo 的標題不為 null
+  - todo 的標題包含 "urgent" 字串
+  - todo 尚未完成（isCompleted() 返回 false）
+  - 如果這三個條件都滿足，就會添加一個驗證錯誤
+
+### 修改 TodoController
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    <!-- 為了方便，這裡只列出和 Validator 相關的程式碼 -->
+
+    private TodoValidator todoValidator;
+
+    public TodoController(TodoValidator todoValidator) {
+        this.todoValidator = todoValidator;
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Todo>> createTodo(@RequestBody Todo todo,
+                                                        BindingResult bindingResult) {
+
+        todoValidator.validate(todo, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+
+            MyApiResponse.ErrorDetails error = new MyApiResponse.ErrorDetails(
+                    "https://example.com/errors/validation-error",
+                    "Validation Error",
+                    HttpStatus.BAD_REQUEST,
+                    "There were validation errors",
+                    "/api/todos"
+            );
+
+            List<String> errorMessages = bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.toList());
+
+            error.setValidationErrors(errorMessages);
+
+            return ResponseEntity.badRequest().body(new MyApiResponse<>(false, null, error));
+        }
+
+        // 原本 Todo 的新增邏輯
+    }
+}
+```
+
+使用注入的 `TodoValidator` 驗證器驗證 todo 物件
+
+如果驗證有問題的話，Validator 會把錯誤放到 `BindingResult` 裡面
+
+我們在從 `BindingResult` 裡面取出錯誤訊息
+
+### 測試
+
+發送一個符合 validator 驗證邏輯的 request 來測試
+
+```http
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+  "title": "學習 Spring Boot - urgent",
+  "completed": false
+}
+```
+
+符合 TodoValidator 的驗證邏輯的話，就會發生錯誤
+
+![](/static/images/2024/ithome/30day-day16-data-validation/04.webp)
+
+## Bean Validation 與 Spring Validator 的比較
+
+### Bean Validation
+
+- 優點
+
+  - 標準化：Java 的標準規範，確保跨框架一致性
+  - 聲明式驗證：使用註解定義規則，程式碼簡潔
+  - 易於使用：開箱即用，無需額外配置
+  - 廣泛支持：與多種框架集成良好
+
+- 缺點
+  - 複雜驗證限制：對於非常複雜的邏輯，可能需要自定義驗證器
+  - 性能：大量驗證時可能有輕微性能影響
+
+### Spring Validator
+
+- 優點
+
+  - 靈活性：可以實現任何複雜的驗證邏輯
+  - 上下文感知：可以訪問 Spring 容器中的其他 bean
+  - 跨屬性驗證：易於實現涉及多個屬性的驗證
+
+- 缺點
+  - 程式碼：相比 Bean Validation，需要編寫更多代碼
+  - 非標準化：特定於 Spring 框架
+
+## 實際應用
+
+在實際應用中，我們可以使用 Bean Validation 來處理基本的屬性驗證，同時使用 Spring Validator 來實現更複雜的業務邏輯驗證
+
+這種組合方法允許我們充分利用兩種驗證方式的優點，為應用提供全面而靈活的數據驗證解決方案
+
+## 總結
+
+Bean Validation 和 Spring Validator 都是強大的資料驗證工具，各有其優缺點
+
+Bean Validation 適用於簡單直接的屬性驗證，而 Spring Validator 則更適合複雜的業務邏輯驗證
+
+在實際應用中，根據具體需求選擇合適的驗證方式，或者結合使用兩者，可以建立出更加健壯和可維護的應用程式
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 16 資料驗證](https://ithelp.ithome.com.tw/articles/10347918)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html
+- https://docs.spring.io/spring-framework/reference/core/validation/validator.html

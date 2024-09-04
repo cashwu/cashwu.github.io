@@ -1,16 +1,15 @@
 ---
 layout: PostSimple
-title: "「Spring Boot API 開發：從 0 到 1」Day 15 API 文件自動化"
-summary: "本文介紹了如何在 Spring Boot 項目中整合 Swagger 來自動生成 API 文件。文章首先簡要介紹了 Swagger 及其主要功能，然後詳細說明了在 Spring Boot 中整合 Swagger 的步驟，包括添加依賴、配置 Swagger、在控制器中添加 Swagger 註解等。文章還介紹了常用的 Swagger 註解及其用途，以及如何查看生成的 API 文件。此外，文章還提供了一些額外的 Swagger 配置選項。最後，文章總結了整合 Swagger 的好處，強調了它對提高開發效率、改善團隊協作和增強 API 可用性的重要性。這篇文章為 Spring Boot 開發者提供了一個全面的 API 文檔自動化指南"
-date: "2024-09-15"
-lastmod: "2024-09-15"
+title: '「Spring Boot API 開發：從 0 到 1」Day 15 API 文件自動化'
+summary: '本文介紹了如何在 Spring Boot 項目中整合 Swagger 來自動生成 API 文件。文章首先簡要介紹了 Swagger 及其主要功能，然後詳細說明了在 Spring Boot 中整合 Swagger 的步驟，包括添加依賴、配置 Swagger、在控制器中添加 Swagger 註解等。文章還介紹了常用的 Swagger 註解及其用途，以及如何查看生成的 API 文件。此外，文章還提供了一些額外的 Swagger 配置選項。最後，文章總結了整合 Swagger 的好處，強調了它對提高開發效率、改善團隊協作和增強 API 可用性的重要性。這篇文章為 Spring Boot 開發者提供了一個全面的 API 文檔自動化指南'
+date: '2024-09-15'
+lastmod: '2024-09-15'
 tags: ['Spring Boot', 'Java', 'ithome2024', 'API', 'Swagger']
 draft: true
-images: ["/static/images/2024/ithome/30day-day15-api-documentation-automation/cover.webp"]
+images: ['/static/images/2024/ithome/30day-day15-api-documentation-automation/cover.webp']
 ---
 
 ![](/static/images/2024/ithome/30day-day15-api-documentation-automation/cover.webp)
-
 
 我們將介紹如何在 Spring Boot 項目中整合 Swagger 來自動生成 API 文件
 
@@ -27,13 +26,12 @@ Swagger 的主要功能包括
 - 允許直接在界面上測試 API
 - 簡化 API 的使用和理解
 
-
 ## 在 Spring Boot 中整合 Swagger
-
 
 ### 添加套件依賴
 
 相關的套件位置
+
 - https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
 
 ```groovy
@@ -42,6 +40,7 @@ implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-u
 ```
 
 > 注意：這裡使用的是 springdoc-openapi 的套件
+
 - Swagger 3 使用 springdoc-openapi 套件，而 Swagger 2 使用 springfox 套件
 - Swagger 3 遵循 OpenAPI 3.0 規範，而 Swagger 2 遵循舊版的 Swagger 2.0 規範
 
@@ -117,6 +116,7 @@ public class TodoController {
 > 注意：因為前面範例中自定義的 ApiResponse，會跟 swagger 裡面定義的 ApiResponse 名稱有衝突，所以在這個範例裡面把自定義的 ApiResponse 改名為 MyApiResponse
 
 常用的 Swagger 註解
+
 - `@Tag` : 用於為 API 控制器分類
 - `@Operation` : 描述 API 端點的操作
 - `@ApiResponse` : 描述 API 操作的回應
@@ -142,7 +142,7 @@ public class TodoController {
 
 ## 額外的 Swagger 配置
 
-可以在 `application.properties` 中添加以下常用的配置  
+可以在 `application.properties` 中添加以下常用的配置
 
 ```properties
 # 這個參數用來設定 Swagger UI 的訪問路徑。預設情況下，Swagger UI 的路徑是 /swagger-ui/index.html
