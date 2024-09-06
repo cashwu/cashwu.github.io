@@ -1,0 +1,466 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 18 JdbcTemplate 與 JdbcClient'
+summary: "本文深入探討了 Spring Boot 中使用 JdbcTemplate 和 JdbcClient 來簡化資料庫操作的方法。文章首先介紹了 JDBC API 和原生 Java SQL 的關係，然後詳細說明了如何使用 JdbcTemplate 和 JdbcClient 改寫之前的 TodoController。文章提供了兩種實現方式的完整程式碼示例，並對比了它們與原生 Java SQL 在程式碼簡潔度、異常處理、資源管理、類型安全性等方面的差異。最後，文章總結了 JdbcTemplate 和 JdbcClient 的主要優勢，並提供了選擇適當工具的建議。這篇文章為 Spring Boot 開發者提供了全面的 JDBC 操作優化指南，有助於提高開發效率和程式碼質量"
+date: "2024-09-18"
+lastmod: "2024-09-18"
+tags: ["Spring Boot", "Java", "ithome2024", "database"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/cover.webp)
+
+
+在上一篇文章中，我們使用了基本的 Java SQL API 來操作 H2 資料庫，雖然這種方法可行，但程式碼冗長且容易出錯
+
+今天，我們來介紹兩個工具：`JdbcTemplate` 和 `JdbcClient`，它們可以大大簡化我們的資料庫操作程式碼
+
+在此之前，讓我們先了解一下 JDBC API 和原生 Java SQL 的關係。
+
+## JDBC API 和原生 Java SQL
+
+JDBC（`Java Database Connectivity`）API 是 Java 標準函式庫中用於資料庫操作的介面集合
+
+它提供了一套統一的方法來連接和操作各種關係型資料庫
+
+而原生 Java SQL 則是直接使用 JDBC API 來執行 SQL 語句的方式
+
+### 主要區別
+
+- 抽象層級
+  - JDBC API 提供了一個抽象層，允許開發者使用統一的介面操作不同的資料庫
+  - 原生 Java SQL 直接使用 JDBC API，需要處理更多底層細節
+- 程式碼複雜度
+  - 使用原生 Java SQL 通常需要編寫更多的樣板程式碼，如建立連接、準備語句、處理結果集等
+  - JDBC API 本身並不提供太多簡化，但它為更高級的抽象（如 JdbcTemplate）提供了基礎
+- 異常處理
+  - 原生 Java SQL 需要手動處理 SQLException
+  - JDBC API 定義了這些異常，但並不提供自動處理機制
+- 資源管理
+  - 使用原生 Java SQL 時，開發者需要手動管理資源（如關閉連接、語句和結果集）
+  - JDBC API 提供了這些資源的介面，但不會自動管理它們
+
+現在，讓我們看看 Spring 框架如何通過 JdbcTemplate 和 JdbcClient 來簡化這些操作。
+
+## JdbcTemplate 和 JdbcClient 簡介
+
+JdbcTemplate 和 JdbcClient 都是 `Spring Framework` 提供的工具，用於簡化 JDBC 操作
+
+它們的主要目的是減少樣板程式碼，提高開發效率，並降低錯誤率
+
+### JdbcTemplate
+
+JdbcTemplate 是 Spring Framework 中較早引入的 JDBC 抽象層級
+
+它封裝了許多 JDBC 操作，如建立連接、準備和執行語句、處理異常等，讓開發者能夠專注於 SQL 邏輯而不是底層細節
+
+### JdbcClient
+
+JdbcClient 是 Spring Framework 6.0 中引入的新 API，專為簡化 JDBC 操作而設計
+
+它提供了一個流暢的 API，使得資料庫操作更加直觀和簡潔
+
+## 調整程式碼
+
+### 增加依賴
+
+如果還沒有加入 `JDBC` 的依賴的話，需要在 `build.gradle` 檔案中添加必要的依賴
+
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+```
+
+### 相關設定
+
+在 `application.properties` 裡面要先設定 datadsource 相關的設定，Spring Boot 就會自動配置 DataSource 和 JdbcTemplate
+
+```properties
+spring.datasource.url=jdbc:h2:~/test
+spring.datasource.username=sa
+spring.datasource.password=
+```
+
+如果沒有在 application.properties 設定 datasource 相關參數的話，預設會把資料庫建立在記憶體裡面
+
+可以在 `log` 看到名稱為一個 `GUID` ， `mem` 代表 memory  的意思
+
+![](/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/01.webp)
+
+
+### 使用 JdbcTemplate
+
+讓我們來看看如何使用 JdbcTemplate 重寫之前的 TodoController
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    // 為了方便，在這裡只展示了修改後，所增加的 DB 操作相關程式碼
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public TodoController(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @PostMapping
+    public ResponseEntity<MyApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+
+        try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(
+                        "INSERT INTO todos (title, completed) VALUES (?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, todo.getTitle());
+                ps.setBoolean(2, todo.isCompleted());
+                return ps;
+            }, keyHolder);
+
+            todo.setId(keyHolder.getKey().longValue());
+            return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<MyApiResponse<List<Todo>>> getAllTodos() {
+
+        try {
+            List<Todo> todos = jdbcTemplate.query("SELECT * FROM todos", todoRowMapper());
+            return ResponseEntity.ok(new MyApiResponse<>(true, todos, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @GetMapping("/{id}")
+
+    public ResponseEntity<MyApiResponse<Todo>> getTodo(@PathVariable Long id) {
+
+        try {
+            Todo todo = jdbcTemplate.query(
+                    "SELECT * FROM todos WHERE id = ?",
+                    todoRowMapper(),
+                    id).get(0);
+
+            if (todo == null) {
+                return createNotFoundError(id);
+            }
+
+            return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MyApiResponse<Todo>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+
+        try {
+            int affectedRows = jdbcTemplate.update(
+                    "UPDATE todos SET title = ?, completed = ? WHERE id = ?",
+                    updatedTodo.getTitle(), updatedTodo.isCompleted(), id);
+
+            if (affectedRows > 0) {
+                updatedTodo.setId(id);
+                return ResponseEntity.ok(new MyApiResponse<>(true, updatedTodo, null));
+            } else {
+                return createNotFoundError(id);
+            }
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MyApiResponse<Todo>> deleteTodo(@PathVariable Long id) {
+
+        try {
+            int affectedRows = jdbcTemplate.update("DELETE FROM todos WHERE id = ?", id);
+
+            if (affectedRows > 0) {
+                return ResponseEntity.ok(new MyApiResponse<>(true, null, null));
+            } else {
+                return createNotFoundError(id);
+            }
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    private RowMapper<Todo> todoRowMapper() {
+        return (rs, rowNum) -> {
+            Todo todo = new Todo();
+            todo.setId(rs.getLong("id"));
+            todo.setTitle(rs.getString("title"));
+            todo.setCompleted(rs.getBoolean("completed"));
+            return todo;
+        };
+    }
+}
+```
+
+之前的 DatabaseInitializer 也可以使用 JdbcTemplate 改寫一下
+
+```java
+@Component
+public class DatabaseInitializer {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public DatabaseInitializer(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @PostConstruct
+    public void initDatabase() {
+        String sql = "CREATE TABLE IF NOT EXISTS todos (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                "title VARCHAR(255) NOT NULL," +
+                "completed BOOLEAN NOT NULL)";
+
+        try {
+            jdbcTemplate.execute(sql);
+            System.out.println("初始化資料庫成功");
+        } catch (Exception e) {
+            System.err.println("初始化資料庫失敗：" + e.getMessage());
+        }
+    }
+}
+```
+
+
+### 使用 JdbcClient
+
+現在，讓我們看看如何使用 JdbcClient 來實現相同的功能
+
+在使用 JdbcClient 時，必須確認映射的類別 (在這裡就是 Todo )，是否有預設`無參數的建構子`．以及，`屬性名稱`與資料庫的名稱有沒有一樣
+
+如果不一樣的話，需要提供一個自定義的 `RowMapper` (就跟 `JdbcTemplate` 的 `RowMapper` 一樣)
+
+```java 
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    // 為了方便，在這裡只展示了修改後，所增加的 DB 操作相關程式碼
+
+    private final JdbcClient jdbcClient;
+
+    public TodoController(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
+
+    @PostMapping
+    public ResponseEntity<MyApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+
+        try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbcClient.sql("INSERT INTO todos (title, completed) VALUES (?, ?)")
+                    .params(todo.getTitle(), todo.isCompleted())
+                    .update(keyHolder);
+
+            Long id = keyHolder.getKey().longValue();
+
+            todo.setId(id);
+            return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<MyApiResponse<List<Todo>>> getAllTodos() {
+
+        try {
+            List<Todo> todos = jdbcClient.sql("SELECT * FROM todos")
+                    .query(Todo.class)
+                    .list();
+            return ResponseEntity.ok(new MyApiResponse<>(true, todos, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MyApiResponse<Todo>> getTodo(@PathVariable Long id) {
+
+        try {
+            Todo todo = jdbcClient.sql("SELECT * FROM todos WHERE id = ?")
+                    .param(id)
+                    .query(Todo.class)
+                    .optional()
+                    .orElse(null);
+
+            if (todo == null) {
+                return createNotFoundError(id);
+            }
+
+            return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MyApiResponse<Todo>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+
+        try {
+            int affectedRows = jdbcClient.sql("UPDATE todos SET title = ?, completed = ? WHERE id = ?")
+                    .params(updatedTodo.getTitle(), updatedTodo.isCompleted(), id)
+                    .update();
+
+            if (affectedRows > 0) {
+                updatedTodo.setId(id);
+                return ResponseEntity.ok(new MyApiResponse<>(true, updatedTodo, null));
+            } else {
+                return createNotFoundError(id);
+            }
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MyApiResponse<Todo>> deleteTodo(@PathVariable Long id) {
+
+        try {
+            int affectedRows = jdbcClient.sql("DELETE FROM todos WHERE id = ?")
+                    .param(id)
+                    .update();
+
+            if (affectedRows > 0) {
+                return ResponseEntity.ok(new MyApiResponse<>(true, null, null));
+            } else {
+                return createNotFoundError(id);
+            }
+        } catch (Exception e) {
+            // return error …
+        }
+    }
+}
+```
+
+DatabaseInitializer 再使用 JdbcClient 改寫一下
+
+```java 
+@Component
+public class DatabaseInitializer {
+
+    private final JdbcClient jdbcClient;
+
+    public DatabaseInitializer(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
+
+    @PostConstruct
+    public void initDatabase() {
+        String sql = "CREATE TABLE IF NOT EXISTS todos (" +
+                "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                "title VARCHAR(255) NOT NULL," +
+                "completed BOOLEAN NOT NULL)";
+
+        try {
+            jdbcClient.sql(sql).update();
+            System.out.println("初始化資料庫成功");
+        } catch (Exception e) {
+            System.err.println("初始化資料庫失敗：" + e.getMessage());
+        }
+    }
+}
+```
+
+
+## JdbcTemplate、JdbcClient 與原生 Java SQL 的比較
+
+### 程式碼簡潔度
+ - 原生 Java SQL：需要大量樣板程式碼，如建立連接、準備語句、處理結果集等
+ - JdbcTemplate：簡化了許多操作，但仍需要一些樣板程式碼
+ - JdbcClient：提供最簡潔的 API，使用方法鏈式調用，程式碼最為簡潔
+
+### 異常處理
+ - 原生 Java SQL：需要手動處理 SQLException
+ - JdbcTemplate 和 JdbcClient：自動處理和轉換 SQL 異常為 Spring 的資料存取異常
+
+### 資源管理
+ - 原生 Java SQL：需要手動管理資源（如關閉連接、語句和結果集）
+ - JdbcTemplate 和 JdbcClient：自動管理資源，減少資源洩漏的風險
+
+### 類型安全
+ - 原生 Java SQL：需要手動轉換結果集中的資料
+ - JdbcTemplate：使用 RowMapper 來映射結果
+ - JdbcClient：提供更好的類型安全性，特別是在查詢結果映射時
+
+### 學習曲線
+ - 原生 Java SQL：需要深入了解 JDBC API
+ - JdbcTemplate：已存在多年，有豐富的文檔和社區支持
+ - JdbcClient：API 設計更直觀，對新手更友好
+
+### 功能豐富度
+ - 原生 Java SQL：提供最大的靈活性，但需要更多程式碼
+ - JdbcTemplate：提供了豐富的功能和底層控制選項
+ - JdbcClient：專注於簡化常見操作，對於複雜查詢可能需要額外處理
+
+### 參數處理
+ - 原生 Java SQL 和 JdbcTemplate：使用問號佔位符和參數數組，在複雜查詢中可能較難管理
+ - JdbcClient：可以使用命名參數（如 :id、:name），這使得參數的使用更加清晰
+
+### 版本要求
+ - 原生 Java SQL：可在任何 Java 版本中使用
+ - JdbcTemplate：可在較舊的 Spring 版本中使用
+ - JdbcClient：需要 Spring Framework 6.0 或更高版本
+
+## 同場加映「Spring Boot HikariCP」
+
+`HikariCP` 是一個在 Spring Boot 應用程式中常見的高效能 `JDBC 連線池`（Connection Pool）函式庫
+
+它以其速度和穩定性著稱，常用於 Java 應用程式中來管理資料庫連接
+
+> HikariCP 指的是 Hikari Connection Pool
+
+以下是幾個重點
+
+- 預設連線池：從 Spring Boot 2.x 版本開始，HikariCP 就成為了預設的連線池
+- 設定方式：在 Spring Boot 中，可以透過 application.properties 檔案中的 `spring.datasource.hikari` 命名空間來設定 Hikari 特定的屬性
+- 效能優勢：HikariCP 以其速度快、可靠性高和資源使用少而聞名，這使得它成為 Java 應用程式中資料庫連線池的熱門選擇
+- 輕量級：相較於其他連線池解決方案，HikariCP 的程式碼量較小，但效能卻相當出色
+- 自動優化：HikariCP 提供了許多自動優化的功能，可以根據系統的負載自動調整連線池的大小
+- 監控功能：它還提供了豐富的監控指標，方便開發者追蹤和優化資料庫連線的使用情況
+
+## 結論
+
+總結來說，`JdbcTemplate` 和 `JdbcClient` 都大大簡化了資料庫操作
+
+以下是幾個主要觀點
+
+- 簡化操作
+    - 減少了樣板程式碼
+    - 提供了更好的異常處理和資源管理
+- 選擇考量
+    - 項目需求
+    - 團隊熟悉度
+    - 使用的 Spring 版本
+- 建議
+    - 新專案考慮使用 JdbcClient，因為它提供了更現代、更流暢的 API
+    - 維護現有專案或需要更多底層控制，JdbcTemplate 仍然是一個可靠的選擇
+- 主要優勢
+    - 提升開發效率
+    - 幫助開發者專注於業務邏輯
+    - 減少繁瑣的資料庫操作細節
+
+無論選擇 JdbcTemplate 還是 JdbcClient，它們都能為 Java 開發者提供強大的工具，簡化資料庫操作，提高程式碼品質和可維護性
+
+選擇適合自己專案需求的工具，將有助於更高效地開發和維護資料庫相關的應用程式
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 18 JdbcTemplate 與 JdbcClient]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/data-access/jdbc.html
+- https://github.com/brettwooldridge/HikariCP
