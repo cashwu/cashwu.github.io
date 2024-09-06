@@ -5,7 +5,7 @@ summary: "文章介紹了配置文件的格式選擇（Properties vs YAML），�
 date: "2024-09-06"
 lastmod: "2024-09-06"
 tags: ["Spring Boot", "Java", "ithome2024"]
-draft: true
+draft: false
 images: ["/static/images/2024/ithome/30day-day06-master-application-properties/cover.webp"]
 ---
 
@@ -70,18 +70,26 @@ Spring Boot 允許我們定義自己的屬性，並使用 `Spring Expression Lan
 
 ### 基本配置
 
-首先，在 `application.properties` 中添加
+首先，在 `application.properties` 中添加兩個設定
+
+可以看到 `todo.reminder.message` 直接使用了 `todo.reminder.threshold` 的值
+
+我覺得這是很棒的設計，可以在一個值裡面使用到另一個值，而且是直接寫在設定檔裡面
 
 ```
 todo.reminder.threshold=7
 todo.reminder.message=任務在 ${todo.reminder.threshold} 天內未完成！
 ```
 
+
+
 有幾種方式可以使用到這些值
 
 ### 使用 @Value 注入
 
-較為簡單的方式是使用 `@Value` annotation (註解)來注入這些值：
+較為簡單的方式是使用 `@Value` annotation (註解)來注入這些值
+
+注意這裡 `Value` 裡面的值，要跟在設定檔裡面的 `Key` 一樣
 
 ```
 package com.demo.todolist.controller;
@@ -116,7 +124,11 @@ application.properties 預設應該為 `ISO-8859-1` 編碼，如果要在裡面�
   
 ### 使用 @ConfigurationProperties
 
-更好的方式是使用 `@ConfigurationProperties` 將相關的配置綁定到一個 class 或 record 上：
+更好的方式是使用 `@ConfigurationProperties` 將相關的配置綁定到一個 class 或 record 上
+
+注意這裡 `field` 的值，要跟在設定檔裡面的 Key 一樣
+
+而因為有寫了 `prefix`，所以只要再加上最後那段的名稱就好，這樣子可以很方便的拿到值
 
 ```
 package com.demo.todolist.config;
@@ -175,6 +187,8 @@ public class TodoListController {
 
 使用 @ConfigurationProperties 的好處是它可以將相關的配置組織在一起，提高代碼的可讀性和可維護性。
 
+> 比較建議使用 @ConfigurationProperties 的方式，這樣子可以很方便的拿到值
+
 ## 第三方 Starter 和套件的配置
 
 Spring Boot Starter 大多是預先配置的相依性描述符，可以大幅簡化專案設置，每個 starter 通常都有自己的配置屬性。
@@ -198,7 +212,7 @@ Spring Boot 的 application.properties 和 .NET Core 的 appsettings.json 在功
 
 - 作為應用程序的主要配置源
 
--  支持環境特定配置
+- 支持環境特定配置
 
 - 允許外部化配置
 
@@ -208,6 +222,7 @@ Spring Boot 的 application.properties 和 .NET Core 的 appsettings.json 在功
 
 - 文件格式：
   - application.properties 使用鍵值對格式，或是 yaml 格式
+    - 而且它的值可以交換使用
   - appsettings.json 使用 JSON 格式
 
 - 動態重載：
