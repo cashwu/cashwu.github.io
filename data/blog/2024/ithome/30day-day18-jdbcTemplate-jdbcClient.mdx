@@ -260,8 +260,9 @@ public class TodoController {
 
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcClient.sql("INSERT INTO todos (title, completed) VALUES (?, ?)")
-                    .params(todo.getTitle(), todo.isCompleted())
+            jdbcClient.sql("INSERT INTO todos (title, completed) VALUES (:title, :completed)")
+                    .param("title", todo.getTitle())
+                    .param("completed", todo.isCompleted())
                     .update(keyHolder);
 
             Long id = keyHolder.getKey().longValue();
@@ -269,12 +270,13 @@ public class TodoController {
             todo.setId(id);
             return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
         } catch (Exception e) {
-            // return error …
+            // return error … 
         }
     }
 
     @GetMapping
     public ResponseEntity<MyApiResponse<List<Todo>>> getAllTodos() {
+        logger.info("get all todo");
 
         try {
             List<Todo> todos = jdbcClient.sql("SELECT * FROM todos")
@@ -282,7 +284,7 @@ public class TodoController {
                     .list();
             return ResponseEntity.ok(new MyApiResponse<>(true, todos, null));
         } catch (Exception e) {
-            // return error …
+            // return error … 
         }
     }
 
@@ -290,8 +292,8 @@ public class TodoController {
     public ResponseEntity<MyApiResponse<Todo>> getTodo(@PathVariable Long id) {
 
         try {
-            Todo todo = jdbcClient.sql("SELECT * FROM todos WHERE id = ?")
-                    .param(id)
+            Todo todo = jdbcClient.sql("SELECT * FROM todos WHERE id = :id")
+                    .param("id", id)
                     .query(Todo.class)
                     .optional()
                     .orElse(null);
@@ -302,7 +304,7 @@ public class TodoController {
 
             return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
         } catch (Exception e) {
-            // return error …
+            // return error … 
         }
     }
 
@@ -310,8 +312,10 @@ public class TodoController {
     public ResponseEntity<MyApiResponse<Todo>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
 
         try {
-            int affectedRows = jdbcClient.sql("UPDATE todos SET title = ?, completed = ? WHERE id = ?")
-                    .params(updatedTodo.getTitle(), updatedTodo.isCompleted(), id)
+            int affectedRows = jdbcClient.sql("UPDATE todos SET title = :title, completed = :completed WHERE id = :id")
+                    .param("title", updatedTodo.getTitle())
+                    .param("completed", updatedTodo.isCompleted())
+                    .param("id", id)
                     .update();
 
             if (affectedRows > 0) {
@@ -321,7 +325,7 @@ public class TodoController {
                 return createNotFoundError(id);
             }
         } catch (Exception e) {
-            // return error …
+            // return error … 
         }
     }
 
@@ -329,8 +333,8 @@ public class TodoController {
     public ResponseEntity<MyApiResponse<Todo>> deleteTodo(@PathVariable Long id) {
 
         try {
-            int affectedRows = jdbcClient.sql("DELETE FROM todos WHERE id = ?")
-                    .param(id)
+            int affectedRows = jdbcClient.sql("DELETE FROM todos WHERE id = :id")
+                    .param("id", id)
                     .update();
 
             if (affectedRows > 0) {
@@ -339,7 +343,7 @@ public class TodoController {
                 return createNotFoundError(id);
             }
         } catch (Exception e) {
-            // return error …
+            // return error … 
         }
     }
 }
@@ -456,7 +460,7 @@ public class DatabaseInitializer {
 
 選擇適合自己專案需求的工具，將有助於更高效地開發和維護資料庫相關的應用程式
 
-> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 18 JdbcTemplate 與 JdbcClient]()
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 18 JdbcTemplate 與 JdbcClient](https://ithelp.ithome.com.tw/articles/10348235)
 
 > 圖片來源：AI 產生
 
