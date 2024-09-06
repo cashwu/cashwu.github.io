@@ -1,0 +1,204 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 19 Spring Data JDBC'
+summary: '本文深入探討了 Spring Data JDBC 的使用方法及其與 JdbcClient 的比較。文章首先介紹了 Spring Data JDBC 的主要特點，包括簡單性、無狀態概念和自動化 CRUD 操作等。接著，文章詳細說明了如何在 Spring Boot 項目中集成 Spring Data JDBC，包括添加依賴、修改實體類別和創建 Repository。文章還提供了使用 Spring Data JDBC 重寫 TodoController 的完整代碼示例。最後，文章對比了 Spring Data JDBC 和 JdbcClient 在抽象層級、程式碼量、靈活性、學習曲線和性能等方面的差異，並提供了實務上的選擇建議。這篇文章為 Spring Boot 開發者提供了全面的 Spring Data JDBC 使用指南，有助於選擇適合項目需求的數據訪問方法'
+date: '2024-09-19'
+lastmod: '2024-09-19'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'database']
+draft: true
+images: ['/static/images/2024/ithome/30day-day19-spring-data-jdbc/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day19-spring-data-jdbc/cover.webp)
+
+## Spring Data JDBC 簡介
+
+Spring Data JDBC 是 Spring 生態系統中的一個輕量級 `ORM` 框架
+
+它提供了一種簡單而強大的方式來操作資料庫
+
+主要特點包括
+
+- 簡單性：Spring Data JDBC 提供了一個相對簡單的資料庫模型
+- 無狀態概念：Spring Data JDBC 沒有持久化上下文或會話的概念
+- 支援聚合根：它鼓勵使用領域驅動設計（DDD）中的聚合根概念
+- 自動化 CRUD 操作：提供了基本的 CRUD 操作，無需編寫 SQL
+- 查詢方法：支援基於方法名稱的查詢生成
+
+## 調整程式碼
+
+### 增加依賴
+
+將之前的 `JDBC` 依賴替換成 `Spring Data JDBC`
+
+```
+implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+```
+
+### 修改實體類別
+
+- `@Table` 註解用來映射到資料庫的表，記得`大小寫`要和資料庫一致，如果不指定表名稱，那麼預設的表名稱會是對應類別的名稱
+- `@Id` 註解用於標記主鍵
+
+```Java
+@Table("TODOS")
+public class Todo {
+
+    @Id
+    private Long id;
+    private String title;
+    private boolean completed;
+
+    // 建構子、getter 和 setter
+}
+```
+
+### 增加 Repository
+
+新增一個 `TodoRepository` interface 來擴展 `CrudRepository`
+
+```Java
+public interface TodoRepository extends CrudRepository<Todo, Long> {
+}
+```
+
+`CrudRepository` 是 Spring Data 專案中的一個核心介面，它提供了一組用於執行常見 `CRUD` 操作的方法
+
+它有兩個泛型參數
+
+- `Todo`：這是實體類別的類型。在這個例子中，表示我們要操作的是 Todo 類型的實體
+- `Long`：這是實體類別主鍵的類型。這裡表示 Todo 類的 @Id 欄位是 Long 類型
+
+透過擴展 `CrudRepository`，我們的 `TodoRepository` 自動獲得了以下方法
+
+```Java
+public interface CrudRepository<T, ID> extends Repository<T, ID> {
+    <S extends T> S save(S entity);
+    <S extends T> Iterable<S> saveAll(Iterable<S> entities);
+    Optional<T> findById(ID id);
+    boolean existsById(ID id);
+    Iterable<T> findAll();
+    Iterable<T> findAllById(Iterable<ID> ids);
+    long count();
+    void deleteById(ID id);
+    void delete(T entity);
+    void deleteAllById(Iterable<? extends ID> ids);
+    void deleteAll(Iterable<? extends T> entities);
+    void deleteAll();
+}
+```
+
+### 修改 TodoController
+
+```Java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    // 為了方便，在這裡只展示了修改後，所增加的 DB 操作相關程式碼
+
+    private final TodoRepository todoRepository;
+
+    public TodoController(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+        Todo savedTodo = todoRepository.save(todo);
+        return ResponseEntity.ok(new ApiResponse<>(true, savedTodo, null));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Todo>>> getAllTodos() {
+        List<Todo> todos = (List<Todo>) todoRepository.findAll();
+        return ResponseEntity.ok(new ApiResponse<>(true, todos, null));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> getTodo(@PathVariable Long id) {
+        return todoRepository.findById(id)
+                .map(todo -> ResponseEntity.ok(new MyApiResponse<>(true, todo, null)))
+                .orElse(createNotFoundError(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Todo>> updateTodo(@PathVariable Long id, @RequestBody Todo updatedTodo) {
+        return todoRepository.findById(id)
+                .map(todo -> {
+                    todo.setTitle(updatedTodo.getTitle());
+                    todo.setCompleted(updatedTodo.isCompleted());
+                    Todo savedTodo = todoRepository.save(todo);
+                    return ResponseEntity.ok(new MyApiResponse<>(true, savedTodo, null));
+                })
+                .orElse(createNotFoundError(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteTodo(@PathVariable Long id) {
+        if (todoRepository.existsById(id)) {
+            todoRepository.deleteById(id);
+            return ResponseEntity.ok(new MyApiResponse<>(true, null, null));
+        } else {
+            return createNotFoundError(id);
+        }
+    }
+}
+```
+
+## Spring Data JDBC 與 JdbcClient 的比較
+
+### 抽象層級
+
+- JdbcClient：提供了一個較低層級的抽象，你仍然需要編寫 SQL
+- Spring Data JDBC：提供了更高層級的抽象，大多數情況下不需要編寫 SQL
+
+### 程式碼
+
+- JdbcClient：需要編寫更多的程式碼，特別是 SQL
+- Spring Data JDBC：程式碼更簡潔，特別是對於基本的 CRUD 操作，而且方法可以鍊式串接調用
+
+### 靈活性
+
+- JdbcClient：提供更多的靈活性，可以執行任何複雜的 SQL 查詢
+- Spring Data JDBC：對於複雜查詢可能需要額外的配置或自定義方法
+
+### 學習曲線
+
+- JdbcClient：對於熟悉 SQL 的開發者來說較容易上手
+- Spring Data JDBC：需要學習其特定的約定和註解，但長期來看可能更容易維護
+
+### 性能
+
+- JdbcClient：由於直接使用 SQL，可能在某些情況下性能更好
+- Spring Data JDBC：對於大多數操作來說性能足夠，但可能在某些複雜查詢上有輕微的開銷
+
+### 領域模型支援
+
+- JdbcClient：不直接支援領域模型，需要手動映射
+- Spring Data JDBC：更好地支援領域驅動設計，特別是聚合根的概念
+
+### 實務上的建議
+
+- 如果你的專案較小，或者主要是簡單的 CRUD 操作，Spring Data JDBC 可能是更好的選擇，因為它可以大大減少樣板程式碼
+- 如果你的專案需要大量複雜的 SQL 查詢，或者你需要對資料庫操作有更細粒度的控制，JdbcClient 可能更適合
+- 如果你的團隊更熟悉 SQL 和原生 JDBC 操作，JdbcClient 可能更容易採用
+- 如果你正在實施領域驅動設計，並且希望你的資料庫訪問層與你的領域模型緊密結合，Spring Data JDBC 可能是更好的選擇。
+- 如果你的專案需要在不同的持久化技術之間切換（例如，從關聯型資料庫切換到 NoSQL 資料庫），Spring Data 的抽象可能會更有幫助
+
+## 總結
+
+總而言之，兩種方法都有其優點，選擇哪一個主要取決於你的專案需求、團隊技能和長期維護考慮
+
+Spring Data JDBC 提供了更高層次的抽象和自動化，適合快速開發和簡單的數據模型
+
+JdbcClient 則更靈活，適合需要精細控制 SQL 的場景。選擇取決於專案需求和複雜度
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 19 Spring Data JDBC]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://spring.io/projects/spring-data-jdbc
+- https://docs.spring.io/spring-data/jdbc/docs/current/reference/html/
