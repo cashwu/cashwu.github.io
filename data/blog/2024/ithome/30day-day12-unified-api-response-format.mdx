@@ -15,11 +15,14 @@ images: ['/static/images/2024/ithome/30day-day12-unified-api-response-format/cov
 
 今天，我們將探討如何設計一個統一的 API 回應結構，並基於之前的 Todo List API 範例進行改寫
 
-## RFC 7807 Problem Details for HTTP APIs
+## RFC 9457 Problem Details for HTTP APIs
 
-RFC 7807 定義了一種用於在 HTTP API 中傳遞問題詳情的標準格式，稱為「問題詳情（Problem Details）」
+RFC 9457 定義了一種用於在 HTTP API 中傳遞問題詳情的標準格式，稱為「問題詳情（Problem Details）」
 
 這個標準旨在提供一個一致的方法來描述 API 中發生的錯誤情況，使得客戶端能夠更好地理解錯誤的性質和處理方法
+
+> 要注意一下，這主題有可能會查到 RFC 7807 的相關內容，這是因為 RFC 9457 (發佈於 2023 年) 是 RFC 7807 (發佈於 2016 年) 的一個重要更新和擴展。
+> 它保留了原始規範的核心概念，同時增加了新的功能、澄清了一些模糊點，並提供了更多實施指導
 
 ### 主要特點
 
@@ -285,3 +288,4 @@ public class TodoController {
 ## 參考連結
 
 - https://www.rfc-editor.org/rfc/rfc7807
+- https://www.rfc-editor.org/rfc/rfc9457
