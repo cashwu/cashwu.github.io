@@ -1,16 +1,18 @@
 ---
 layout: PostSimple
-title: "「Spring Boot API 開發：從 0 到 1」Day 07 application.properties 多環境配置"
-summary: "文章詳細說明了 Profile 的概念、設置方法、命名規則，以及如何啟用特定 Profile。同時，文章還解釋了 Profile 的運作原理、多個 Profile 同時啟用時的處理順序，以及 Spring Boot 配置的優先順序。最後，文章提供了 Profile 使用的最佳實踐建議，強調了 Profile 機制在提高開發效率和簡化部署維護方面的重要性"
-date: "2024-09-07"
-lastmod: "2024-09-07"
-tags: ["Spring Boot", "Java", "ithome2024"]
-draft: true
-images: ["/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp"]
+title: '「Spring Boot API 開發：從 0 到 1」Day 07 application.properties 多環境配置'
+summary: '文章詳細說明了 Profile 的概念、設置方法、命名規則，以及如何啟用特定 Profile。同時，文章還解釋了 Profile 的運作原理、多個 Profile 同時啟用時的處理順序，以及 Spring Boot 配置的優先順序。最後，文章提供了 Profile 使用的最佳實踐建議，強調了 Profile 機制在提高開發效率和簡化部署維護方面的重要性'
+date: '2024-09-07'
+lastmod: '2024-09-07'
+tags: ['Spring Boot', 'Java', 'ithome2024']
+draft: false
+images:
+  [
+    '/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp',
+  ]
 ---
 
 ![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp)
-
 
 上次我們談到了相關的 application.properties 設定，而今天我們要來聊聊 Spring Boot 中的 Profile 機制
 
@@ -23,7 +25,6 @@ Profile 是 Spring Framework 提供的一種條件式配置機制
 簡單來說，它允許你根據不同的執行環境來啟用或停用一組 Bean 或配置屬性
 
 這就像是給你的應用程序準備了多套衣服，根據不同場合來穿戴
-
 
 ## 如何設定不同環境的 Profile？
 
@@ -38,7 +39,7 @@ Profile 是 Spring Framework 提供的一種條件式配置機制
 配置檔案的命名遵循以下規則：
 
 - application-[`profile`].properties
-    - 其中 profile 是環境的名稱，比如 dev、uat、prod 等。
+  - 其中 profile 是環境的名稱，比如 dev、uat、prod 等。
 
 讓我們來看一個例子：
 
@@ -83,7 +84,7 @@ logging.level.root=WARN
 
 ```properties
 spring.profiles.active=uat
-```     
+```
 
 - 在程式碼中設置：
 
@@ -103,7 +104,6 @@ public class TodolistApplication {
 > 運行時就可以看到有相關的 Profile 被啟用的 log
 
 ![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/02.webp)
-
 
 - 通過命令行參數：
 
@@ -125,7 +125,6 @@ java -jar todolist-0.0.1-SNAPSHOT.jar
 > 如果沒有啟用任何 Profile 時，Spring Boot 會使用名為 `default` 的 Profile。
 
 ![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/01.webp)
-
 
 ### 多 Profile 啟用
 
@@ -153,12 +152,11 @@ Spring Boot 會按照以下順序載入配置
 2. 根據啟用的 Profile，加載對應的 `application-[profile].properties`
 3. 如果有多個 Profile 被啟用，後面啟用的 Profile 會覆蓋掉前面的配置
 
-
 這就像是穿衣服的順序：先穿基礎款 application.properties，然後根據場合（啟用的 Profile）
 
 再穿上對應的外套 application-profile.properties
 
->  比較專業的說法可以用 decorator XD
+> 比較專業的說法可以用 decorator XD
 
 ## Spring Boot 配置的優先順序：
 
@@ -193,7 +191,6 @@ Profile 特定的配置文件（如 application-dev.properties）的優先級高
 
 > YAML 和 Properties 具有相同的優先級，可以互換使用。
 > 如果同時存在 YAML 和 Properties，Properties 會優先，不過先前說過了，不建議兩個檔案同時存在
-
 
 ## Profile 最佳實踐：
 
