@@ -1,0 +1,167 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 20 Spring Data JPA'
+summary: '本文深入探討了 Spring Data JPA 的特點及其與 Spring Data JDBC 的比較。文章首先介紹了 Spring Data JPA 的主要特點，包括簡化開發、方法名稱查詢、分頁和排序支援等。接著，文章詳細說明了如何在 Spring Boot 項目中集成 Spring Data JPA，包括添加依賴、修改實體類別和建立 Repository。文章還對比了 Spring Data JPA 和 Spring Data JDBC 在複雜度、效能、查詢能力、關聯處理、延遲載入和事務處理等方面的差異。最後，文章提供了實務上的選擇建議，幫助開發者根據專案需求選擇合適的數據訪問框架。這篇文章為 Spring Boot 開發者提供了全面的 Spring Data JPA 使用指南，有助於理解和選擇適合項目需求的 ORM 框架'
+date: '2024-09-20'
+lastmod: '2024-09-20'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'database']
+draft: true
+images: ['/static/images/2024/ithome/30day-day20-spring-data-jpa/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day20-spring-data-jpa/cover.webp)
+
+前一篇文章介紹了 Spring Data JDBC 的相關使用，今天我們要認識它的兄弟 `Spring Data JPA`
+
+這兩個框架都是 Spring 家族的成員，但各有特色
+
+讓我們一起來探索 Spring Data JPA 的相關功能吧 !
+
+## Spring Data JPA 簡介
+
+`Spring Data JPA` 是 Spring 生態系統中一個強大的 ORM 框架
+
+它建立在 `JPA` (`Java Persistence API`) 規範之上，提供了一個更高層次的抽象，和更多便利的功能
+
+### 主要特點
+
+- 簡化開發：自動生成常用的 CRUD 操作，減少樣板程式碼
+- 方法名稱查詢：根據方法名稱自動生成查詢語句
+- 分頁和排序：內建支援分頁和排序功能
+- 快取支援：與各種快取技術整合，提升效能
+- 豐富的查詢支援：支援 JPQL 、Criteria API 和原生 SQL
+
+### 預設 ORM 套件
+
+Spring Data JPA 預設使用 `Hibernate` 作為其 JPA 提供者（ORM 套件）
+
+`Hibernate` 是一個成熟且功能豐富的 ORM 框架，它實現了 JPA 規範，並提供了許多額外的特性
+
+## 調整程式碼
+
+### 增加依賴
+
+將之前的 `Spring Data JDBC` 依賴替換成 `Spring Data JPA`
+
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+```
+
+### 修改實體類別
+
+```java
+@Entity
+@Table(name = "TODOS")
+public class Todo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private boolean completed;
+
+    // 建構子、getter 和 setter
+}
+```
+
+- JDBC 使用 `org.springframework.data` 套件下的註解，JPA 使用 `jakarta.persistence` 套件下的註解
+- JDBC 不需要 `@Entity` 註解，JPA 需要
+- JDBC 的 `@Table` 直接指定表名，JPA 的 `@Table` 需要使用 `name` 屬性指定表名
+- JDBC 需要手動處理主鍵的部份，JPA 則提供了 `@GeneratedValue` 註解來自動生成主鍵
+
+### 修改 Repository
+
+```java
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+}
+```
+
+JDBC 通常使用 `CrudRepository` ，而 JPA 使用 `JpaRepository`
+
+`JpaRepository` 擴展自 `ListCrudRepository`，後者又繼承自 `CrudRepository`，因此 `JpaRepository` 提供了更多的功能
+
+關係圖如下
+
+```
+                 Repository<T, ID>
+                         ^
+                         |
+          +--------------+---------------+
+          |                              |
+  CrudRepository<T, ID>     PagingAndSortingRepository<T, ID>
+          ^                              ^
+          |                              |
+ ListCrudRepository<T, ID>   ListPagingAndSortingRepository<T, ID>
+          ^                              ^
+          |                              |
+          +------------------------------+
+                         |
+                         |
+              JpaRepository<T, ID> -----> QueryByExampleExecutor<T>
+                         ^
+                         |
+                         |
+       TodoRepository extends JpaRepository<Todo, Long>
+```
+
+> controller 基本上不需要修改，因為 JpaRepository 提供了與 CrudRepository 相同的方法
+
+## Spring Data JDBC 和 Spring Data JPA 的比較
+
+### 複雜度
+
+- JDBC：較為輕量，概念簡單
+- JPA：功能更豐富，概念更複雜，但提供了更高層次的抽象
+
+### 效能
+
+- JDBC：直接操作資料庫，對於簡單查詢可能效能較好
+- JPA：有快取機制，對於複雜查詢和關聯操作可能效能更好，實際效能取決於具體使用方式和最佳化
+
+### 查詢能力
+
+- JDBC：透過 CrudRepository 提供基本的 CRUD 操作，支援方法名稱查詢，也可使用 @Query 註解自定義 SQL
+- JPA：除了基本 CRUD 操作外，還提供更豐富的查詢方式，包括強大的方法名稱查詢、JPQL、Criteria API 和原生 SQL 支援
+
+### 關聯處理
+
+- JDBC：需要手動處理關聯，但支援簡單的一對多關聯
+- JPA：自動處理實體間的各種複雜關聯，包括一對一、一對多、多對多等
+
+### 延遲載入
+
+- JDBC：不直接支援延遲載入，但可以通過程式設計模式實現類似效果
+- JPA：原生支援延遲載入，可以最佳化效能
+
+### 事務處理
+
+- JDBC：支援事務，但需要更多手動配置
+- JPA：提供更簡單的事務管理，支援聲明式事務
+
+## 實務上的建議
+
+- 簡單專案和快速開發：選擇 `Spring Data JDBC`。它提供簡潔的資料訪問方式，適合小型專案和簡單資料模型
+- 複雜專案和豐富功能：選擇 `Spring Data JPA`。它適合大型專案，提供複雜資料關係處理和豐富的查詢功能
+- 領域驅動設計（DDD）：`Spring Data JDBC` 的聚合概念更適合 DDD 實踐
+- 效能：對於批次處理和某些效能敏感場景，`Spring Data JDBC` 可能優於 Spring Data JPA。
+- 生態系統和支持：`Spring Data JPA` 在企業應用中更為普遍，擁有更廣泛的社區支持
+
+## 總結
+
+Spring Data JPA 提供了更豐富的功能和更強大的 ORM 能力，適合複雜的企業級應用
+
+而 Spring Data JDBC 則更輕量、更簡單，適合小型專案或對性能和簡單性有特殊要求的場景
+
+選擇時應根據專案需求、團隊經驗和長期維護考慮來決定
+
+後面的文章，也會對 Spring Data JPA 的相關功能再更進一步地介紹
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 20 Spring Data JPA](https://ithelp.ithome.com.tw/articles/10348407)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://spring.io/projects/spring-data-jpa
+- https://en.wikipedia.org/wiki/Jakarta_Persistence
+- https://hibernate.org
