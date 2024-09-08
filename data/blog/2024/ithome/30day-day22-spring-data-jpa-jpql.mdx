@@ -1,0 +1,131 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 22 JPA JPQL 與原生 SQL'
+summary: '本文深入探討了 Spring Data JPA 中 JPQL（Java Persistence Query Language）的使用。文章首先介紹了 JPQL 的基本概念、規則以及與 SQL 的區別。接著，文章展示了如何在程式碼中使用 @Query 註解實現 JPQL 查詢，並詳細解釋了每個查詢的含義。文章還簡要介紹了如何使用原生 SQL 查詢。此外，文章分析了 JPQL 的優缺點。最後，文章提供了一系列最佳實踐建議。這篇文章為 Spring Boot 開發者提供了全面的 JPQL 使用指南，有助於提高查詢的靈活性和效率'
+date: '2024-09-22'
+lastmod: '2024-09-22'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'database']
+draft: true
+images: ['/static/images/2024/ithome/30day-day22-spring-data-jpa-jpql/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day22-spring-data-jpa-jpql/cover.webp)
+
+在 Spring Data JPA 的世界裡，JPQL（`Java Persistence Query Language`）是一個強大的工具
+
+它讓我們能夠用類似 SQL 的語法來查詢 Java 物件
+
+今天，我們就來深入了解 JPQL，並看看如何在我們的專案中運用它
+
+## JPQL 簡介
+
+JPQL 是一種`物件導向`的查詢語言，專為 JPA 設計，用於查詢 JPA 管理的 `實體`
+
+它的語法類似 SQL，但操作的是 Java 類別和屬性，而不是資料庫的表格和欄位
+
+### 相關規則
+
+- 使用實體類別名稱和屬性名稱，而不是資料庫的表格名稱和欄位名稱
+- 除了關鍵字外，它的查詢語法對`大小寫敏感`
+- 支持多種查詢類型，包括 SELECT、UPDATE 和 DELETE 等
+- 提供豐富的函式和運算符，如 CONCAT、LENGTH、BETWEEN 等
+- 支持`參數綁定`，提高安全性和可重用性
+
+### 與 SQL 的區別
+
+- JPQL 操作的是 Java 物件(類別)，SQL 操作的是資料庫表格
+- JPQL 是與資料庫無關的，SQL 則依賴於特定的資料庫系統
+- JPQL 的 JOIN 語法簡化，和 SQL 的 JOIN 語法略有不同
+- JPQL 提供了一些物件導向的特性，如多態查詢
+
+## 修改程式碼
+
+讓我們修改上個範例的 `TodoRepository`，把原本用`查詢方法（Query Methods）`實作的地方，改用 `JPQL` 來改寫
+
+使用 `@Query` 註解來標示相關的 `JPQL`
+
+使用 `@Param` 註解來將方法參數與 `JPQL` 查詢中的`參數綁定`
+
+```java
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+
+    @Query("SELECT t FROM Todo t WHERE t.title = :title")
+    List<Todo> findByTitle(@Param("title") String title);
+
+    @Query("SELECT t FROM Todo t WHERE t.completed = true")
+    List<Todo> findByCompletedTrue();
+
+    @Query("SELECT t FROM Todo t WHERE t.title LIKE %:keyword% ORDER BY t.id DESC")
+    List<Todo> findByTitleContainingOrderByIdDesc(@Param("keyword") String keyword);
+
+    @Query("SELECT COUNT(t) FROM Todo t WHERE t.completed = false")
+    long countByCompletedFalse();
+}
+```
+
+讓我們來解說每個 JPQL 查詢
+
+- findByTitle: 這個查詢選擇所有和查詢的 title 完全一致的 Todo 項目
+- findByCompletedTrue: 選擇所有已完成的 Todo 項目
+- findByTitleContainingOrderByIdDesc: 這個查詢使用 `LIKE` 關鍵字進行 title 模糊查詢，並按 id 降序排序結果
+  - 注意，這裡的查詢區分大小寫，如果要不區分大小寫的話，可以使用 `LOWER`
+- countByCompletedFalse: 計算所有未完成的 Todo 項目數量
+
+> 因為是修改原有的查詢方法（Query Methods），所以 Controller 不用修改
+
+### 測試
+
+一樣可以使用之前的 `api-test.http` 來測試
+
+### 原生 SQL
+
+我們可以使用 `@Query` 註解並設定 `nativeQuery = true`，就可以指定使用`原生 SQL`
+
+```java
+@Query(value = "SELECT * FROM todos WHERE title = ?1", nativeQuery = true)
+List<Todo> findByTitleNative(String title);
+```
+
+## JPQL 的優缺點
+
+### 優點
+
+- 可移植性：JPQL 查詢可以在不同的資料庫之間移植，無需修改
+- 物件導向：直接操作實體對象，與程式碼更加一致
+- 類型安全：可以在編譯時期檢查語法錯誤
+- 簡化複雜查詢：相比`查詢方法`，可以處理更複雜的查詢邏輯
+- 靈活性：支持動態查詢和複雜的條件組合
+
+### 缺點
+
+- 學習成本：需要學習新的查詢語言語法
+- 功能限制：某些資料庫特定的功能 (SQL) 可能無法在 JPQL 使用
+- 複雜查詢的局限性：對於極其複雜的查詢，可能還是需要使用原生 SQL
+- 除錯困難：錯誤信息可能不如原生 SQL 清晰
+- 效能問題：在某些情況下，手動優化的 SQL 可能比 JPQL 產生的查詢更高效
+
+## 最佳實務
+
+- 適度使用：對於簡單查詢，`查詢方法` 可能更直觀；複雜查詢則考慮使用 JPQL
+- 參數綁定：始終使用`參數綁定` 來防止 `SQL Injection`
+- 測試驗證：編寫`測試` 確保 JPQL 查詢的正確性
+- 效能監控：對於關鍵查詢，監控並分析產生的 SQL 以確保效能
+- 結合使用：某些情況下，可以考慮結合使用 JPQL 和原生 SQL 以達到最佳效果
+
+## 結論
+
+JPQL 是 Spring Data JPA 中一個強大的查詢工具，它彌補了查詢方法的一些限制，同時保持了與 Java 程式碼的一致性
+
+通過合理使用 JPQL，我們可以編寫更靈活、更複雜的查詢，同時保持程式碼的可讀性和可維護性
+
+然而，在使用 JPQL 時，我們也需要權衡其優缺點，並在適當的場景下選擇使用
+
+無論是 JPQL、查詢方法還是原生 SQL，選擇正確的工具來完成任務才是最重要的
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 22 JPQL 查詢]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html#jpa.query-methods.at-query
