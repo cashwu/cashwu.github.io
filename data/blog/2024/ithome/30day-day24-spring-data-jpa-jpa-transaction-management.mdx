@@ -1,0 +1,211 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 24 JPA 交易管理'
+summary: '本文深入探討了 Spring Data JPA 中的交易管理實現。文章首先介紹了交易管理的概念和 ACID 特性，然後詳細說明了如何使用 @Transactional 註解來實現交易控制。文章提供了具體的程式碼示例。此外，文章分析了交易管理的優缺點，包括保證資料一致性的優點，以及可能帶來的性能開銷等缺點。最後，文章提供了一些實務上的建議，如合理劃分交易邊界和避免長時間交易等。這篇文章為 Spring Boot 開發者提供了全面的交易管理實現指南，有助於提高應用程式的資料一致性和完整性'
+date: '2024-09-24'
+lastmod: '2024-09-24'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'database']
+draft: true
+images:
+  ['/static/images/2024/ithome/30day-day24-spring-data-jpa-jpa-transaction-management/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day24-spring-data-jpa-jpa-transaction-management/cover.webp)
+
+在開發企業級應用程式時，`交易管理`是一個至關重要的概念
+
+交易是一系列操作的集合，這些操作要麼全部成功執行，要麼全部不執行
+
+這種特性保證了資料的一致性和完整性，尤其是在處理複雜的業務邏輯或多個相關操作時
+
+今天，我們將探討如何在 Spring Data JPA 中實現交易管理
+
+## 資料庫的交易管理
+
+### 什麼是交易管理？
+
+交易管理（`Transaction Management`）是一種確保多個資料庫操作要麼全部成功，要麼全部不執行的機制
+
+### ACID
+
+交易的基本特性通常被稱為 `ACID`
+
+- 原子性（Atomicity）：交易中的所有操作要麼全部完成，要麼全部不完成
+- 一致性（Consistency）：交易必須使資料庫從一個一致性狀態轉換到另一個一致性狀態
+- 隔離性（Isolation）：併發執行的交易之間不會互相影響
+- 持久性（Durability）：一旦交易提交 (`commit`)，其結果就會被永久保存
+
+## JPA 的 @Transactional 實作
+
+在 Spring 框架中，`交易管理`變得相當簡單。Spring 提供了`聲明式交易管理`，我們只需要通過`註解`或 `XML 配置`就可以輕鬆實現交易控制
+
+在使用 Spring Data JPA 時，我們可以使用 `@Transactional` 註解來實現交易管理
+
+這個註解 `@Transactional` 可以應用在方法或類別上，來定義該方法或該類別中的所有`公開方法`都應該在一個交易中執行
+
+`@Transactional` 註解支持多種屬性來細粒度控制交易行為
+
+- `propagation`：定義交易的傳播行為
+- `isolation`：定義交易的隔離級別
+- `timeout`：定義交易的超時時間
+- `readOnly`：指定交易是否為只讀
+- `rollbackFor`：指定哪些異常會導致交易回滾
+
+使用 `@Transactional` 註解時，Spring 會自動處理交易的開始、提交或回滾
+
+如果方法正常結束，交易會被提交；如果拋出異常，交易則會被回滾
+
+> 文章範例中不會特別說明這幾個屬性，有興趣的讀者可以參考官方文件
+
+### 新增 TodoService
+
+讓我們來新增一個 `TodoService` 來加入交易管理
+
+```java
+@Service
+public class TodoService {
+
+    private final TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
+
+    @Transactional
+    public Todo save(Todo todo) {
+
+        // 保存 Todo
+        Todo savedTodo = todoRepository.save(todo);
+
+        // 假設我們需要進行一些額外的操作
+        // 如果這裡拋出異常，整個交易會回滾
+        performAdditionalOperations(savedTodo);
+
+        return savedTodo;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Todo> findAll() {
+        return todoRepository.findAll();
+    }
+
+    private void performAdditionalOperations(Todo todo) {
+        // 模擬一些可能會拋出異常的操作
+        if (todo.getTitle().length() > 20) {
+            throw new RuntimeException("Todo title is too long from TodoService");
+        }
+    }
+}
+```
+
+這裡要先注意的是，`@Transactional` 應該要匯入 `springframework` 套件下的，而不是 `Jakarta` 套件下的
+
+在這個例子中，我們對 `save` 方法使用了 `@Transactional` 註解，這意味著方法中的所有資料庫操作都會在同一個交易中執行
+
+如果方法執行過程中拋出任何未捕捉的例外，交易會自動回滾，確保資料的一致性
+
+我們還在 `findAll` 方法上使用了 `@Transactional(readOnly = true)`， 這表明該方法只進行讀取操作，不會修改資料，這可以幫助資料庫最佳化查詢效能
+
+### 修改 Controller
+
+修改 `TodoController` 來使用 TodoService
+
+```java
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    // 為了方便，在這裡只展示了所增加的相關程式碼
+
+    private final TodoService todoService;
+
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    }
+
+    @PostMapping
+    public ResponseEntity<MyApiResponse<Todo>> createTodo(@RequestBody Todo todo) {
+
+        Todo savedTodo = todoService.save(todo);
+        return ResponseEntity.ok(new MyApiResponse<>(true, savedTodo, null));
+    }
+
+    @GetMapping
+    public ResponseEntity<MyApiResponse<List<Todo>>> getAllTodos() {
+
+        List<Todo> todos = todoService.findAll();
+        return ResponseEntity.ok(new MyApiResponse<>(true, todos, null));
+    }
+}
+```
+
+### 測試
+
+新增一個 `title` 長度大於 `20` 的資料
+
+```http
+### 創建一個新的 Todo
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+
+{
+  "title": "學習 Spring Boot 學習 Spring Boot",
+  "completed": false
+}
+```
+
+可以看到錯誤是從 TodoService 裡面丟出來的
+
+![](/static/images/2024/ithome/30day-day24-spring-data-jpa-jpa-transaction-management/01.webp)
+
+也可以看到，全部的 Todo 沒有剛才新增的那筆
+
+![](/static/images/2024/ithome/30day-day24-spring-data-jpa-jpa-transaction-management/02.webp)
+
+### 為什麼要加上 TodoService
+
+在使用 Spring Data JPA 的時候，很多方法會定義在 `Repository` 的方法上面，而且方法通常是`單一`的資料庫操作，不需要交易管理
+
+而如果把 `交易邊界` 放在 `Controller` 的方法（`endpoint`）上面的話，會非常奇怪，等於是一整個 `HTTP` 的行為（操作）都包含在交易管理裡面
+
+再者，一般的業務邏輯也不會直接寫在 `Controller` 上，會在這兩者之間再加上 `Service` 層，把業務邏輯寫在 `Service` 這一層
+
+即 `Controller` - `Service` - `Repository` ，就是一般所謂的`三層式架構`
+
+> 後面會直接重構程式碼，變成 `Controller` - `Service` - `Repository` 的三層式架構。就不會在文章中特地說明
+
+## 交易的優缺點
+
+### 優點
+
+- 資料一致性：確保多個資料庫操作要麼全部成功，要麼全部失敗
+- 簡化錯誤處理：自動回滾失敗的操作，減少手動錯誤處理的工作量
+- 提高資料完整性：避免部分操作成功而部分操作失敗的情況
+
+### 缺點
+
+- 性能開銷：交易管理會帶來一定的性能開銷，特別是在高併發環境下
+- 複雜性增加：需要在程式碼中考慮交易的邊界和範圍，增加了程式碼的複雜性
+- 潛在的死鎖：不當的交易管理可能導致資料庫的死鎖問題
+
+## 實務上的建議作法
+
+- 合理劃分交易邊界：避免將過多的操作放在一個交易中，以減少性能開銷
+- 避免長時間交易：長時間交易會佔用資料庫連線，應避免在交易中執行耗時的操作
+- 處理併發問題：在高併發環境下，應考慮使用適當的鎖機制來避免資料不一致問題
+
+## 結論
+
+通過使用 `@Transactional`，我們可以輕鬆地在 Spring Data JPA 中實現交易管理，從而提高應用程式的資料一致性和完整性
+
+然而，過度使用交易可能會影響效能，因為交易管理涉及額外的資料庫操作
+
+因此，我們需要根據具體的業務需求來決定何時使用交易，以及如何配置交易的屬性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 24 JPA 交易管理](https://ithelp.ithome.com.tw/articles/10348649)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/data-access/transaction.html
