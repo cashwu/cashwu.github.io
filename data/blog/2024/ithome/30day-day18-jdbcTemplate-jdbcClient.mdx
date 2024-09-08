@@ -1,16 +1,15 @@
 ---
 layout: PostSimple
 title: '「Spring Boot API 開發：從 0 到 1」Day 18 JdbcTemplate 與 JdbcClient'
-summary: "本文深入探討了 Spring Boot 中使用 JdbcTemplate 和 JdbcClient 來簡化資料庫操作的方法。文章首先介紹了 JDBC API 和原生 Java SQL 的關係，然後詳細說明了如何使用 JdbcTemplate 和 JdbcClient 改寫之前的 TodoController。文章提供了兩種實現方式的完整程式碼示例，並對比了它們與原生 Java SQL 在程式碼簡潔度、異常處理、資源管理、類型安全性等方面的差異。最後，文章總結了 JdbcTemplate 和 JdbcClient 的主要優勢，並提供了選擇適當工具的建議。這篇文章為 Spring Boot 開發者提供了全面的 JDBC 操作優化指南，有助於提高開發效率和程式碼質量"
-date: "2024-09-18"
-lastmod: "2024-09-18"
-tags: ["Spring Boot", "Java", "ithome2024", "database"]
+summary: '本文深入探討了 Spring Boot 中使用 JdbcTemplate 和 JdbcClient 來簡化資料庫操作的方法。文章首先介紹了 JDBC API 和原生 Java SQL 的關係，然後詳細說明了如何使用 JdbcTemplate 和 JdbcClient 改寫之前的 TodoController。文章提供了兩種實現方式的完整程式碼示例，並對比了它們與原生 Java SQL 在程式碼簡潔度、異常處理、資源管理、類型安全性等方面的差異。最後，文章總結了 JdbcTemplate 和 JdbcClient 的主要優勢，並提供了選擇適當工具的建議。這篇文章為 Spring Boot 開發者提供了全面的 JDBC 操作優化指南，有助於提高開發效率和程式碼質量'
+date: '2024-09-18'
+lastmod: '2024-09-18'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'database']
 draft: true
-images: ["/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/cover.webp"]
+images: ['/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/cover.webp']
 ---
 
 ![](/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/cover.webp)
-
 
 在上一篇文章中，我們使用了基本的 Java SQL API 來操作 H2 資料庫，雖然這種方法可行，但程式碼冗長且容易出錯
 
@@ -83,10 +82,9 @@ spring.datasource.password=
 
 如果沒有在 application.properties 設定 datasource 相關參數的話，預設會把資料庫建立在記憶體裡面
 
-可以在 `log` 看到名稱為一個 `GUID` ， `mem` 代表 memory  的意思
+可以在 `log` 看到名稱為一個 `GUID` ， `mem` 代表 memory 的意思
 
 ![](/static/images/2024/ithome/30day-day18-jdbcTemplate-jdbcClient/01.webp)
-
 
 ### 使用 JdbcTemplate
 
@@ -233,7 +231,6 @@ public class DatabaseInitializer {
 }
 ```
 
-
 ### 使用 JdbcClient
 
 現在，讓我們看看如何使用 JdbcClient 來實現相同的功能
@@ -242,7 +239,7 @@ public class DatabaseInitializer {
 
 如果不一樣的話，需要提供一個自定義的 `RowMapper` (就跟 `JdbcTemplate` 的 `RowMapper` 一樣)
 
-```java 
+```java
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
@@ -270,7 +267,7 @@ public class TodoController {
             todo.setId(id);
             return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
         } catch (Exception e) {
-            // return error … 
+            // return error …
         }
     }
 
@@ -284,7 +281,7 @@ public class TodoController {
                     .list();
             return ResponseEntity.ok(new MyApiResponse<>(true, todos, null));
         } catch (Exception e) {
-            // return error … 
+            // return error …
         }
     }
 
@@ -304,7 +301,7 @@ public class TodoController {
 
             return ResponseEntity.ok(new MyApiResponse<>(true, todo, null));
         } catch (Exception e) {
-            // return error … 
+            // return error …
         }
     }
 
@@ -325,7 +322,7 @@ public class TodoController {
                 return createNotFoundError(id);
             }
         } catch (Exception e) {
-            // return error … 
+            // return error …
         }
     }
 
@@ -343,7 +340,7 @@ public class TodoController {
                 return createNotFoundError(id);
             }
         } catch (Exception e) {
-            // return error … 
+            // return error …
         }
     }
 }
@@ -351,7 +348,7 @@ public class TodoController {
 
 DatabaseInitializer 再使用 JdbcClient 改寫一下
 
-```java 
+```java
 @Component
 public class DatabaseInitializer {
 
@@ -378,45 +375,52 @@ public class DatabaseInitializer {
 }
 ```
 
-
 ## JdbcTemplate、JdbcClient 與原生 Java SQL 的比較
 
 ### 程式碼簡潔度
- - 原生 Java SQL：需要大量樣板程式碼，如建立連接、準備語句、處理結果集等
- - JdbcTemplate：簡化了許多操作，但仍需要一些樣板程式碼
- - JdbcClient：提供最簡潔的 API，使用方法鏈式調用，程式碼最為簡潔
+
+- 原生 Java SQL：需要大量樣板程式碼，如建立連接、準備語句、處理結果集等
+- JdbcTemplate：簡化了許多操作，但仍需要一些樣板程式碼
+- JdbcClient：提供最簡潔的 API，使用方法鏈式調用，程式碼最為簡潔
 
 ### 異常處理
- - 原生 Java SQL：需要手動處理 SQLException
- - JdbcTemplate 和 JdbcClient：自動處理和轉換 SQL 異常為 Spring 的資料存取異常
+
+- 原生 Java SQL：需要手動處理 SQLException
+- JdbcTemplate 和 JdbcClient：自動處理和轉換 SQL 異常為 Spring 的資料存取異常
 
 ### 資源管理
- - 原生 Java SQL：需要手動管理資源（如關閉連接、語句和結果集）
- - JdbcTemplate 和 JdbcClient：自動管理資源，減少資源洩漏的風險
+
+- 原生 Java SQL：需要手動管理資源（如關閉連接、語句和結果集）
+- JdbcTemplate 和 JdbcClient：自動管理資源，減少資源洩漏的風險
 
 ### 類型安全
- - 原生 Java SQL：需要手動轉換結果集中的資料
- - JdbcTemplate：使用 RowMapper 來映射結果
- - JdbcClient：提供更好的類型安全性，特別是在查詢結果映射時
+
+- 原生 Java SQL：需要手動轉換結果集中的資料
+- JdbcTemplate：使用 RowMapper 來映射結果
+- JdbcClient：提供更好的類型安全性，特別是在查詢結果映射時
 
 ### 學習曲線
- - 原生 Java SQL：需要深入了解 JDBC API
- - JdbcTemplate：已存在多年，有豐富的文檔和社區支持
- - JdbcClient：API 設計更直觀，對新手更友好
+
+- 原生 Java SQL：需要深入了解 JDBC API
+- JdbcTemplate：已存在多年，有豐富的文檔和社區支持
+- JdbcClient：API 設計更直觀，對新手更友好
 
 ### 功能豐富度
- - 原生 Java SQL：提供最大的靈活性，但需要更多程式碼
- - JdbcTemplate：提供了豐富的功能和底層控制選項
- - JdbcClient：專注於簡化常見操作，對於複雜查詢可能需要額外處理
+
+- 原生 Java SQL：提供最大的靈活性，但需要更多程式碼
+- JdbcTemplate：提供了豐富的功能和底層控制選項
+- JdbcClient：專注於簡化常見操作，對於複雜查詢可能需要額外處理
 
 ### 參數處理
- - 原生 Java SQL 和 JdbcTemplate：使用問號佔位符和參數數組，在複雜查詢中可能較難管理
- - JdbcClient：可以使用命名參數（如 :id、:name），這使得參數的使用更加清晰
+
+- 原生 Java SQL 和 JdbcTemplate：使用問號佔位符和參數數組，在複雜查詢中可能較難管理
+- JdbcClient：可以使用命名參數（如 :id、:name），這使得參數的使用更加清晰
 
 ### 版本要求
- - 原生 Java SQL：可在任何 Java 版本中使用
- - JdbcTemplate：可在較舊的 Spring 版本中使用
- - JdbcClient：需要 Spring Framework 6.0 或更高版本
+
+- 原生 Java SQL：可在任何 Java 版本中使用
+- JdbcTemplate：可在較舊的 Spring 版本中使用
+- JdbcClient：需要 Spring Framework 6.0 或更高版本
 
 ## 同場加映「Spring Boot HikariCP」
 
@@ -425,6 +429,8 @@ public class DatabaseInitializer {
 它以其速度和穩定性著稱，常用於 Java 應用程式中來管理資料庫連接
 
 > HikariCP 指的是 Hikari Connection Pool
+
+> hikari 是日文中的「光」的意思
 
 以下是幾個重點
 
@@ -442,19 +448,19 @@ public class DatabaseInitializer {
 以下是幾個主要觀點
 
 - 簡化操作
-    - 減少了樣板程式碼
-    - 提供了更好的異常處理和資源管理
+  - 減少了樣板程式碼
+  - 提供了更好的異常處理和資源管理
 - 選擇考量
-    - 項目需求
-    - 團隊熟悉度
-    - 使用的 Spring 版本
+  - 項目需求
+  - 團隊熟悉度
+  - 使用的 Spring 版本
 - 建議
-    - 新專案考慮使用 JdbcClient，因為它提供了更現代、更流暢的 API
-    - 維護現有專案或需要更多底層控制，JdbcTemplate 仍然是一個可靠的選擇
+  - 新專案考慮使用 JdbcClient，因為它提供了更現代、更流暢的 API
+  - 維護現有專案或需要更多底層控制，JdbcTemplate 仍然是一個可靠的選擇
 - 主要優勢
-    - 提升開發效率
-    - 幫助開發者專注於業務邏輯
-    - 減少繁瑣的資料庫操作細節
+  - 提升開發效率
+  - 幫助開發者專注於業務邏輯
+  - 減少繁瑣的資料庫操作細節
 
 無論選擇 JdbcTemplate 還是 JdbcClient，它們都能為 Java 開發者提供強大的工具，簡化資料庫操作，提高程式碼品質和可維護性
 

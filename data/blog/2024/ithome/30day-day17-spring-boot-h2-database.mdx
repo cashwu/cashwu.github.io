@@ -337,11 +337,11 @@ public class DatabaseInitializer {
 
 這個類別會在 Spring 容器初始化後自動執行 initDatabase 方法，確保 todos 被建立
 
-使用這種方法，我們不需要單獨的 SQL schema，所有的資料庫初始化邏輯都集中在 Java 程式碼中，使得管理和版本控制變得更加容易。
-
 另外，可以看到 log 裡面也有成功的訊息
 
 ![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/08.webp)
+
+> 實務上的話，會使用 flyway 或是 liquibase 這種專門的工具來管理 DB 的 schema 變化
 
 ## 結論
 
