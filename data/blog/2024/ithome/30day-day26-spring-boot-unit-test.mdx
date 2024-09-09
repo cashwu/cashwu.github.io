@@ -1,0 +1,334 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 26 單元測試'
+summary: '探索如何為 Spring Boot 應用程式撰寫單元測試。單元測試驗證程式碼的最小單位是否按預期運作。文章介紹 Spring Boot 測試工具如 @WebMvcTest、@DataJpaTest、@MockBean 和 @SpringBootTest，並使用 JUnit 5 和 Mockito 撰寫測試。通過這些測試，確保程式碼的品質、可維護性和可靠性。學習如何模擬對象行為並驗證方法呼叫次數'
+date: '2024-09-26'
+lastmod: '2024-09-26'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'test']
+draft: true
+images: ['/static/images/2024/ithome/30day-day26-spring-boot-unit-test/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day26-spring-boot-unit-test/cover.webp)
+
+在軟體開發的世界裡，單元測試就像是我們程式碼的守護天使
+
+它們默默地守護著我們的程式，確保每一個小功能都能正確運作
+
+今天，讓我們一起來探索如何為 Spring Boot 應用程式撰寫單元測試，特別是針對應用程式的 `Service` 的部份
+
+## 什麼是單元測試？
+
+單元測試是測試程式碼中最小可測試單位的過程
+
+其目的是驗證每個程式碼單元是否按預期運作，且不依賴於其他部分的程式碼
+
+這樣子的單元測試，我們稱為 `isolate 單元測試`
+
+過程中需要用到一些隔離的套件 (框架) 來做到 `independ 的測試`，這裡我們用的是 `Mokito`
+
+## 測試 3A 原則
+
+單元測試的 3A 原則是一種廣泛使用的結構化方法，用於編寫清晰、可讀性高的單元測試
+
+3A 代表 Arrange（安排）、Act（執行）和 Assert（斷言）
+
+- `Arrange`（準備）
+
+  - 這是測試的準備階段
+  - 在這個階段，設置測試所需要的所有前置條件和輸入
+  - 包括建立物件、設置 mock 物件、準備相關資料等
+
+- `Act`（操作）
+
+  - 這是測試的執行階段
+  - 在這個階段，您呼叫要測試的方法或執行要測試的行為
+  - 通常這個階段只有一行代碼，就是呼叫被測試的方法
+
+- `Assert`（驗證）
+  - 這是測試的驗證階段
+  - 在這個階段，您檢查方法的執行結果是否符合預期
+  - 使用 assert 語句來驗證結果，比如檢查返回值、狀態變化等
+
+> 因為 3個單字的開頭都是 `A` ，所以才叫 `3A 原則`
+
+## JUnit 測試框架
+
+`JUnit` 是一個流行的 Java 單元測試框架，目前的最新版本是 `JUnit 5`
+
+其提供了現代化和靈活的測試框架，使得編寫和組織單元測試變得更加容易和強大
+
+### JUnit 5 的相關註解
+
+- @Test：標記一個測試方法
+- @BeforeEach：在每個測試方法之前執行
+- @AfterEach：在每個測試方法之後執行
+- @BeforeAll：在所有測試方法之前執行一次（靜態方法）
+- @AfterAll：在所有測試方法之後執行一次（靜態方法）
+- @Disabled：禁用測試方法或類別
+
+### JUnit 5 的相關驗證
+
+- 主要使用 Assertions 類別提供的靜態方法進行驗證
+  - assertEquals
+  - assertTrue
+
+## Mokito 單元測試模擬套件
+
+`Mockito` 是一個流行的 Java 單元測試模擬套件，它主要用於解決單元測試中的`依賴`問題
+
+### Mokito 的作用
+
+- 建立模擬物件：Mockito 可以建立類別或接口的`模擬實例` (instance)
+  - 通過模擬依賴，我們可以隔離被測試的類別
+- 控制行為：可以定義這些模擬物件的`行為`，如方法返回值、拋出異常等
+  - 我們可以`精確控制`這些模擬物件的`行為`，而不需要真實的實現
+  - 使用`模擬物件`可以避免真實物件`互動`可能帶來的`副作用`（如資料庫操作）
+- 驗證互動：可以驗證模擬物件是否`按預期被呼叫`
+
+### Mokito 相關 API
+
+- 使用 `@Mock` 註解建立一個模擬的物件
+
+  - 例如：模擬一個 repository 的物件
+
+- 使用 `@InjectMocks` 將標示為 `@Mock`的模擬物件注入到此標示的類別中
+
+  - 例如：將模擬的 repository 物件，注入到 service 物件中
+
+- 使用 `when(...).thenReturn(...).thenReturn(...)` 來定義模擬物件的行為
+
+  - 簡單來說，就是當 `when` 中指定的方法被呼叫時，它會模擬回傳 `thenReturn`  內指定的內容（資料）
+  - 例如：模擬 repository 的 save 方法，會回傳一個指定的 todo 物件
+
+- 使用 `verify(...).thenReturn(...)` 來確認模擬對象的方法是否被呼叫，以及呼叫的次數
+  - 簡單來說，就是確認在這次的測試運行中，相關的方法是否有被呼叫到，以及它的呼叫次數
+  - 例如：在 service 的 save 方法執行過程中，確認 repository 的 save 方法是否有被呼叫一次
+
+> 當您建立一個 Spring Boot 專案時，如果包含了相關測試依賴（通常是 spring-boot-starter-test）
+>
+> 那麼 JUnit 5 和 Mockito 會被自動包含在您的專案當中，並不用特別再安裝
+
+## TodoService 的單元測試
+
+在 `test` 的 package 裡面，建立相對應的 `services` package，然後建立一個 `TodoServiceTest` 的測試類別
+
+![](/static/images/2024/ithome/30day-day26-spring-boot-unit-test/01.webp)
+
+```java
+public class TodoServiceTest {
+
+    @Mock
+    private TodoRepository todoRepository;
+
+    @InjectMocks
+    private TodoService todoService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    // 測試方法將在這裡添加
+}
+```
+
+`MockitoAnnotations.openMocks(this)`，這個方法的作用是初始化標記了 `@Mock` 和 `@InjectMocks` 註解的欄位 - 它會建立 mock 對象，並將這些 mock 注入到被測試的類中
+
+下面是另一種不使用 `MockitoAnnotations.openMocks(this)` 的寫法，改用註解的方式，在測試類別上面標示 `@ExtendWith(MockitoExtension.class)`
+
+```java
+@ExtendWith(MockitoExtension.class)
+class TodoServiceTest {
+    @Mock
+    private TodoRepository todoRepository;
+
+    @InjectMocks
+    private TodoService todoService;
+
+   // 測試方法將在這裡添加
+}
+```
+
+> 請注意，在這裡我們並不會為每個方法都撰寫相對應的測試和詳細講解
+
+### save 測試
+
+```java
+@Test
+void testSave() {
+
+    // arrange
+    Todo todo = new Todo();
+    todo.setTitle("測試待辦事項");
+    todo.setCompleted(false);
+
+    when(todoRepository.save(any(Todo.class))).thenReturn(todo);
+
+    // act
+    Todo savedTodo = todoService.save(todo);
+
+    // assert
+    assertNotNull(savedTodo);
+    assertEquals("測試待辦事項", savedTodo.getTitle());
+    assertFalse(savedTodo.isCompleted());
+    verify(todoRepository, times(1)).save(any(Todo.class));
+}
+```
+
+### findById 測試
+
+```java
+@Test
+void testFindById() {
+
+    // arrange
+    Long id = 1L;
+    Todo todo = new Todo();
+    todo.setId(id);
+    todo.setTitle("找到的待辦事項");
+
+    when(todoRepository.findById(id)).thenReturn(Optional.of(todo));
+
+    // act
+    Optional<Todo> foundTodo = todoService.findById(1L);
+
+    // assert
+    assertTrue(foundTodo.isPresent());
+    assertEquals("找到的待辦事項", foundTodo.get().getTitle());
+    verify(todoRepository, times(1)).findById(id);
+}
+```
+
+### deleteTodo 測試
+
+```java
+@Test
+void testDeleteTodo() {
+
+    // arrange
+    Long id = 1L;
+
+    when(todoRepository.existsById(id)).thenReturn(true);
+    doNothing().when(todoRepository).deleteById(id);
+
+    // act
+    boolean result = todoService.deleteTodo(1L);
+
+    // assert
+    assertTrue(result);
+    verify(todoRepository, times(1)).existsById(id);
+    verify(todoRepository, times(1)).deleteById(id);
+}
+```
+
+### getPagedTodos 測試
+
+```java
+/**
+ * 測試在升序排序的情況下獲取分頁結果
+ * 模擬了第一頁（page=0），每頁10條記錄，按 id 升序排序的情況
+ * 驗證返回的頁面內容、大小和順序是否正確。
+ */
+@Test
+void getPagedTodos_ShouldReturnPagedResultsInAscendingOrder() {
+
+    // arrange
+    int page = 0;
+    int size = 10;
+    String sortBy = "id";
+    String direction = "asc";
+
+    List<Todo> todos = Arrays.asList(
+            new Todo(1L, "Task 1", false),
+            new Todo(2L, "Task 2", true),
+            new Todo(3L, "Task 3", false)
+    );
+    Page<Todo> expectedPage = new PageImpl<>(todos);
+
+    when(todoRepository.findAll(any(Pageable.class))).thenReturn(expectedPage);
+
+    // act
+    Page<Todo> result = todoService.getPagedTodos(page, size, sortBy, direction);
+
+    // assert
+    assertEquals(expectedPage, result);
+    assertEquals(3, result.getContent().size());
+    assertEquals("Task 1", result.getContent().get(0).getTitle());
+    assertEquals("Task 3", result.getContent().get(2).getTitle());
+}
+```
+
+```java
+/**
+ * 測試在降序排序的情況下獲取分頁結果
+ * 模擬了第二頁（page=1），每頁5條記錄，按 title 降序排序的情況
+ * 驗證返回的頁面內容、大小和順序是否正確
+ */
+@Test
+void getPagedTodos_ShouldReturnPagedResultsInDescendingOrder() {
+
+    // arrange
+    int page = 1;
+    int size = 5;
+    String sortBy = "title";
+    String direction = "desc";
+
+    List<Todo> todos = Arrays.asList(
+            new Todo(3L, "Task C", true),
+            new Todo(2L, "Task B", false),
+            new Todo(1L, "Task A", true)
+    );
+    Page<Todo> expectedPage = new PageImpl<>(todos);
+
+    when(todoRepository.findAll(any(Pageable.class))).thenReturn(expectedPage);
+
+    // act
+    Page<Todo> result = todoService.getPagedTodos(page, size, sortBy, direction);
+
+    // assert
+    assertEquals(expectedPage, result);
+    assertEquals(3, result.getContent().size());
+    assertEquals("Task C", result.getContent().get(0).getTitle());
+    assertEquals("Task A", result.getContent().get(2).getTitle());
+}
+```
+
+## 同場加映：Spring Boot 的相關工具
+
+Spring Boot 提供了許多工具和註解，使得撰寫測試變得更加容易
+
+以下是一些常用的工具
+
+- @WebMvcTest：用於測試 Spring MVC 控制器
+- @DataJpaTest：用於測試 JPA 相關的組件
+- @MockBean：用於建立和注入模擬對象
+- @SpringBootTest：用於加載完整的 Spring 應用程式上下文
+
+> 這些相關的測試工具，後面的文章會陸繼介紹
+
+## 結論
+
+單元測試是確保程式碼品質的重要工具
+
+通過為 TodoService 撰寫單元測試，我們可以
+
+- 驗證每個方法的行為是否符合預期
+- 在修改程式碼時快速發現潛在的問題
+- 提高程式碼的可維護性和可靠性
+
+記住，好的單元測試應該是獨立的、可重複的，並且容易理解的
+
+通過持續地撰寫和維護單元測試，我們可以建立一個更加穩固和可靠的 Spring Boot 應用程式
+
+這裡並沒有太過深入的講解單元測試，只有帶到一些基本的觀念，如果有興趣，建議可以閱讀 `單元測試的藝術 第二版`
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 26 單元測試]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://junit.org/junit5/
+- https://site.mockito.org/
+- https://docs.spring.io/spring-boot/reference/testing/test-scope-dependencies.html#page-title
