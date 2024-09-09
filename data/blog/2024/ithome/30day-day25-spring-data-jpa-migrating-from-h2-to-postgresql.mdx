@@ -1,0 +1,175 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 25 從 H2 到 PostgreSQL"
+summary: "本文介紹如何在 Spring Boot 專案中從 H2 資料庫轉換到 PostgreSQL，包括使用 Supabase 建立 PostgreSQL 資料庫、修改依賴和配置、調整程式碼等步驟。文章還討論了 PostgreSQL 的優勢、大小寫問題，以及使用 Spring Data JPA 實現無縫資料庫切換的便利性"
+date: "2024-09-25"
+lastmod: "2024-09-25"
+tags: ["Spring Boot", "Java", "ithome2024", "database"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/cover.webp)
+
+
+在前面的文章中，我們已經介紹了如何在 Spring Boot 中使用 H2 資料庫
+
+H2 資料庫非常適合快速原型開發和測試環境，但在實際的正式環境中，我們通常會選擇更強大、更穩定的資料庫，如 PostgreSQL
+
+本篇文章將介紹如何從 H2 轉換到 PostgreSQL，並展示如何修改程式碼來進行這項轉換
+
+## 為什麼選擇 PostgreSQL？
+
+雖然 H2 資料庫在開發和測試階段非常方便，但在正式環境中，PostgreSQL 提供了更多優勢
+
+- 穩定性和可靠性：PostgreSQL 是一個成熟的資料庫系統，具有高穩定性和可靠性，適合生產環境
+- 豐富的功能：PostgreSQL 支持更多的資料類型、擴展和功能，如 JSONB、全文搜尋和地理空間數據
+- 性能優勢：在處理大量數據和高併發請求時，PostgreSQL 的性能表現更佳
+- 社群支持：PostgreSQL 擁有活躍的開源社群，提供了豐富的資源和支持
+
+## 更換成 PostgreSQL
+
+### 使用 supabase
+
+下面我們將使用 `Supabase` 的資料庫功能，它可以快速地建立一個 `PostgreSQL 資料庫` 
+
+> 這裡並不會太詳細地介紹 Supabase 的功能，只會大致帶過
+
+先建立一個專案，在建立時就要設定 `資料庫密碼`
+
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/01.webp)
+
+
+大約 3 ~ 5 分鐘就可以建立完專案
+
+來到 Settings > Database 的地方
+
+`Connection string` 可以選擇 `JDBC` 的部分，下面就有完整的`連線字串` 可以直接使用
+
+
+記得將 `[YOUR-PASSWORD]` 替換成一開始建立專案時自行設定的密碼
+  
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/02.webp)
+
+### 增加依賴
+
+在 `build.gradle` 中增加 `PostgreSQL` 的依賴，記得善用 IDE 提供的編輯功能
+
+```groovy
+runtimeOnly 'org.postgresql:postgresql'
+```
+
+### 修改應用程式配置
+
+
+修改 `application.properties` 資料庫相關設定
+
+將前面取得的 `Supabase` 連結字串放到 `spring.datasource.url` 即可
+
+因為連結字串中已包含帳號和密碼，所以原本的 `username` 和 `password` 就不需要另外提供
+
+然後記得將 `driver` 換成 `PostgreSQL` 
+
+```properties
+# PostgreSQL 資料庫配置
+
+# 資料庫 URL
+spring.datasource.url=jdbc:postgresql://aws.supabase.com:6543/postgres?user=[user]&password=[password]
+
+# 驅動程式類別名稱
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# 資料庫用戶名
+#spring.datasource.username=
+
+# 資料庫密碼
+#spring.datasource.password=
+```
+
+### 修改程式碼
+
+
+在大多數情況下，如果使用的是 `Spring Data JPA`，程式碼基本上不需要修改
+
+唯一要注意的就是自己寫 SQL script 的地方
+
+記得要將 `DatabaseInitializer` 裡面用到的建立 table 相關語法，換成 `PostgreSQL` 的語法
+
+
+```java
+@PostConstruct
+public void initDatabase() {
+    String sql = "CREATE TABLE IF NOT EXISTS todos (" +
+            "id SERIAL PRIMARY KEY," +
+            "title VARCHAR(255) NOT NULL," +
+            "completed BOOLEAN NOT NULL)";
+
+    try {
+        jdbcClient.sql(sql).update();
+        System.out.println("初始化資料庫成功");
+    } catch (Exception e) {
+        System.err.println("初始化資料庫失敗：" + e.getMessage());
+    }
+}
+```
+
+### 其它
+
+這樣就全部完成了。另外一個要注意的地方是`大小寫`的問題
+
+PostgreSQL 對於未加`引號`的識別符會自動轉換為`小寫`， 換句話說，PostgreSQL 預設的資料表名稱和欄位名稱都習慣使用`小寫` 
+
+而 `Spring Data JPA` 預設情況下產生的 `SQL script` 中的標識符是未加引號的
+
+這意味著如果你在 `Spring Data JPA` 註解中使用`大寫` 名稱，PostgreSQL 會自動將其轉換為`小寫` 
+
+  
+
+以程式碼裡面的 `Todo` 為例，在 PostgreSQL 中實際執行的 SQL 會將 TODOS 轉換為 `todos` 
+
+```
+@Table(name = "TODOS")
+```
+
+
+### 測試
+
+啟動應用程式時，可以看到已經正常連線到 `Supabase` 的資料庫，而且也`初始化成功` 
+
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/03.webp)
+
+在 `Supabase` 檢查資料庫相關資料表，也看到有 `todos` 
+
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/04.webp)
+
+
+一樣使用 `api-test.http` 來測試所有的 API
+
+在 `Supabase` 也可以看到（查詢到）相關的資料
+
+  
+![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/05.webp)
+
+
+## 結論
+
+透過從 H2 轉換到 PostgreSQL，我們可以在正式環境中使用更穩定、更強大的資料庫系統
+
+也可以看到，使用了 `Spring Data JPA` 後，基本上就可以無縫地更換資料庫，不太需要修改太多程式碼
+
+當然，原有資料的部分就需要另外進行移轉，這已超出本篇文章的範圍
+
+## 備註
+
+一般來說，從本地開發到測試環境，甚至到正式環境，都會使用相同的資料庫系統（這裡指的不是同一個資料庫）
+
+而不會像本文所示，在本地開發使用 H2，到了正式環境才使用 PostgreSQL
+
+這是為了文章的前後脈絡所設計，請勿誤會
+
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 25 從 H2 到 PostgreSQL](https://ithelp.ithome.com.tw/articles/10348840)
+
+> 圖片來源：AI 產生
+
+## 參考連結
