@@ -1,0 +1,130 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 28 DataJpaTest 測試"
+summary: "使用 Spring 框架的 DataJpaTest 進行 JPA 測試，專注於測試資料庫操作而無需設置完整應用程式。本篇文章介紹如何使用 @DataJpaTest 註解、自動配置記憶體資料庫、執行 @Entity 類別掃描及啟用 SQL 日誌記錄。透過測試 TodoRepository 的自定義查詢方法和 JPQL 方法，確保每個測試方法的初始狀態一致，並驗證查詢結果的正確性。這種方法不僅高效可靠，還能提高程式碼的可靠性，並在重構或優化時提供安全保障。"
+date: "2024-09-28"
+lastmod: "2024-09-28"
+tags: ["Spring Boot", "Java", "ithome2024", "test"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day28-spring-boot-datajpatest/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day28-spring-boot-datajpatest/cover.webp)
+
+在前面的文章中，我們已經測試了 `Service` 和 `Controller` 的部分
+
+今天要來看 `Repository` (`JPA`) 的部分，探討如何進行測試
+
+
+我們會使用 Spring 框架提供給我們的 `DataJpaTest` 這個工具，它專門用於測試 `JPA` 相關的組件
+
+它的主要目的是讓開發者能夠輕鬆地測試`資料庫操作`，而無需設置完整的 Spring 應用程式
+
+
+## DataJpaTest 的主要用途
+
+- 預設自動設定資料庫在`記憶體` (H2）
+- 配置 `Hibernate` 、`Spring Data`  和 `DataSource` 
+- 執行 `@Entity` 類別的掃描
+- 啟用 `SQL 日誌記錄` 
+
+## 使用方法和限制
+
+
+- 使用 `@DataJpaTest` 這個註解即可，它會設定好相關的測試試環境
+
+- 預設使用`記憶體資料庫`，如果要使用實際的資料庫，可以用下面的註解
+    - `@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)` 
+
+- 每個測試方法結束後會`自動回滾交易`，確保測試之間的獨立性，不過還是需要自己控制相關的`測試資料` 
+
+  
+
+## 測試 TodoRepository
+
+一樣先在 `test` 的 package 裡面，建立相對應的 `repository` package，然後建立一個 `TodoRepositoryTest` 的測試類別
+  
+
+我們將測試 `TodoRepository` 自定義的`查詢方法` 和 `JPQL 方法`
+
+
+```java
+@DataJpaTest
+public class TodoRepositoryTest {
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @BeforeEach
+    public void setup() {
+
+        // 在每個測試方法執行前，先清空所有的資料，確保每個測試方法都有一致的初始狀態
+        todoRepository.deleteAll();
+        
+        // 新增測試資料
+        todoRepository.saveAll(Arrays.asList(
+            new Todo(null, "買牛奶", false),
+            new Todo(null, "寫程式", true),
+            new Todo(null, "看書", false)
+        ));
+    }
+
+    @Test
+    public void testFindByTitle() {
+        List<Todo> todos = todoRepository.findByTitle("買牛奶");
+        assertEquals(1, todos.size());
+        assertEquals("買牛奶", todos.get(0).getTitle());
+    }
+
+    @Test
+    public void testFindByCompletedTrue() {
+        List<Todo> completedTodos = todoRepository.findByCompletedTrue();
+        assertEquals(1, completedTodos.size());
+        assertTrue(completedTodos.get(0).isCompleted());
+    }
+
+    @Test
+    public void testFindByTitleContainingOrderByIdDesc() {
+        List<Todo> todos = todoRepository.findByTitleContainingOrderByIdDesc("寫");
+        assertEquals(1, todos.size());
+        assertEquals("寫程式", todos.get(0).getTitle());
+    }
+
+    @Test
+    public void testCountByCompletedFalse() {
+        long count = todoRepository.countByCompletedFalse();
+        assertEquals(2, count);
+    }
+
+    @Test
+    public void testFindAllWithPagination() {
+        Page<Todo> todoPage = todoRepository.findAll(PageRequest.of(0, 2));
+        assertEquals(2, todoPage.getContent().size());
+        assertEquals(3, todoPage.getTotalElements());
+    }
+}
+```
+
+執行測試時，可以看到相關的 SQL Script
+
+![](/static/images/2024/ithome/30day-day28-spring-boot-datajpatest/01.webp)  
+
+## 結論
+  
+使用 `@DataJpaTest` 進行 `Spring Data JPA`  的測試是一種高效且可靠的方法
+
+它允許我們專注於測試 `資料庫的操作`，而無需處理完整的應用程式
+
+通過編寫全面的測試案例，我們可以確保 `Repository`的正確性，尤其是相關的自定義的 `查詢方法` 和 `JPQL 方法`
+
+這不僅能提高程式碼的可靠性，還能在進行重構或優化時提供安全保障
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 28 DataJpaTest 測試](https://ithelp.ithome.com.tw/articles/10349150)
+
+
+> 圖片來源：AI 產生
+
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html#testing.spring-boot-applications.autoconfigured-spring-data-jpa
