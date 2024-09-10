@@ -1,0 +1,179 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 27 MockMvc 測試"
+summary: "使用 MockMVC 測試 Spring MVC 應用程式的控制器是有效的方法，它允許開發者模擬 HTTP 請求而無需啟動伺服器。本文介紹了如何使用 @WebMvcTest 註解來專門測試控制器，以及如何利用 @MockBean 模擬服務層行為，並通過 MockMvc 模擬 HTTP 請求。文中詳細展示了 CRUD 操作的測試案例，涵蓋了創建、查詢、更新和刪除待辦事項的各種情境，並強調了驗證回應狀態碼和內容的重要性。建議為每個控制器方法編寫全面的測試案例，以提高應用品質"
+date: "2024-09-27"
+lastmod: "2024-09-27"
+tags: ["Spring Boot", "Java", "ithome2024", "test"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day27-spring-boot-mockmvc-test/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day27-spring-boot-mockmvc-test/cover.webp)
+
+在上一篇文章中，我們已經測試了 `Service` 的部分
+
+今天要來看 `Controller` 的部分，探討如何進行測試
+
+在這裡我們就不用和 `Service` 一樣的單元測試的方式
+
+我們會使用 Spring 框架提供給我們的 `MockMVC` 這個工具，它專門用來測試 Spring MVC 應用程式的`控制器（Controller）` 
+
+它允許開發者模擬 HTTP 的動作，而無需實際啟動伺服器
+
+  
+## MockMVC Test 的主要用途
+
+- 驗證控制器的行為：測試各種 `HTTP 方法`（GET、POST、PUT、DELETE 等）的處理
+- 檢查回應狀態：確認控制器返回正確的 `HTTP 狀態碼`
+- 驗證回應內容：檢查回應的 body、header 等是否`符合預期`
+- 測試請求參數和路徑變數：確保控制器正確處理`各種輸入`
+- 模擬不同的請求情境：包括`正常情況`和`錯誤處理`
+
+## MockMVC 測試中的重要註解
+
+### @WebMvcTest
+
+- 這個註解用於專門測試 Spring MVC 控制器
+- 它會自動配置 Spring MVC 基礎設施，並只實例化被測試的控制器，所以可以大大加快測試速度
+
+### @MockBean
+
+- 用於建立和注入一個 `Mockito mock 物件`到 Spring 應用程式中
+- 它會替換掉應用程式上下文中任何相同類型的`已存在的 bean`
+- 在我們的例子中，它用來模擬 `TodoService`，讓我們能夠控制服務層的行為
+
+### @Autowired
+
+- 在測試中，可以讓你方便的注入 MockMvc 和其他測試所需的組件
+
+## TodoController 的 MockMVC 測試
+
+一樣先在 `test` 的 package 裡面，建立相對應的 controller package，然後建立一個 `TodoControllerTest` 的測試類別
+
+下面我們測試了主要的 CRUD 相關功能
+
+```java
+@WebMvcTest(TodoController.class)
+public class TodoControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TodoService todoService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    public void createTodo() throws Exception {
+        Todo todo = new Todo(null, "新待辦事項", false);
+        Todo savedTodo = new Todo(1L, "新待辦事項", false);
+
+        when(todoService.save(any(Todo.class))).thenReturn(savedTodo);
+
+        mockMvc.perform(post("/api/todos").contentType(MediaType.APPLICATION_JSON)
+                                          .content(objectMapper.writeValueAsString(todo)))
+               .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.data.id").value(1))
+               .andExpect(jsonPath("$.data.title").value("新待辦事項"))
+               .andExpect(jsonPath("$.data.completed").value(false));
+
+        verify(todoService, times(1)).save(any(Todo.class));
+    }
+
+    @Test
+    public void getAllTodos() throws Exception {
+        Todo todo1 = new Todo(1L, "測試待辦事項", false);
+        Todo todo2 = new Todo(2L, "測試待辦事項2", true);
+
+        when(todoService.findAll()).thenReturn(Arrays.asList(todo1, todo2));
+
+        mockMvc.perform(get("/api/todos")).andExpect(status().isOk())
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.data[0].id").value(1))
+               .andExpect(jsonPath("$.data[0].title").value("測試待辦事項"))
+               .andExpect(jsonPath("$.data[0].completed").value(false))
+               .andExpect(jsonPath("$.data[1].id").value(2))
+               .andExpect(jsonPath("$.data[1].title").value("測試待辦事項2"))
+               .andExpect(jsonPath("$.data[1].completed").value(true));
+
+        verify(todoService, times(1)).findAll();
+    }
+
+    @Test
+    public void getTodo() throws Exception {
+        Todo todo = new Todo(1L, "測試待辦事項", false);
+
+        when(todoService.findById(1L)).thenReturn(Optional.of(todo));
+
+        mockMvc.perform(get("/api/todos/1")).andExpect(status().isOk())
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.data.id").value(1))
+               .andExpect(jsonPath("$.data.title").value("測試待辦事項"))
+               .andExpect(jsonPath("$.data.completed").value(false));
+
+        verify(todoService, times(1)).findById(1L);
+    }
+
+    @Test
+    public void updateTodo() throws Exception {
+        Todo updatedTodo = new Todo(1L, "更新的待辦事項", true);
+
+        when(todoService.updateTodo(eq(1L), any(Todo.class))).thenReturn(Optional.of(updatedTodo));
+
+        mockMvc.perform(put("/api/todos/1").contentType(MediaType.APPLICATION_JSON)
+                                           .content(objectMapper.writeValueAsString(updatedTodo)))
+               .andExpect(status().isOk()).andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.data.id").value(1))
+               .andExpect(jsonPath("$.data.title").value("更新的待辦事項"))
+               .andExpect(jsonPath("$.data.completed").value(true));
+
+        verify(todoService, times(1)).updateTodo(eq(1L), any(Todo.class));
+    }
+
+    @Test
+    public void deleteTodo() throws Exception {
+        when(todoService.deleteTodo(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/todos/1")).andExpect(status().isOk())
+               .andExpect(jsonPath("$.success").value(true));
+
+        verify(todoService, times(1)).deleteTodo(1L);
+    }
+}
+```
+
+> 要注意 import 的 package  
+> 
+> - MockServer 開頭的，主要用於 WebFlux 
+> - MockMvc 開頭的，主要用於 Spring MVC - 這才是我們要 import 的
+
+在測試中，`@WebMvcTest(TodoController.class)` 告訴 Spring Boot 只初始化與 `TodoController` 相關的 Spring MVC 基礎設施
+
+每個測試方法都使用 `MockMvc` 來模擬 HTTP 請求，並使用 `Mockito` 來模擬 `TodoService` 的行為
+
+我們驗證了回應的`狀態碼` 和`內容`，確保控制器正確處理請求並返回預期的結果
+
+> 有點可惜的是，找不到一個驗證 Json 比較方便的工具，所以只好用 `jsonPath` 來驗證
+
+## 結論
+
+`MockMVC` 測試是 Spring Boot 應用程式中不可或缺的一部分
+
+它們提供了一種有效的方式來測試控制器層的邏輯，而無需啟動整個應用程式
+
+在實際開發中，建議為每個控制器方法編寫全面的測試案例，包括正面和負面的情境
+
+這樣可以大大提高應用程式的品質，並在進行修改或重構時提供安全網
+
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 27 MockMVC 測試](https://ithelp.ithome.com.tw/articles/10349137)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html
+- https://spring.io/guides/gs/testing-web
