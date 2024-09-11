@@ -1,0 +1,282 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 30 Rest Assured 測試"
+summary: "REST Assured 是一個強大的 Java 函式庫，用於測試 RESTful API。本文介紹了 REST Assured 的基本用法，包括設定前置條件、發送請求和驗證回應。透過 BDD 風格的測試，使程式碼更易讀。文章還討論了 REST Assured 與 Hamcrest 和 AssertJ 的整合，進一步提升測試的靈活性和表達力。最後，文章比較了 SpringBootTest 和 REST Assured 的優缺點，強調了 REST Assured 在 API 測試中的優勢及其應用場景"
+date: "2024-09-30"
+lastmod: "2024-09-30"
+tags: ["Spring Boot", "Java", "ithome2024", "test"]
+draft: true
+images: ["/static/images/2024/ithome/30day-day30-spring-boot-rest-assured/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day30-spring-boot-rest-assured/cover.webp)
+
+在上一篇文章中，我們探討了如何使用 SpringBootTest 進行端對端測試
+
+今天，我們要介紹另一個強大的 API 測試工具：`REST Assured`
+
+  
+## REST Assured 簡介
+
+`REST Assured` 是一個專門用來測試 `RESTful API` 的 Java 函式庫，它提供了一種簡單、直觀的方式來驗證 HTTP 回應
+
+### 主要用途
+
+- API 測試自動化：REST Assured 讓你能夠輕鬆地編寫和執行 API 測試
+- 回應驗證：它提供了豐富的方法來驗證 HTTP 回應的各個方面，包括狀態碼、標頭和內容
+- 請求建立：REST Assured 允許你以流暢的方式建立複雜的 HTTP 請求
+- BDD 風格測試：REST Assured 支援使用 Given-When-Then 格式編寫測試，使測試更易讀和理解
+
+### 使用方法
+
+使用 REST Assured 的基本步驟如下
+
+- `given`: 設定測試的相關前置條件，例如請求參數、標頭等
+- `when`: 發送 HTTP 請求，執行實際的 API 呼叫
+- `then`: 驗證回應是否符合預期"
+
+一個簡單的例子，展示了 BDD 風格的測試
+
+```java
+given()
+  .param("key", "value")
+.when()
+  .get("/api/resource")
+.then()
+  .statusCode(200)
+  .body("message", equalTo("Success"));
+```
+
+這種方式不僅使測試程式碼更容易閱讀和理解，還能夠清晰地描述測試的意圖和預期結果，這正是 BDD 的核心優勢
+
+  
+### 限制
+
+- 學習曲線：雖然 REST Assured 的語法相對直觀，但新手可能需要一些時間來熟悉它的流暢 API
+- 非 Spring 專屬：REST Assured 不是專為 Spring 應用程式設計的，因此在某些情況下可能需要額外的配置
+
+## REST Assured 與測試驗證工具
+
+REST Assured 的強大之處不僅在於其流暢的 API
+
+還在於它能夠與其他測試驗證工具無縫整合，特別是 `Hamcrest` 和 `AssertJ`
+
+這種結合使得 API 測試變得更加靈活和表達力強
+
+### Hamcrest
+
+Hamcrest 是一個強大的 matcher 框架，它提供了一系列預定義的 matcher，可以用於構建靈活的驗證
+
+REST Assured 原生支援 Hamcrest matcher，這使得驗證 API 回應變得非常直觀
+
+```java
+.body("data.size()", equalTo(2))
+.body("data.title", hasItems("測試待辦事項1", "測試待辦事項2"))
+.body("data.find { it.completed == true }.title", equalTo("測試待辦事項2"))
+```
+
+這些驗證使用了 Hamcrest 的 equalTo()，hasItems() 等 matcher，可以輕鬆地驗證回應內容的各個方面
+
+### AssertJ
+
+AssertJ 是另一個流行的驗證庫，它提供了一種更加流暢和易讀的方式來編寫驗證
+
+雖然 REST Assured 主要使用 Hamcrest 進行回應驗證，但 AssertJ 在驗證從`資料庫檢索的資料`或`其他 Java 物件`時特別有用
+
+```java
+assertThat(todoRepository.findAll())
+    .hasSize(2)
+    .extracting("title", "completed")
+    .containsExactly(
+        tuple("測試待辦事項1", false),
+        tuple("測試待辦事項2", true)
+    );
+```
+
+> Hamcrest 和 AssertJ 都已經包含在 Spring Boot 的 spring-boot-starter-test
+
+
+## 調整端對端測試
+
+需要在 `build.gradle` 中添加 `REST Assured` 的依賴
+
+```groovy
+testImplementation 'io.rest-assured:rest-assured:5.5.0'
+```
+
+接下來，讓我們開始改寫測試類別
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:application-test.properties")
+public class TodoEndToEndTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        todoRepository.deleteAll();
+    }
+
+    @Test
+    void createTodo() {
+
+        Todo newTodo = new Todo(null, "測試待辦事項", false);
+
+        // 呼叫 API
+        given()
+            .contentType(ContentType.JSON)
+            .body(newTodo)
+        .when()
+            .post("/api/todos")
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data.title", equalTo("測試待辦事項"))
+            .body("data.completed", equalTo(false));
+
+        // 驗證資料庫
+        assertThat(todoRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void getAllTodos() {
+        
+        // 新增測試資料
+        Todo todo1 = new Todo(null, "測試待辦事項1", false);
+        Todo todo2 = new Todo(null, "測試待辦事項2", true);
+        todoRepository.saveAll(Arrays.asList(todo1, todo2));
+
+        // 呼叫 API
+        given()
+        .when()
+            .get("/api/todos")
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data", hasSize(2))
+            .body("data[0].title", equalTo("測試待辦事項1"))
+            .body("data[0].completed", equalTo(false))
+            .body("data[1].title", equalTo("測試待辦事項2"))
+            .body("data[1].completed", equalTo(true));
+    }
+
+    @Test
+    void getTodo() {
+
+        // 新增測試資料
+        Todo todo = todoRepository.save(new Todo(null, "測試待辦事項", false));
+
+        // 呼叫 API
+        given()
+        .when()
+            .get("/api/todos/{id}", todo.getId())
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data.title", equalTo("測試待辦事項"))
+            .body("data.completed", equalTo(false));
+    }
+
+    @Test
+    void updateTodo() {
+
+        // 新增測試資料
+        Todo todo = todoRepository.save(new Todo(null, "原始待辦事項", false));
+
+        Todo updatedTodo = new Todo(todo.getId(), "更新後的待辦事項", true);
+
+        // 呼叫 API
+        given()
+            .contentType(ContentType.JSON)
+            .body(updatedTodo)
+        .when()
+            .put("/api/todos/{id}", todo.getId())
+        .then()
+            .statusCode(200);
+
+        // 驗證資料庫
+        Todo actualTodo = todoRepository.findById(todo.getId()).orElseThrow();
+        assertThat(actualTodo.getTitle()).isEqualTo("更新後的待辦事項");
+        assertThat(actualTodo.isCompleted()).isTrue();
+    }
+
+    @Test
+    void deleteTodo() {
+
+        // 新增測試資料
+        Todo savedTodo = todoRepository.save(new Todo(null, "要刪除的待辦事項", false));
+
+        // 呼叫 API
+        given()
+        .when()
+            .delete("/api/todos/{id}", savedTodo.getId())
+        .then()
+            .statusCode(200);
+
+        // 驗證資料庫
+        assertThat(todoRepository.findAll()).isEmpty();
+    }
+}
+```
+  
+這裡借用了`⁠SpringBootTest` 來啟動測試用的應用程式，和使用 `Repository` 來⁠新增和驗證資料
+
+而 `REST Assured` 的重點在於，發送 HTTP 請求並驗證 API 的回應
+
+> 我覺得比較麻煩的地方是，IDE 的排版設定，如果設定的不好，會讓整個測試類別的排版變得很醜，這點有點可惜
+
+## SpringBootTest 與 REST Assured 的比較
+
+### SpringBootTest
+
+- 優點
+    - 與 Spring Boot 緊密整合
+    - 可以直接訪問 Spring 容器中的 bean
+    - 提供完整的應用程式上下文
+- 缺點
+    - 啟動時間較長
+    - 資源消耗較大
+    - 測試可能較難閱讀和維護
+
+  
+
+### REST Assured
+
+- 優點
+    - 專門為 API 測試設計
+    - 語法直觀，易於閱讀和編寫
+    - 豐富的 matcher 和驗證選項
+    - 可以獨立於 Spring 環境運行
+- 缺點
+    - 不直接與 Spring 容器整合
+    - 可能需要額外的設定來訪問 Spring bean
+    - 主要關注 API 層面的測試
+
+  
+
+## 結論
+
+REST Assured 為 API 測試提供了一個強大而靈活的解決方案
+
+它的`流暢 API` 使得編寫和閱讀測試變得更加容易
+
+相比於 SpringBootTest，REST Assured 更專注於 `API 層面的測試`，這使得它在某些情況下更適合進行`端對端的 API 測試`
+
+透過結合 REST Assured 和 Spring Boot 測試框架，我們可以建立更全面、更靈活的 API 測試策略，從而提高應用程式的品質和可靠性
+
+  
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 30 REST Assured 測試](https://ithelp.ithome.com.tw/articles/10349418)
+
+> 圖片來源：AI 產生
+
+
+## 參考連結
+
+- https://rest-assured.io/
+- https://github.com/rest-assured/rest-assured/wiki/Usage
