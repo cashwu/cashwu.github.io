@@ -56,7 +56,7 @@ spring.jpa.hibernate.ddl-auto=create-drop
 在 `test` 的 package 下面，建立 `TodoEndToEndTest`  測試類別
 
 ```java
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class TodoEndToEndTest {
 
@@ -178,7 +178,7 @@ public class TodoEndToEndTest {
 ```
 
 - `@SpringBootTest` 啟動完整的應用程式
-  - 使用 `webEnvironment = WebEnvironment.RANDOM_PORT` 時，Spring Boot 會啟動一個測試用的應用程式，並使用一個`隨機`的可用 `port 號`
+  - 使用 `webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT` 時，Spring Boot 會啟動一個測試用的應用程式，並使用一個`隨機`的可用 `port 號`
 - `@TestPropertySource` 指定使用測試專用的`屬性文件`
 - `@LocalServerPort` 可以獲取測試用應用程式隨機分配的 `port 號`
 - `TestRestTemplate`，它是 Spring Boot 提供的用於進行 HTTP 請求的測試工具
