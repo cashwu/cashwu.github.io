@@ -1,0 +1,265 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 31 跨來源資源共享（CORS）'
+summary: 'CORS（跨來源資源共享）是現代網路開發中的重要概念，允許不同來源的網頁請求資源。本文介紹了在 Spring Boot 中應用 CORS 的方法，包括使用 @CrossOrigin 註解和全局配置。@CrossOrigin 註解適用於特定控制器或方法，而全局配置則適用於整個應用程式。文章還提供了設置和測試 CORS 的實際步驟，並強調了 CORS 在安全性和靈活性方面的重要性。通過適當配置，CORS 能夠有效防止未經授權的存取，同時允許跨網域通信'
+date: '2024-10-01'
+lastmod: '2024-10-01'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'cors']
+draft: true
+images: ['/static/images/2024/ithome/30day-day31-spring-boot-cors/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/cover.webp)
+
+在現代網路應用程式開發中，`跨來源資源共用` （Cross-Origin Resource Sharing，簡稱 `CORS`）是一個常見且重要的概念
+
+今天，我們就來聊聊 CORS 在 Spring Boot 中的應用，讓你的 API 能夠自由地跨網域通信
+
+## 跨來源資源共享（CORS）
+
+### 什麼是 CORS
+
+技術上來說，CORS 是一種安全機制，允許網頁從`不同來源` (`不同網域`) 的伺服器請求資源
+
+沒有 CORS，瀏覽器會阻止這些跨不同來源請求，以防止潛在的安全威脅
+
+### CORS 對 API 的重要性
+
+- `安全性`：CORS 讓你能夠控制哪些網域可以存取你的 API，有效防止`未經授權`的存取
+- `靈活性`：它允許你的 API 被不同網域的前端應用程式使用，增加了 `API 的通用性`
+- `合規性`：許多現代網路應用架構（如微服務）需要`跨網域通信`，CORS 使這成為可能
+
+### CORS 的應用場景
+
+- 單頁應用程式（SPA）呼叫後端 API
+- 微服務架構中不同服務之間的通信
+- 第三方整合，如使用外部 API 服務
+
+> 關於 CORS 相關參數的深入解釋，請參考文末的參考連結，這裡不會深入的探討
+
+## 在 Spring Boot 中設定 CORS
+
+Spring Boot 提供了多種方式來配置 CORS，我們將介紹最常用的兩種方法
+
+### 使用 @CrossOrigin 註解
+
+這是最簡單的方法，適合需要對特定`控制器`或`方法`啟用 CORS 的情況
+
+直接把註解加到`控制器`或`方法`上就好，然後指定相關的`網域`
+
+在這個例子中，我們允許來自 `http://example.com` 的請求存取 `/hello` 端點
+
+```java
+@RestController
+public class HelloController {
+
+    @CrossOrigin(origins = "http://example.com")
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello, Cross-Origin World!";
+    }
+}
+```
+
+### 全局 CORS 配置
+
+如果你想為整個`應用程式`配置 CORS，可以使用`全局配置`
+
+```java
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://example.com")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .maxAge(3600);
+            }
+        };
+    }
+}
+```
+
+讓我們來解釋一下 CORS 的相關參數
+
+- addMapping(String pathPattern)
+
+  - 功能：指定哪些路徑應該被 CORS 配置所涵蓋
+  - 設定內容：API 路徑模式
+  - 範例
+    - `/**` 表示應用到所有路徑
+    - `/api/**` 只應用到以 `/api` 開頭的路徑
+
+- allowedOrigins(String... origins)
+
+  - 功能：指定允許存取你的資源的來源（網域）
+  - 設定內容：允許的網域列表
+  - 範例
+    - `http://example.com` 只允許來自 `example.com` 的請求
+    - `*` 允許所有來源（不建議在生產環境中使用）
+
+- allowedMethods(String... methods)
+
+  - 功能：指定允許的 HTTP 方法
+  - 設定內容：HTTP 方法列表
+  - 範例
+    - `GET`, `POST`, `PUT`, `DELETE` 允許這四種 HTTP 方法
+
+- allowedHeaders(String... headers)
+
+  - 功能：指定允許的 HTTP 標頭
+  - 設定內容：HTTP 標頭列表
+  - 範例
+    - `*` 允許所有標頭
+    - `Content-Type`, `Authorization` 只允許這兩個特定標頭
+
+- exposedHeaders(String... headers)
+
+  - 功能：指定回應中可以被客戶端存取的標頭
+  - 設定內容：要暴露給客戶端的標頭列表
+  - 範例
+    - `Authorization` 允許客戶端讀取回應中的 `Authorization` 標頭
+
+- allowCredentials(boolean allowCredentials)
+
+  - 功能：指定是否允許發送認證資訊（如 cookies、HTTP 認證或客戶端 SSL 證書）
+  - 設定內容：true 或 false
+  - 範例
+    - `true` 允許發送認證資訊
+
+- maxAge(long maxAge)
+  - 功能：指定預檢請求的結果可以被`快取` 多長時間（以秒為單位）
+  - 設定內容：快取時間（秒）
+  - 範例
+    - `3600` 表示預檢請求的結果可以被快取一小時
+
+## 實際測試 CORS 功能
+
+要在本機測試 CORS 功能，我們需要兩個部分：一個簡單的前端頁面和一個 Spring Boot 後端
+
+讓我們一步步來設置和測試
+
+### 設置 Spring Boot 後端
+
+我們使用之前的全局配置方法來設定 CORS，但稍作修改以允許`本地測試`
+
+```java
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5500") // 允許來自 local 伺服器的請求
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
+    }
+}
+```
+
+在一開始的 `HelloController` 增加一個 `API 端點`
+
+```java
+@RestController
+public class HelloController {
+
+    @GetMapping("/api/hello")
+    public String hello() {
+        return "Hello from Spring Boot!";
+    }
+}
+```
+
+啟動你的 Spring Boot 應用程式，它應該會運行在 `http://localhost:8080`
+
+### 建立前端頁面
+
+建立一個簡單的 HTML 文件，命名為 index.html
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CORS Test</title>
+  </head>
+  <body>
+    <h1>CORS Test</h1>
+    <button onclick="testCORS()">Test API Call</button>
+    <p id="result"></p>
+
+    <script>
+      function testCORS() {
+        fetch('http://localhost:8080/api/hello')
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById('result').textContent = data
+          })
+          .catch((error) => {
+            document.getElementById('result').textContent = 'Error: ' + error
+          })
+      }
+    </script>
+  </body>
+</html>
+```
+
+> 測試檔案會一併放在版控裡面
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/01.webp)
+
+### 運行和測試
+
+- 為了方便，這裡使用了 Visual Studio Code 的 [Live Server 擴充功能](https://github.com/ritwickdey/vscode-live-server-plus-plus) 來運行 HTML
+  - 預設應該是會在 `http://localhost:5500` 運行
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/02.webp)
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/03.webp)
+
+- 點擊 `Test API Call` 按鈕
+- 如果 CORS 未正確配置，你會在瀏覽器的`控制台`中看到一個錯誤
+  - 因為後端程式的設定是使用 `localhost` ，需要把它換成 `127.0.0.1` 或是再多一組設定
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/04.webp)
+
+- 如果 CORS 配置正確，你應該看到 `Hello from Spring Boot!` 顯示在頁面上
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/05.webp)
+
+![](/static/images/2024/ithome/30day-day31-spring-boot-cors/06.webp)
+
+通過這個簡單的測試，你可以直觀地看到 CORS 的作用
+
+- 當配置正確時，跨網域請求將順利進行
+- 如果配置不當，瀏覽器會阻止請求，保護資源不被未授權的來源訪問
+
+## 結論
+
+CORS 在現代網路應用開發中扮演著重要角色，它既保障了安全性，又提供了必要的靈活性
+
+通過 Spring Boot 的簡單配置，你可以輕鬆地實現 CORS，讓你的 API 能夠安全地與不同網域的應用程式進行通信
+
+記住，雖然 CORS 很有用，但也要謹慎使用，只允許必要的來源和方法，以確保你的 API 安全性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 31 跨來源資源共享（CORS）](https://ithelp.ithome.com.tw/articles/10349463)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://developer.mozilla.org/zh-TW/docs/Web/HTTP/CORS
+- https://docs.spring.io/spring-framework/reference/web/webmvc-cors.html
