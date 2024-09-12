@@ -1,0 +1,232 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 32 Spring Security 基礎"
+summary: "Spring Security 是一個功能豐富的安全框架，專門用於保護基於 Spring 的應用程式。本文介紹了 Spring Security 的基礎知識，包括身份驗證、授權、防護常見 Web 攻擊等主要功能。文章詳細說明了如何在 Spring Boot 中安裝和配置 Spring Security，並展示了預設設定、測試及 API 授權的實作方法。通過簡單配置，開發者可以為應用程式添加基本的安全防護"
+date: "2099-01-01"
+lastmod: "2099-01-01"
+tags: ['Spring Boot', 'Java', 'ithome2024', 'security']
+draft: true
+images: ["/static/images/2024/ithome/30day-day32-spring-security-basics/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/cover.webp)
+
+
+在現代 Web 開發中，安全性是一個不可忽視的重要議題
+
+`Spring Security` 作為 Spring 生態系統中的一員，為開發者提供了一套強大且靈活的安全解決方案
+
+讓我們一起來探索 Spring Security 的基礎知識，並了解如何在 Spring Boot 應用中實現基本的安全防護
+
+## 什麼是 Spring Security？
+
+Spring Security 是一個功能豐富的安全框架，專門用於保護以 Spring 為基礎的應用程式
+
+它提供了全面的安全服務，包括身份驗證、授權、防護常見的 Web 攻擊等
+
+### 主要功能
+
+- 身份驗證：支持多種驗證方式，如表單登入、基本驗證、OAuth 2.0 等
+- 授權：細粒度的存取控制，可以精確控制使用者對資源的存取權限
+- 防護常見攻擊：如跨站請求偽造（CSRF）、點擊劫持等
+- 整合性：與 Spring Boot、Spring MVC 等框架無縫整合
+
+### 限制
+
+- 學習曲線：對於初學者來說，可能需要一些時間來熟悉其概念和設定
+- 性能開銷：在某些情況下，可能會對應用性能造成輕微影響
+- 設定複雜：高度自定義時，設定可能變得複雜
+
+
+## 修改程式碼
+
+
+### 增加依賴
+
+可以利用 IDE 的功能，方便的加上 `Spring Security` 的依賴，預設會加上 `security` 和 `security-test` 這兩個依賴
+
+如果是自己手動新增的話，就看需不需要加上 test 那個
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/01.webp)
+
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-security'
+
+// 方便你在測試使用的 spring-security-test
+testImplementation 'org.springframework.security:spring-security-test'
+```
+
+### 預設設定
+
+安裝完 `Spring Security` 後，它會自動設定一些基本的安全設定
+
+- 所有 HTTP 端點都被保護，需要身份驗證
+- 產生一個預設的使用者名稱和隨機密碼
+- 提供一個基本的表單登入頁面
+- 啟用 CSRF 保護、XSS 保護等安全特性
+
+> 預設的情況之下是最安全的 (因為所有的端點都被保護)，在視使用者的需要，一步步的打開 (設定) 安全性  
+
+
+## 測試 Security
+
+### 執行應用程式
+
+安裝完後執行程式，應該可以在 `log` 中看到有關 `Security` 的相關訊息
+
+- 產生了一個預設的密碼：`3c24f6a4-bba8-4377-b3db-060ed6210976` 
+    - 而且下面的訊息會跟你說，產生的密碼僅供`開發`使用
+    - 要注意的是，這組密碼每次執行產生的都`不一樣` 
+
+- 已經設定了一個全站的 `AuthenticationManager`，並且使了一個 `inMemoryUserDetailsManager` 的 `UserDetailsService` 
+    - 基本上就是一個存放在記憶體的使用者管理
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/02.webp)
+
+### 預設登入畫面
+
+`Spring Security` 提供了一個基本 (預設) 的登入頁面
+
+當你存取任何受保護的資源 (頁面) 時，會自動導向到這個登入頁面
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/03.webp)
+
+可以使用預設的帳號和密碼就可以登入
+
+- 帳號預設為 `user` 
+- 密碼就是 `log` 裡面的預設密碼
+
+### Security Cookie 
+
+登入後在任一頁面查看 `Cookie` 的話，可以看到有一個 `session cookie` 
+
+它會記錄這次登入相關的資訊，把它刪掉的話，就會要求你登入了
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/04.webp)
+
+### API 測試
+
+如果使用先前的 `api-test.http` 來測試 API，就會出現 `401` 的狀況
+
+在回應的訊息裡面也有 `WWW-Authenticate: Base`，基本上就是告訴你需要使用 `HTTP Basic 認證` 
+
+而 `realm` 是用來標識和區分不同的受保護區域，讓使用者和瀏覽器知道，他們正在存取哪個特定的安全區域
+
+`Realm` 只是一個廣泛用的示例值
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/05.webp)
+
+而下面這三個，是 `Spring Security` 預設的安全相關的 HTTP Header，用於防止各種常見的 Web 攻擊
+
+```
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+X-Frame-Options: DENY
+```
+
+如果在 header 裡面有帶上 `HTTP Basic 認證` 的話，就可以拿到相對應的資料了
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/06.webp)
+
+## API 相關授權設定
+
+先建立一個 `SecurityConfig`，然後加上 `EnableMethodSecurity` 註解
+
+`EnableMethodSecurity` 預設啟用了 `@PreAuthorize`、`@PostAuthorize` 、 `@PreFilter` 和 `@PostFilter` 
+
+```java
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+}
+```
+
+在 API 上面，可以使用 `@PreAuthorize` 註解來控制方法級別 (API) 的存取
+
+以下面的 API 為例，角色必須是 `ADMIN` 才可以存取
+
+而系統預設的使用者是沒有 `Role` 的
+
+```java
+@RestController
+public class HelloController {
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/api/hello")
+    public String hello() {
+        return "Hello from Spring Boot!";
+    }
+}
+```
+
+直接使用預設的使用者呼叫 API 會取得 `Access Denied` 
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/07.webp)  
+
+
+可以寫一個 API 來取得現在登入者的`相關資訊`，可以看到 `Authorities` (`Role`) 的部分是空的
+
+```java
+@GetMapping("/authInfo")
+public String authInfo(Authentication auth) {
+
+    return "Authentication type: " + auth.getClass().getSimpleName()
+            + "\nName: " + auth.getName()
+            + "\nAuthorities: " + auth.getAuthorities()
+            + "\nDetails: " + auth.getDetails()
+            + "\nCredentials: " + auth.getCredentials()
+            + "\nPrincipal: " + auth.getPrincipal();
+}
+```
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/08.webp)  
+
+
+## 調整安全設定
+
+因為預設的使用者沒有 `Role` 可以設定
+
+我們可以簡單的使用 `application.properties` 來做一些 `Spring Security` 的設定
+
+下面我們設定了帳號、密碼和角色的部份
+
+```properties
+spring.security.user.name=cash
+spring.security.user.password=abc123!
+spring.security.user.roles=ADMIN
+```
+
+> 要注意的是，當你設定了 `user` 的 `password`的話，那程式就不會再自動產生一組預設的密碼了
+
+設定好之後，再取得一次相關的登入者訊息，可以看到 `Authorities` 有 `ROLE_ADMIN` 了
+
+> `Spring Security` 預設會給 `Role` 加上 `ROLE_` 的前綴
+> 
+> 不過在程式碼裡面，就只要寫 `ADMIN` 就好了
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/09.webp)  
+
+再一次呼叫 API，就可以拿到資料了
+
+![](/static/images/2024/ithome/30day-day32-spring-security-basics/10.webp)  
+
+## 結論
+
+Spring Security 為 Spring Boot 應用提供了強大的安全功能
+
+通過簡單的設定，你就可以為你的應用程式添加基本的安全防護
+
+隨著你對 Spring Security 的深入了解，你可以根據應用程式的具體需求進行更複雜的自訂設定
+
+下一篇文章我們將更深入的討論 Spring Security 的自定義設定
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 32 Spring Security 基礎]()
+  
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://spring.io/guides/gs/securing-web
+- https://docs.spring.io/spring-boot/reference/web/spring-security.html
+- https://docs.spring.io/spring-boot/how-to/security.html
+- https://docs.spring.io/spring-security/reference/getting-spring-security.html
