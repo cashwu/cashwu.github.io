@@ -1,0 +1,168 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 36 Spring Boot Actuator 監控與管理'
+summary: 'Spring Boot Actuator 是 Spring Boot 框架中的一個強大工具，提供即時監控和管理應用程式的多種功能。本文介紹了 Actuator 的用途，如健康檢查、指標收集、日誌管理和環境屬性查看。加入 Actuator 只需簡單設置依賴和配置檔案，並可利用 Spring Security 設定存取權限。本文還展示了如何自定義應用資訊及測試 Actuator API。Actuator 為開發和維護帶來極大便利，但在正式環境中需注意安全設定'
+date: '2024-10-06'
+lastmod: '2024-10-06'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'actuator']
+draft: true
+images: ['/static/images/2024/ithome/30day-day36-spring-boot-actuator/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/cover.webp)
+
+Spring Boot 已經讓我們的開發變得超級簡單，但你有沒有想過，如果能夠即時監控應用程式的狀態，那該有多好
+
+這就是 `Spring Boot Actuator` 的魔力所在！
+
+## 什麼是 Spring Boot Actuator
+
+`Spring Boot Actuator` 是 Spring Boot 框架中的一個子項目
+
+為應用程式提供了一系列的`監控`和`管理`功能
+
+這也是應用程式上線後，不可或缺的一環
+
+### Actuator 的用途
+
+- 健康檢查：隨時了解你的應用程式是否健康運行
+- 指標收集：收集各種運行時的指標，如記憶體使用、CPU 負載等
+- 日誌管理：動態調整日誌級別，無需重啟應用
+- 環境屬性：查看當前應用程式的相關設定
+
+### Actuator 的功能
+
+Actuator 提供了許多 HTTP 端點（endpoints），每個端點都負責特定的監控或管理功能
+
+例如
+
+- `/health`：顯示應用程式的健康狀態
+- `/metrics`：顯示各種應用指標
+- `/info`：顯示應用信息
+- `/env`：顯示環境變量
+
+> 因為 Actuator 的端點非常多，這裡只列出一些常見的端點，和一些相關的範例
+
+## 在 Spring Boot 中加入 Actuator
+
+### 增加依賴
+
+可以利用 IDE 的功能，方便的加上 `Spring Boot Actuator` 的依賴
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/01.webp)
+
+### 設定 Spring Security
+
+為了測試方便，這裡沒有設定任何存取限制。在實際上，應該要設定特定的`角色`才能存取
+
+```java
+// 這裡只列出 spring actuator 相關的程式碼，而不是全部的程式碼
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests((requests) -> requests
+        .requestMatchers("/actuator/**").permitAll()
+        // .requestMatchers("/actuator/**").hasRole("ADMIN")
+    );
+
+    return http.build();
+}
+```
+
+### 設定 application.properties
+
+```properties
+# 測試使用，可以全部打開看看
+management.endpoints.web.exposure.include=*
+# 實務上會根據需要打開
+#management.endpoints.web.exposure.include=health,info,metrics,env
+
+# 是不是要顯示完整的 health 資料
+management.endpoint.health.show-details=always
+
+# 是否啟用相關 info 資訊
+management.info.java.enabled=true
+management.info.os.enabled=true
+
+# 是否呈現相關 env 的內容
+# 測試使用，可以全部打開看看，在正式環境中，應謹慎使用此設定，以避免敏感資訊洩露
+management.endpoint.env.show-values=always
+```
+
+也可以使用程式碼來自定應用程式資訊 (`Info`) 的內容
+
+```java
+@Controller
+public class AppInfoContributor implements InfoContributor {
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("customInfo", getCustomInfo());
+    }
+
+    private Map<String, Object> getCustomInfo() {
+        Map<String, Object> customInfo = new HashMap<>();
+        customInfo.put("version", "1.0.0");
+        customInfo.put("description", "This is a custom info");
+        customInfo.put("author", "cash");
+        return customInfo;
+    }
+}
+```
+
+## 測試 Actuator API
+
+### /actuator 所有啟用的 actuator
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/02.webp)
+
+### /actuator/health 應用程式健康狀況
+
+沒有啟用 `show-details`
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/03.webp)
+
+有啟用 `show-details`
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/04.webp)
+
+### /actuator/info 應用程式資訊
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/05.webp)
+
+### /actuator/metrics 應用程式指標列表
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/06.webp)
+
+### /actuator/metrics/[name] 應用程式單一指標
+
+查看應用程式的單一指標，這裡以 `system.cpu.count` 為例
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/07.webp)
+
+### /actuator/env 查看環境變數
+
+沒有啟用 `show-values`
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/08.webp)
+
+有啟用 `show-values`
+
+![](/static/images/2024/ithome/30day-day36-spring-boot-actuator/09.webp)
+
+## 結論 
+
+Spring Boot Actuator 就像是為你的應用程式安裝了一個儀表板
+
+它讓你能夠實時監控和管理你的應用，大大提升了開發和維護的效率
+
+無論是在開發階段還是正式環境，Actuator 都是一個非常有用的工具
+
+在正式環境中，務必特別注意相關的存取安全性問題，以確保應用程式的安全性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 36 Spring Boot Actuator 監控與管理]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/reference/actuator/enabling.html
