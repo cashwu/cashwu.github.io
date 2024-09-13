@@ -112,6 +112,8 @@ user 呼叫`一般 API`也沒有問題
 
 而原本在 controller 的 `PreAuthorize` 註解，可以使用這裡的 `requestMatchers` 來取代
 
+> 這裡 securityFilterChain 的相關寫法，網路上或是 AI 的答案，蠻常都是舊版的寫法，要小心
+
 ```java
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -142,6 +144,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     return http.build();
 }
 ```
+
 ### 請求授權設定
 
 - `/` : 允許所有用戶存取
@@ -181,7 +184,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/06.webp)
 
 
-> 這裡 securityFilterChain 的相關寫法，網路上或是 AI 的答案，蠻常都是舊版的寫法，要小心
 
 ## 將使用者資料儲存到H2資料庫
 
