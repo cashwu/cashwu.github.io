@@ -1,0 +1,341 @@
+---
+layout: PostSimple
+title: "「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試"
+summary: "這篇文章詳細介紹了如何在 Spring Boot 應用程式中加入 Spring Security 後，調整測試程式碼以支援認證和授權。內容涵蓋了使用 spring-security-test 模擬認證和授權、處理 CSRF 保護，以及使用 Mock 物件進行測試。此外，文章還展示了如何修改相關的測試，並提供了具體的程式碼範例，確保應用程式的安全性和測試的完整性"
+date: "2024-10-04"
+lastmod: "2024-10-04"
+tags: ['Spring Boot', 'Java', 'ithome2024', 'security', 'test']
+draft: true
+images: ["/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp"]
+---
+
+![](/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp)
+
+
+因為加入了 `Spring Security`，所以我們需要調整相關的測試程式碼，來加入相關的認證和授權
+
+## spring-security-test
+
+### 主要用途
+
+- 模擬認證：允許你在測試中輕鬆模擬已認證的使用者
+- 模擬授權：讓你可以為測試設置特定的權限或角色
+- CSRF 支援：提供在測試中處理 CSRF（跨站請求偽造）保護的工具
+- 安全相關的 Mock 物件：提供一些模擬的安全相關物件，方便測試
+  
+
+### 常用的註解和方法
+
+#### @WithMockUser
+
+這是最常用的註解之一，用於模擬一個已認證的使用者
+
+你可以指定使用者名稱、角色，甚至是權限
+
+```java
+@Test
+@WithMockUser(username = "user", roles = "USER")
+// @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})  
+public void testUserAccess() {
+    // 測試程式碼
+}
+```
+
+#### @WithAnonymousUser
+
+用於模擬匿名使用者：
+
+```java
+@Test
+@WithAnonymousUser
+public void testAnonymousAccess() {
+    // 測試程式碼
+}
+```
+
+  
+
+#### @WithUserDetails
+
+如果你有自訂的 `UserDetailsService`，可以使用這個註解
+
+```java
+@Test
+@WithUserDetails("user@example.com")
+public void testWithUserDetails() {
+    // 測試程式碼
+}
+```
+
+  
+
+#### SecurityMockMvcRequestPostProcessors
+
+這個類別提供了一些有用的方法，特別是在使用 MockMvc 進行測試時
+
+  
+
+```java
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+```
+
+  
+
+這裡的 `csrf()` 方法會為請求添加一個有效的 `CSRF token` 
+
+  
+
+```
+@Test
+public void testWithCsrf() throws Exception {
+    mockMvc.perform(post("/api/data").with(csrf()))
+            .andExpect(status().isOk());
+}
+```
+
+  
+
+#### 使用 `RequestPostProcessor` 模擬使用者
+
+除了使用註解，你也可以在特定的請求中模擬使用者
+
+```java
+mockMvc.perform(get("/api/data").with(user("admin").roles("ADMIN")))
+        .andExpect(status().isOk());
+```
+
+## 修改 TodoController 測試
+
+在每個測試方法上加上 `@WithMockUser` 註解，模擬一個已登入的使用者。
+
+在 `POST`、`PUT` 和 `DELETE` 請求中，增加 `.with(csrf())` 來模擬 `CSRF token` 
+
+```java
+@WebMvcTest(TodoController.class)
+public class TodoControllerTest {
+
+    @Test
+    @WithMockUser(username = "user")
+    public void createTodo() throws Exception {
+        Todo todo = new Todo(null, "新待辦事項", false);
+        Todo savedTodo = new Todo(1L, "新待辦事項", false);
+
+        when(todoService.save(any(Todo.class))).thenReturn(savedTodo);
+
+        mockMvc.perform(post("/api/todos")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(todo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.title").value("新待辦事項"))
+                .andExpect(jsonPath("$.data.completed").value(false));
+
+        verify(todoService, times(1)).save(any(Todo.class));
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    public void getAllTodos() throws Exception {
+        // 測試內容保持不變
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    public void getTodo() throws Exception {
+        // 測試內容保持不變
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    public void updateTodo() throws Exception {
+        Todo updatedTodo = new Todo(1L, "更新的待辦事項", true);
+
+        when(todoService.updateTodo(eq(1L), any(Todo.class))).thenReturn(Optional.of(updatedTodo));
+
+        mockMvc.perform(put("/api/todos/1")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedTodo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.title").value("更新的待辦事項"))
+                .andExpect(jsonPath("$.data.completed").value(true));
+
+        verify(todoService, times(1)).updateTodo(eq(1L), any(Todo.class));
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    public void deleteTodo() throws Exception {
+        when(todoService.deleteTodo(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/todos/1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        verify(todoService, times(1)).deleteTodo(1L);
+    }
+}
+```
+
+## 修改 TodoEndToEnd 測試
+
+在 `setUp` 中建立一個測試的使用者
+
+在每個測試方法中，我們使用 REST Assured 提供的 `.auth().basic(username, password)` 來設定 HTTP 基本認證
+
+這會在每個請求的標頭中添加 `Authorization: Basic ...` 
+
+```java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:application-test.properties")
+public class TodoEndToEndTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private String username = "testuser";
+    private String password = "testpassword";
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        todoRepository.deleteAll();
+        userRepository.deleteAll();
+
+        // 建立測試用戶
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRoles("USER");
+        userRepository.save(user);
+    }
+
+    @Test
+    void createTodo() {
+        Todo newTodo = new Todo(null, "測試待辦事項", false);
+
+        given()
+            .auth().basic(username, password)
+            .contentType(ContentType.JSON)
+            .body(newTodo)
+        .when()
+            .post("/api/todos")
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data.title", equalTo("測試待辦事項"))
+            .body("data.completed", equalTo(false));
+
+        assertThat(todoRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void getAllTodos() {
+        Todo todo1 = new Todo(null, "測試待辦事項", false);
+        Todo todo2 = new Todo(null, "測試待辦事項2", true);
+        todoRepository.saveAll(Arrays.asList(todo1, todo2));
+
+        given()
+            .auth().basic(username, password)
+        .when()
+            .get("/api/todos")
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data", hasSize(2))
+            .body("data[0].title", equalTo("測試待辦事項"))
+            .body("data[0].completed", equalTo(false))
+            .body("data[1].title", equalTo("測試待辦事項2"))
+            .body("data[1].completed", equalTo(true));
+    }
+
+    @Test
+    void getTodo() {
+        Todo savedTodo = todoRepository.save(new Todo(null, "測試待辦事項", false));
+
+        given()
+            .auth().basic(username, password)
+        .when()
+            .get("/api/todos/{id}", savedTodo.getId())
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data.title", equalTo("測試待辦事項"))
+            .body("data.completed", equalTo(false));
+    }
+
+    @Test
+    void updateTodo() {
+        Todo savedTodo = todoRepository.save(new Todo(null, "原始待辦事項", false));
+        Todo updatedTodo = new Todo(savedTodo.getId(), "更新後的待辦事項", true);
+
+        given()
+            .auth().basic(username, password)
+            .contentType(ContentType.JSON)
+            .body(updatedTodo)
+        .when()
+            .put("/api/todos/{id}", savedTodo.getId())
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true))
+            .body("data.title", equalTo("更新後的待辦事項"))
+            .body("data.completed", equalTo(true));
+
+        Todo actualTodo = todoRepository.findById(savedTodo.getId()).orElseThrow();
+        assertThat(actualTodo.getTitle()).isEqualTo("更新後的待辦事項");
+        assertThat(actualTodo.isCompleted()).isTrue();
+    }
+
+    @Test
+    void deleteTodo() {
+        Todo savedTodo = todoRepository.save(new Todo(null, "要刪除的待辦事項", false));
+
+        given()
+            .auth().basic(username, password)
+        .when()
+            .delete("/api/todos/{id}", savedTodo.getId())
+        .then()
+            .statusCode(200)
+            .body("success", equalTo(true));
+
+        assertThat(todoRepository.findAll()).isEmpty();
+    }
+}
+```
+
+## 測試
+
+測試程式碼都修改完後，執行所有的測試，應該都是呈現`綠燈`
+
+![](/static/images/2024/ithome/30day-day34-spring-security-test/01.webp)
+
+
+## 結論
+
+在這篇文章中，我們深入探討了如何調整 Spring Boot 應用程式的測試，以適應加入 Spring Security 後的變化
+
+透過這些調整，我們不僅確保了應用程式的安全性，還保證了測試的完整性和有效性
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試]()
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+
+- https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html
+- https://docs.spring.io/spring-security/reference/servlet/test/method.html
+- https://github.com/rest-assured/rest-assured/wiki/Usage#basic-authentication
