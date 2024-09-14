@@ -1,16 +1,15 @@
 ---
 layout: PostSimple
-title: "「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試"
-summary: "這篇文章詳細介紹了如何在 Spring Boot 應用程式中加入 Spring Security 後，調整測試程式碼以支援認證和授權。內容涵蓋了使用 spring-security-test 模擬認證和授權、處理 CSRF 保護，以及使用 Mock 物件進行測試。此外，文章還展示了如何修改相關的測試，並提供了具體的程式碼範例，確保應用程式的安全性和測試的完整性"
-date: "2024-10-04"
-lastmod: "2024-10-04"
+title: '「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試'
+summary: '這篇文章詳細介紹了如何在 Spring Boot 應用程式中加入 Spring Security 後，調整測試程式碼以支援認證和授權。內容涵蓋了使用 spring-security-test 模擬認證和授權、處理 CSRF 保護，以及使用 Mock 物件進行測試。此外，文章還展示了如何修改相關的測試，並提供了具體的程式碼範例，確保應用程式的安全性和測試的完整性'
+date: '2024-10-04'
+lastmod: '2024-10-04'
 tags: ['Spring Boot', 'Java', 'ithome2024', 'security', 'test']
 draft: true
-images: ["/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp"]
+images: ['/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp']
 ---
 
 ![](/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp)
-
 
 因為加入了 `Spring Security`，所以我們需要調整相關的測試程式碼，來加入相關的認證和授權
 
@@ -22,7 +21,6 @@ images: ["/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp
 - 模擬授權：讓你可以為測試設置特定的權限或角色
 - CSRF 支援：提供在測試中處理 CSRF（跨站請求偽造）保護的工具
 - 安全相關的 Mock 物件：提供一些模擬的安全相關物件，方便測試
-  
 
 ### 常用的註解和方法
 
@@ -35,7 +33,7 @@ images: ["/static/images/2024/ithome/30day-day34-spring-security-test/cover.webp
 ```java
 @Test
 @WithMockUser(username = "user", roles = "USER")
-// @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})  
+// @WithMockUser(username = "admin", roles = {"USER", "ADMIN"})
 public void testUserAccess() {
     // 測試程式碼
 }
@@ -53,8 +51,6 @@ public void testAnonymousAccess() {
 }
 ```
 
-  
-
 #### @WithUserDetails
 
 如果你有自訂的 `UserDetailsService`，可以使用這個註解
@@ -67,23 +63,15 @@ public void testWithUserDetails() {
 }
 ```
 
-  
-
 #### SecurityMockMvcRequestPostProcessors
 
 這個類別提供了一些有用的方法，特別是在使用 MockMvc 進行測試時
-
-  
 
 ```java
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 ```
 
-  
-
-這裡的 `csrf()` 方法會為請求添加一個有效的 `CSRF token` 
-
-  
+這裡的 `csrf()` 方法會為請求添加一個有效的 `CSRF token`
 
 ```
 @Test
@@ -92,8 +80,6 @@ public void testWithCsrf() throws Exception {
             .andExpect(status().isOk());
 }
 ```
-
-  
 
 #### 使用 `RequestPostProcessor` 模擬使用者
 
@@ -108,7 +94,7 @@ mockMvc.perform(get("/api/data").with(user("admin").roles("ADMIN")))
 
 在每個測試方法上加上 `@WithMockUser` 註解，模擬一個已登入的使用者。
 
-在 `POST`、`PUT` 和 `DELETE` 請求中，增加 `.with(csrf())` 來模擬 `CSRF token` 
+在 `POST`、`PUT` 和 `DELETE` 請求中，增加 `.with(csrf())` 來模擬 `CSRF token`
 
 ```java
 @WebMvcTest(TodoController.class)
@@ -187,7 +173,7 @@ public class TodoControllerTest {
 
 在每個測試方法中，我們使用 REST Assured 提供的 `.auth().basic(username, password)` 來設定 HTTP 基本認證
 
-這會在每個請求的標頭中添加 `Authorization: Basic ...` 
+這會在每個請求的標頭中添加 `Authorization: Basic ...`
 
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -322,19 +308,17 @@ public class TodoEndToEndTest {
 
 ![](/static/images/2024/ithome/30day-day34-spring-security-test/01.webp)
 
-
 ## 結論
 
 在這篇文章中，我們深入探討了如何調整 Spring Boot 應用程式的測試，以適應加入 Spring Security 後的變化
 
 透過這些調整，我們不僅確保了應用程式的安全性，還保證了測試的完整性和有效性
 
-> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試]()
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 34 Spring Security 測試](https://ithelp.ithome.com.tw/articles/10350034)
 
 > 圖片來源：AI 產生
 
 ## 參考連結
-
 
 - https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html
 - https://docs.spring.io/spring-security/reference/servlet/test/method.html

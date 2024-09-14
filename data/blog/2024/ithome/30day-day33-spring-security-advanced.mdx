@@ -1,16 +1,15 @@
 ---
 layout: PostSimple
-title: "「Spring Boot API 開發：從 0 到 1」Day 33 Spring Security 進階"
-summary: "這篇文章深入探討了如何使用程式碼來自訂 Spring Security 的安全設定，包括記憶體中使用者資料的設定、密碼編碼、HTTP 請求授權設定，以及將使用者資料儲存到 H2 資料庫中。文章詳細介紹了如何使用 BCryptPasswordEncoder 來安全地儲存密碼，並展示了如何自訂 UserDetailsService 和配置 HttpSecurity 以實現更靈活的 API 端點存取控制。此外，還提供了在使用 Spring Security 後，如何安全地存取 H2 console 的相關設定。這些進階設定使應用程式更加安全和可擴展"
-date: "2024-10-03"
-lastmod: "2024-10-03"
+title: '「Spring Boot API 開發：從 0 到 1」Day 33 Spring Security 進階'
+summary: '這篇文章深入探討了如何使用程式碼來自訂 Spring Security 的安全設定，包括記憶體中使用者資料的設定、密碼編碼、HTTP 請求授權設定，以及將使用者資料儲存到 H2 資料庫中。文章詳細介紹了如何使用 BCryptPasswordEncoder 來安全地儲存密碼，並展示了如何自訂 UserDetailsService 和配置 HttpSecurity 以實現更靈活的 API 端點存取控制。此外，還提供了在使用 Spring Security 後，如何安全地存取 H2 console 的相關設定。這些進階設定使應用程式更加安全和可擴展'
+date: '2024-10-03'
+lastmod: '2024-10-03'
 tags: ['Spring Boot', 'Java', 'ithome2024', 'security']
 draft: true
-images: ["/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.webp"]
+images: ['/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.webp']
 ---
 
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.webp)
-
 
 在上一篇文章中，我們介紹了 Spring Security 的基礎知識
 
@@ -18,9 +17,9 @@ images: ["/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.
 
 ## 自訂記憶體中的使用者資料
 
-移除 `application.properties` 裡面的 `spring.security.user` 相關設定 
+移除 `application.properties` 裡面的 `spring.security.user` 相關設定
 
-修改原本的 `SecurityConfig`，加上 `UserDetailsService` 和 `PasswordEncoder` 兩個 `bean` 
+修改原本的 `SecurityConfig`，加上 `UserDetailsService` 和 `PasswordEncoder` 兩個 `bean`
 
 ```java
 @Configuration
@@ -76,21 +75,22 @@ public class SecurityConfig {
 > 注意：這僅為說明目的，實際應用中絕對不要將密碼記錄在 Log 中  
 > (很重要，要說三次）
 
-
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/01.webp)
 
 預設產生的密碼，由`$`分隔成了三個部份
 
 - 演算法標識
-    - `2a`  這表示 BCrypt 的版本
+
+  - `2a`  這表示 BCrypt 的版本
 
 - 成本因子（cost factor）
-    - `10`  也稱為工作因子（work factor）
-    - 它決定了雜湊的迭代次數，這裡是 2^10 = 1024 次
-    - 數字越大，計算雜湊所需的時間就越長，安全性更高，但同時也會增加系統負擔
+
+  - `10`  也稱為工作因子（work factor）
+  - 它決定了雜湊的迭代次數，這裡是 2^10 = 1024 次
+  - 數字越大，計算雜湊所需的時間就越長，安全性更高，但同時也會增加系統負擔
 
 - 鹽值和雜湊值
-    - 剩餘部分包含了 `salt` (加鹽）和實際雜湊後的值
+  - 剩餘部分包含了 `salt` (加鹽）和實際雜湊後的值
 
 ### 測試
 
@@ -98,7 +98,7 @@ public class SecurityConfig {
 
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/02.webp)
 
-如果用 user 呼叫，則會發生 `Access Denied` 
+如果用 user 呼叫，則會發生 `Access Denied`
 
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/03.webp)
 
@@ -162,14 +162,14 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
 ### 登入設定
 
-- 自訂登入頁面路徑為 `/login` 
+- 自訂登入頁面路徑為 `/login`
 - 處理登入請求的 URL 為 `/perform_login`
 - 登入成功後預設導向到 `/`
 - 允許所有使用者存取登入功能
 
 ### 登出設定
 
-- 登出請求的 URL 為 `/perform_logout` 
+- 登出請求的 URL 為 `/perform_logout`
 - 登出成功後導向到 `/`
 - 允許所有使用者存取登出功能
 
@@ -182,8 +182,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 設定完，點選前面的 `盾牌` 就可以看到這個 `Matchers` 下面所有的端點
 
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/06.webp)
-
-
 
 ## 將使用者資料儲存到H2資料庫
 
@@ -219,7 +217,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 }
 ```
-在 `application.properties` 裡面設定 JPA 的 `ddl 操作` 
+
+在 `application.properties` 裡面設定 JPA 的 `ddl 操作`
 
 ```properties
 # 每次應用程式啟動，自動建立 table (先刪除後新增)
@@ -268,8 +267,7 @@ public class DatabaseInitializer {
 
 ![](/static/images/2024/ithome/30day-day33-spring-security-advanced/07.webp)
 
-
-建立自訂義的 `UserDetailsService` 
+建立自訂義的 `UserDetailsService`
 
 並且 `override``loadUserByUsername` 這個方法，讓使用者登入的時候呼叫使用
 
@@ -303,22 +301,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 log 也可以看的到，目前的 `UserDetailsService` 是使用 `⁠CustomUserDetailsService`
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/08.webp)  
+![](/static/images/2024/ithome/30day-day33-spring-security-advanced/08.webp)
 
 這樣子 `API` 在使用`基本認證`的時候，就會呼叫 `loadUserByUsername` 這個方法
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/09.webp)  
+![](/static/images/2024/ithome/30day-day33-spring-security-advanced/09.webp)
 
 > 這裡因為範例講解的方便性，直接把使用者寫到資料庫內，所以沒有處理註冊相關的問題  
-> 實務上，還需要有使用者註冊的 API 
+> 實務上，還需要有使用者註冊的 API
 
-## 同場加映：H2 console 的安全存取  
+## 同場加映：H2 console 的安全存取
 
 如果使用了 `Spring Security` 之後，要存取 `H2 console` 的話
 
-要注意下面的相關設定，這樣子才可以存取 `H2 console` 
+要注意下面的相關設定，這樣子才可以存取 `H2 console`
 
-- 需要禁用 `CSRF` 
+- 需要禁用 `CSRF`
 
 ```java
 csrf(AbstractHttpConfigurer::disable)
@@ -330,7 +328,7 @@ csrf(AbstractHttpConfigurer::disable)
 requestMatchers("/h2-console/**").permitAll()
 ```
 
-- 需要設定 `frame` 為 `sameOrigin` 
+- 需要設定 `frame` 為 `sameOrigin`
 
 ```java
 headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
@@ -344,12 +342,11 @@ headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sa
 
 這些改進使得我們的應用程式更加健壯和可擴展
 
-
 在實際的生產環境中，你可能需要考慮更多的安全措施，如使用 HTTPS、實施更複雜的密碼策略、添加多因素認證等
 
 Spring Security 提供了豐富的功能來滿足各種安全需求，你可以根據具體的專案需求進行進一步的自訂和優化
 
-> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 33 Spring Security 進階]()
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 33 Spring Security 進階](https://ithelp.ithome.com.tw/articles/10350012)
 
 > 圖片來源：AI 產生
 
