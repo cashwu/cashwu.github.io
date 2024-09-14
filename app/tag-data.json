@@ -1,9 +1,10 @@
 {
   "mindset": 1,
   "rider": 8,
-  "spring-boot": 38,
-  "java": 44,
-  "ithome2024": 36,
+  "spring-boot": 39,
+  "java": 45,
+  "ithome2024": 37,
+  "deployment": 1,
   "actuator": 1,
   "security": 5,
   "jwt": 2,

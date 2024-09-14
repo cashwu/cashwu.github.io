@@ -1,0 +1,223 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 37 部署 Spring Boot'
+summary: '這篇文章詳細介紹了如何將 Spring Boot 應用程式部署到正式環境，包括建立可執行的 JAR 檔、使用 Docker 容器化應用程式，以及透過 Zeabur 平台進行雲端部署。文章首先說明了如何使用 Gradle 或 IDE 生成 JAR 檔，接著介紹如何撰寫 Dockerfile 並建立 Docker Image，最後展示了在 Zeabur 平台上快速部署應用程式的步驟。這些方法各具優勢，開發者可以依據專案需求選擇最適合的部署方式，輕鬆將 Spring Boot 應用程式上線'
+date: '2024-10-07'
+lastmod: '2024-10-07'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'deployment']
+draft: true
+images: ['/static/images/2024/ithome/30day-day37-deploying-spring-boot/cover.webp']
+---
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/cover.webp)
+
+Spring Boot 應用程式也算是開發的差不多了
+
+現在是時候把它發佈到正式環境了，這篇文章就來看看，應該要怎麼做
+
+## 建立 JAR 檔
+
+### 指令方式
+
+使用 `Gradle` 的話，只要在 `專案根目錄` 執行以下指令
+
+Gradle 就會建立一個 `可執行的 JAR 檔` ，這個 JAR 檔會包含你的應用程式和所有必要的依賴
+
+```bash
+./gradlew bootJar
+```
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/01.webp)
+
+在 `build/libs` 的目錄下，就會產生一個 JAR 檔
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/02.webp)
+
+### IDE 方式
+
+如果不想打指令的話，也可以在 Gradle 的視窗，找到 `Tasks > build > bootJar`，在上面點兩下
+
+一樣會產生 JAR 檔在 `build/libs` 的目錄下
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/03.webp)
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/04.webp)
+
+## 執行 JAR 檔
+
+在根目錄下面，執行以下的指令，就可以把應用程式跑起來了
+
+```bash
+java -jar build/libs/todolist-0.0.1-SNAPSHOT.jar
+```
+
+預設一樣是在 `8080` port，可以開瀏覽器來確認看看
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/05.webp)
+
+## 建立 Docker Image
+
+### 使用 Docker 封裝 JAR 檔
+
+在專案根目錄建立一個名為 Dockerfile 的檔案，內容如下
+
+```dockerfile
+# 使用 OpenJDK 17 作為 base Image
+FROM openjdk:17-jdk-slim
+
+# 設置工作目錄
+WORKDIR /app
+
+# 把 build 完的 JAR 檔，複製到 container 裡面，改名成 app.jar
+COPY build/libs/*.jar app.jar
+
+# 暴露應用程序的 port（假設使用 8080 port）
+EXPOSE 8080
+
+# 運行 JAR 文件
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+在根目錄下面，執行指令，就會建立一個 docker Image
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/06.webp)
+
+可以查看 Image 是不是有建立
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/07.webp)
+
+執行 todoapp Image，可以查看一下，是否有成功執行
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/08.webp)
+
+打開瀏覽器，瀏覽 `8080` port，應該是可以成功的看到畫面
+
+### 讓 Docker 也負責建立 JAR 檔
+
+我們把 build 成 JAR 檔的工作，也交由 Docker 來執行
+
+修改原本的 `Dockfile`，分成兩個階段 build JAR 檔 和 建立 Image
+
+```dockerfile
+# 第一階段： build App
+
+# 使用 gradle 8.10 版本的 JDK 17 Image
+FROM gradle:8.10-jdk17 AS build
+
+# 設置工作目錄
+WORKDIR /app
+
+# 複製相關的檔案
+COPY build.gradle settings.gradle ./
+COPY src ./src
+
+# gradle build
+RUN gradle build --no-daemon
+
+# 第二階段：建立運行時 Image
+
+# 使用 OpenJDK 17 作為 base Image
+FROM openjdk:17-jdk-slim
+
+# 設置工作目錄
+WORKDIR /app
+
+# 把 build 完的 JAR 檔，複製到 container 裡面，改名成 app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
+
+# 暴露應用程序的 port（假設使用 8080 port）
+EXPOSE 8080
+
+# 運行 JAR 文件
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+重新建立 Image 的 2.0 版本
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/09.webp)
+
+可以查看 Image 是不是有建立 2.0 的版本
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/10.webp)
+
+執行 todoapp Image 2.0 版本，可以查看一下，是否有成功執行
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/11.webp)
+
+打開瀏覽器，瀏覽 `8080` port，應該是可以成功的看到畫面
+
+## 同場加映：使用 Zeabur 部署應用程式
+
+[Zeabur](https://zeabur.com) 是一個簡單好用的部署平台
+
+基本上只要點選幾下，幾分鐘後就可以上線一個應用程式
+
+下面來看如何在 Zeabur 部署一個 Spring Boot 應用程式
+
+在 `Dashboard` 點選 `New Project`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/12.webp)
+
+選擇一個專案的所在區域，這裡使用 `Tokyo, Japan`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/13.webp)
+
+選擇部署的方式，這裡使用 `Github`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/14.webp)
+
+選擇一個 Github 的 repo ，這裡當然是選我們的 `Todo 應用程式`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/15.webp)
+
+如果它在目錄裡面偵測到 `Dockerfile`，就會顯示使用 `Docker`，然後按 `Deploy` 部署
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/16.webp)
+
+可以在專案 `Deployments` 裡面有一個 `Building` 正在進行，點選看一下 `Build Logs`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/17.webp)
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/18.webp)
+
+等到 Build 完後，就會自動切到 `Runtime Logs`，就可以看到有相關的 Spring Boot log
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/19.webp)
+
+回到專案的頁面，選選 `Networking` 的選單
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/20.webp)
+
+建立一個自定義的 `Domain`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/21.webp)
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/22.webp)
+
+確認新增後，就可以在專案上面看到相關的 `Domain 資訊`
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/23.webp)
+
+把 `api-test.http` 裡面的 `Domain` 換成 `Zeabur` 的 `Domain` 就可以來測試了
+
+可以看到 API 都可以正常呼叫
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/24.webp)
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/25.webp)
+
+![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/26.webp)
+
+## 結論
+
+介紹了發佈 Spring Boot 應用程式的多種方法，包括建立 JAR 檔、使用 Docker 容器化，以及透過 Zeabur 平台進行雲端部署
+
+這些方法各有優勢，開發者可以根據專案需求選擇最適合的方式，輕鬆將 Spring Boot 應用程式部署到生產環境中
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 37 部署 Spring Boot](https://ithelp.ithome.com.tw/articles/10350618)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://docs.spring.io/spring-boot/how-to/deployment/index.html
