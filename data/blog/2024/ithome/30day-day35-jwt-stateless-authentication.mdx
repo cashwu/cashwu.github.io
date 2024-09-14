@@ -263,7 +263,7 @@ public class AuthController {
 }
 ```
 
-## 測試
+## 測試 API
 
 全部完成後，就可以呼叫 API 來測試
 
@@ -281,6 +281,66 @@ public class AuthController {
 
 ![](/static/images/2024/ithome/30day-day35-jwt-stateless-authentication/03.webp)
 
+## 同場加映：修改測試程式碼支援 JWT
+
+### TodoEndToEnd Test
+
+寫一個 `getJwtToken` 的方法，來實際取得 `JWT`
+
+然後在 `BeforeEach` 的時候，把它設定為 `全局變數`，每一個測試就可以用到了
+
+```java
+public class TodoEndToEndTest {
+
+    // 這裡只列出 JWT 相關的程式碼，而不是全部的程式碼
+
+    @BeforeEach
+    void setUp() {
+
+        // 獲取 JWT Token 並設置為全局變數
+        String token = getJwtToken();
+        RestAssured.requestSpecification = given()
+                .header(new Header("Authorization", "Bearer " + token));
+    }
+
+    // 新增一個方法來獲取 JWT Token
+    private String getJwtToken() {
+
+        return given()
+                .contentType(ContentType.JSON)
+                .body(new AuthenticationRequest(username, password))
+                .when()
+                .post("/api/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("data.jwt");
+    }
+}
+```
+
+### TodoController Test
+
+因為我們加入了 `JwtRequestFilter` ，在使用 `MockMvc` 來執行測試的話，會說找不到 `JwtRequestFilter`
+
+必須要把它相關使用到的`類別`給`顯示 Import` 進來
+
+另外，因為 `UserRepository` 它是 interface，需要用 `MockBean` 的方式
+
+```java
+// 這裡只列出 JWT 相關的程式碼，而不是全部的程式碼
+
+@WebMvcTest(TodoController.class)
+@Import({JwtRequestFilter.class, CustomUserDetailsService.class, JwtService.class})
+public class TodoControllerTest {
+
+    @MockBean
+    private UserRepository userRepository;
+}
+```
+
+這樣子修改完，測試就又可以動了 XD
+
 ## 結論
 
 通過實現 JWT，我們成功地為我們的 API 添加了一個無狀態的身份驗證系統
@@ -295,7 +355,7 @@ public class AuthController {
 - 實現 JWT 刷新機制
 - 處理 JWT 撤銷
 
-> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 35 JWT 實現無狀態身份驗證]()
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 35 JWT 實現無狀態身份驗證](https://ithelp.ithome.com.tw/articles/10350123)
 
 > 圖片來源：AI 產生
 
