@@ -8,8 +8,8 @@ const siteMetadata = {
   theme: 'dark', // system, dark or light
   siteUrl: 'https://blog.cashwu.com',
   siteRepo: 'https://github.com/cashwu/cashwu.github.io',
-  siteLogo: `${process.env.BASE_PATH || ''}/static/images/avatar.png`,
-  socialBanner: `${process.env.BASE_PATH || ''}/static/images/cover.webp`,
+  siteLogo: 'https://image.cashwu.com/avatar.png',
+  socialBanner: 'https://image.cashwu.com/cover.webp',
   mastodon: '',
   email: 'cashwugeek@icloud.com',
   github: 'https://github.com/cashwu',
