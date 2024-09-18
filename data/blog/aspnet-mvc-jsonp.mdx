@@ -12,7 +12,7 @@ layout: PostSimple
 
 先來看在 asp.net mvc 的 Jsonp 要怎麼寫
 
-![](/static/images/2013/aspnet-mvc-jsonp/01.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/01.webp)
 
 寫一個自定的 `JsonpResult` 繼承 `JsonResult` 並且 `override ExecuteResult`
 
@@ -24,7 +24,7 @@ layout: PostSimple
 
 ---
 
-![](/static/images/2013/aspnet-mvc-jsonp/02.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/02.webp)
 
 `Controller` 的話就很簡單
 
@@ -34,23 +34,23 @@ layout: PostSimple
 
 先測試一下在網址傳入 `tc = 123` 是否有正確的返回
 
-![](/static/images/2013/aspnet-mvc-jsonp/03.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/03.webp)
 
 多傳入 `callback = cashcall` 回傳就變成 Jsonp 的格式
 
-![](/static/images/2013/aspnet-mvc-jsonp/04.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/04.webp)
 
 ---
 
 不過一般是用 jQuery Ajax 呼叫，所以下面改用 Chrome 的 `console` 來作測試
 
-![](/static/images/2013/aspnet-mvc-jsonp/05.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/05.webp)
 
 先找一個有 jQuery 的網頁，用 `jQuery.ajax` 來呼叫前面寫好的網頁
 
 會出現 `No Access-Control-Allow-Origin` 的錯誤
 
-![](/static/images/2013/aspnet-mvc-jsonp/06.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/06.webp)
 
 這個時候就改用 jsonp 的方式呼叫
 
@@ -60,9 +60,9 @@ layout: PostSimple
 
 下面是執行時的情況
 
-![](/static/images/2013/aspnet-mvc-jsonp/07.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/07.webp)
 
-![](/static/images/2013/aspnet-mvc-jsonp/08.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/08.webp)
 
 dataType 指定為 `jsonp` 時，jQuery 會自已產生出 `callback`
 
@@ -74,9 +74,9 @@ dataType 指定為 `jsonp` 時，jQuery 會自已產生出 `callback`
 
 callback 就會換成自定義的名稱了
 
-![](/static/images/2013/aspnet-mvc-jsonp/09.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/09.webp)
 
-![](/static/images/2013/aspnet-mvc-jsonp/10.webp)
+![](https://image.cashwu.com/2013/aspnet-mvc-jsonp/10.webp)
 
 ---
 
