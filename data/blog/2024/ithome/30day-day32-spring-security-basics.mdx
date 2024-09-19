@@ -9,7 +9,7 @@ draft: true
 images: ['/static/images/2024/ithome/30day-day32-spring-security-basics/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/cover.webp)
 
 在現代 Web 開發中，安全性是一個不可忽視的重要議題
 
@@ -44,7 +44,7 @@ Spring Security 是一個功能豐富的安全框架，專門用於保護以 Spr
 
 如果是自己手動新增的話，就看需不需要加上 test 那個
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/01.webp)
 
 ```groovy
 implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -78,7 +78,7 @@ testImplementation 'org.springframework.security:spring-security-test'
 - 已經設定了一個全站的 `AuthenticationManager`，並且使了一個 `inMemoryUserDetailsManager` 的 `UserDetailsService`
   - 基本上就是一個存放在記憶體的使用者管理
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/02.webp)
 
 ### 預設登入畫面
 
@@ -86,7 +86,7 @@ testImplementation 'org.springframework.security:spring-security-test'
 
 當你存取任何受保護的資源 (頁面) 時，會自動導向到這個登入頁面
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/03.webp)
 
 可以使用預設的帳號和密碼就可以登入
 
@@ -99,7 +99,7 @@ testImplementation 'org.springframework.security:spring-security-test'
 
 它會記錄這次登入相關的資訊，把它刪掉的話，就會要求你登入了
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/04.webp)
 
 ### API 測試
 
@@ -111,7 +111,7 @@ testImplementation 'org.springframework.security:spring-security-test'
 
 `Realm` 只是一個廣泛用的示例值
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/05.webp)
 
 而下面這三個，是 `Spring Security` 預設的安全相關的 HTTP Header，用於防止各種常見的 Web 攻擊
 
@@ -123,7 +123,7 @@ X-Frame-Options: DENY
 
 如果在 header 裡面有帶上 `HTTP Basic 認證` 的話，就可以拿到相對應的資料了
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/06.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/06.webp)
 
 ## API 相關授權設定
 
@@ -158,7 +158,7 @@ public class HelloController {
 
 直接使用預設的使用者呼叫 API 會取得 `Access Denied`
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/07.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/07.webp)
 
 可以寫一個 API 來取得現在登入者的`相關資訊`，可以看到 `Authorities` (`Role`) 的部分是空的
 
@@ -175,7 +175,7 @@ public String authInfo(Authentication auth) {
 }
 ```
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/08.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/08.webp)
 
 ## 調整安全設定
 
@@ -199,11 +199,11 @@ spring.security.user.roles=ADMIN
 >
 > 不過在程式碼裡面，就只要寫 `ADMIN` 就好了
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/09.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/09.webp)
 
 再一次呼叫 API，就可以拿到資料了
 
-![](/static/images/2024/ithome/30day-day32-spring-security-basics/10.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day32-spring-security-basics/10.webp)
 
 ## 結論
 

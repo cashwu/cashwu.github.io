@@ -9,7 +9,7 @@ draft: false
 images: ['/static/images/2024/nextjs-environment-variables-cloudflare-pages/cover.webp']
 ---
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/cover.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/cover.webp)
 
 你是否曾經為了在不同環境中管理各種設定而頭痛不已？
 
@@ -67,7 +67,7 @@ Next.js 會自動根據你的運行環境選擇正確的設定檔，就像是有
 
 1. 登入 Cloudflare 儀表板，進入到你的 Pages 專案，點擊 `設定`，然後選擇 `環境變數`
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/01.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/01.webp)
 
 2. 點擊 `新增變數` 按鈕，就可以輸入你的變數名稱和值，填完後點擊 `加密` 按鈕
 
@@ -75,29 +75,29 @@ Next.js 會自動根據你的運行環境選擇正確的設定檔，就像是有
 
 > 另外，要注意的是，設定後要等到下次 deploy 才會生效
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/02.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/02.webp)
 
 3. 加密後，畫面上就會提示你，儲存後就看不到這個變數值了，要注意
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/03.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/03.webp)
 
 4. 儲存後，變數值就變成 `Value encrypted` 了，就算按 `編輯變數` 也看不到，只有刪除的功能
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/04.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/04.webp)
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/05.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/05.webp)
 
 5. 可以比較一下，dashboard 新增環境變數的前後，在 `部署詳細資料` 頁面中的差異
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/06.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/06.webp)
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/07.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/07.webp)
 
 6. 另外一個比較 ~雷~ 奇怪的地方是，如果環境變數是在瀏覽器中使用 (也就是有 `NEXT_PUBLIC_` 前綴的)，在 deploy 時，`Cloudflare` 會自動把 `.env` 裡面的環境變數，在畫面上換成固定的值 ...
 
 > 不確定這個行為到底是 `Next.js` 的問題，還是 `Cloudflare` 的問題，這裡我試了蠻久的
 
-![](/static/images/2024/nextjs-environment-variables-cloudflare-pages/08.webp)
+![](https://image.cashwu.com/2024/nextjs-environment-variables-cloudflare-pages/08.webp)
 
 更深入的 `Cloudflare Pages` 設定，可以參考 [Cloudflare Pages Configuration 官方文件](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)
 

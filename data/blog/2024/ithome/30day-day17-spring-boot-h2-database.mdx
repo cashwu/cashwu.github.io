@@ -9,7 +9,7 @@ draft: false
 images: ['/static/images/2024/ithome/30day-day17-spring-boot-h2-database/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/cover.webp)
 
 在開發過程中，我們經常需要一個輕量級的資料庫來快速驗證想法或進行原型開發
 
@@ -46,9 +46,9 @@ H2 資料庫支持多種運行模式
 
 這個視窗和一開始建立專案時的視窗是一樣的
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/01.webp)
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/02.webp)
 
 選完後，`build.gradle` 會自動幫我們新增相關的依賴
 
@@ -72,15 +72,15 @@ spring.h2.console.enabled=true
 
 預設使用 `jdbc:h2:~/test` 就可以連接到 db，可以點 `測試連結` 確認是可以連結上的
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/05.webp)
 
 為了測試方便，這裡使用了 `Embedded (Local) Database` 的方式，它會將 test DB 檔案儲存在根目錄 `~/` 下
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/04.webp)
 
 點連接的話，就會到預設的管理介面
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/06.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/06.webp)
 
 ### 修改程式碼
 
@@ -234,7 +234,7 @@ public class TodoController {
 
 也可以使用 `/h2-console` 來看一下資料有沒有正確寫入
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/07.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/07.webp)
 
 ## H2 資料庫配置
 
@@ -339,7 +339,7 @@ public class DatabaseInitializer {
 
 另外，可以看到 log 裡面也有成功的訊息
 
-![](/static/images/2024/ithome/30day-day17-spring-boot-h2-database/08.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day17-spring-boot-h2-database/08.webp)
 
 > 實務上的話，會使用 flyway 或是 liquibase 這種專門的工具來管理 DB 的 schema 變化
 

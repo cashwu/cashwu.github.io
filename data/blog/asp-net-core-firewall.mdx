@@ -31,7 +31,7 @@ app.UseFirewall(rule);
 
 - 設定完了之後基本上所有的連線都是 403 絕拒連線的 (如下圖)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 如果是把網站放在 `Nginx` 後面作反向代理的話，記得在啟用 Firewall 之前加入 Forwarded 的設定
   - Forwarded 內建的所有 Header
@@ -87,11 +87,11 @@ var rule = FirewallRulesEngine.DenyAllAccess()
 
 - 可以連線的情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 拒絕連線的情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 設定 IP Rang
 
@@ -112,7 +112,7 @@ var rule = FirewallRulesEngine.DenyAllAccess()
 
 - 可以連線的情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 設定國家
 
@@ -133,28 +133,28 @@ var rule = FirewallRulesEngine.DenyAllAccess()
 
 - 在 local 測試的話，它會直接把 private IP 拿去查詢，然後查詢不到就直接拒絕連線
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 為了測試，只好把程式碼上傳到 DigitalOcean 的主機測試
   - 查詢出來的結果是 `Taiwan`，因為我設定的是 `Japan` 所以就拒絕連線了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 使用 VPN [Hotspot Shield](https://www.hotspotshield.com/) 設定 `Japan` 連線
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 結果被偵測到 `Hong Kong`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 後來 VPN 改用 `Hong Kong`，就被偵測到 `Japan`，這個誤差實在有點大
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 把 IP 拿去 [GeoIP2](https://www.maxmind.com/en/geoip-demo) 官網查詢的結果也是 `Japan`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 在使用國家時，請注意到它是有誤差的，不然就要換成自己的服務
 
@@ -172,7 +172,7 @@ var rule = FirewallRulesEngine.DenyAllAccess()
 
 - 可以看到 IP Rang 規則通過就過了，不會在執行 IP 的規則
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 把 IP 和 IP Rang 的順序顛倒
 
@@ -184,7 +184,7 @@ var rule = FirewallRulesEngine.DenyAllAccess()
 
 - 可以看到 IP 的規則沒通過，會在執行下一個 IP Rang 的規則
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 

@@ -12,7 +12,7 @@ images:
   ]
 ---
 
-![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day07-application-properties-multi-environment-configuration/cover.webp)
 
 上次我們談到了相關的 application.properties 設定，而今天我們要來聊聊 Spring Boot 中的 Profile 機制
 
@@ -103,7 +103,7 @@ public class TodolistApplication {
 
 > 運行時就可以看到有相關的 Profile 被啟用的 log
 
-![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day07-application-properties-multi-environment-configuration/02.webp)
 
 - 通過命令行參數：
 
@@ -113,7 +113,7 @@ java -jar todolist-0.0.1-SNAPSHOT.jar --spring.profiles.active=uat
 
 > 在 `IntelliJ IDEA` 中，可以很方便的在啟動的 configuration 中設定，指定要啟用的 Profile
 
-![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day07-application-properties-multi-environment-configuration/03.webp)
 
 - 通過環境變量：
 
@@ -124,13 +124,13 @@ java -jar todolist-0.0.1-SNAPSHOT.jar
 
 > 如果沒有啟用任何 Profile 時，Spring Boot 會使用名為 `default` 的 Profile。
 
-![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day07-application-properties-multi-environment-configuration/01.webp)
 
 ### 多 Profile 啟用
 
 假設我們同時啟用了 `dev` 和 `uat` Profile
 
-![](/static/images/2024/ithome/30day-day07-application-properties-multi-environment-configuration/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day07-application-properties-multi-environment-configuration/04.webp)
 
 ```bash
 spring.profiles.active=uat,dev

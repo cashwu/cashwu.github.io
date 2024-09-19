@@ -16,7 +16,7 @@ layout: PostSimple
 
 - 有一個 data 的 Table，`type` 和 `user` 為 `jsonb`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 欄位名叫 `user` 會跟內建的 `user` 相衝，在實務上使用的話應該避免
 
@@ -63,7 +63,7 @@ public class Data
 
 - 執行結果，把 DB 的資料變成 string 輸出了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 不過拿到字串的話，在程式還需要在轉換一次才方便使用，所以我們可以使用前面[文章](/blog/ef-core-value-converter)有提過的 `Value Converter` 來 mapping 成強型別
 
@@ -121,7 +121,7 @@ public class User
 - 執行結果
   - 可以看到已經轉成強型別了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 同場加映，使用 Sql Command
 
@@ -135,7 +135,7 @@ var data = _dbContext.Data.FromSql($"select * from data where data.user->>'Id' =
 
 - 執行結果
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 

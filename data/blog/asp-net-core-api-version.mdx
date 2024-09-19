@@ -64,11 +64,11 @@ public class Value2Controller : ControllerBase
 
 - 因為有預設值的設定，所以如果瀏覽 `api/values` 時，都會進到 `Value1Controller` 裡面
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 因為有設定 `ReportApiVersions`，所以看 Response 的 Header 就會看到有 `api-supported-versions`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 路由 Version
 
@@ -92,7 +92,7 @@ public class Value2Controller : ControllerBase
 
 - 修改後原本的路由就沒有用了，需要多傳 Version，這樣子就可以作到控制版本了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 淘汰 Version
 
@@ -108,4 +108,4 @@ public class Value1Controller : ControllerBase
 
 - 這樣子不管是用 1.0 還是 2.0，都會出現 `api-deprecated-versions` 和 `api-supported-versions` 跟你說目前的版本和要棄用的版本
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)

@@ -19,24 +19,24 @@ layout: PostSimple
 
 1、先建立一個 jQuery 的 `Controller`，each 的 `Action`，順便新增 `View`
 
-![](/static/images/2014/aspnet-mvc-route-02/01.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/01.webp)
 
 2、原本預設的 `Route` 設定可以符合所有的條件，所以我們新增的要放在它的上面，
 先建立可以符合 `jQuery.each` 的設定
 
-![](/static/images/2014/aspnet-mvc-route-02/02.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/02.webp)
 
 3、測試頁面就會發現明明 `Route` 沒有寫錯，卻發生 `HTTP 錯誤 404.0 - Not Found`，不過這個錯誤是由 `IIS` 發出的，表示 `Route` 沒有比對到
 
-![](/static/images/2014/aspnet-mvc-route-02/03.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/03.webp)
 
 真正的原因是 `.NET 4.0` 跟 `.NET 4.5` 的專案不一樣，只要在 `web.config` 加一段設定就好了
 
-![](/static/images/2014/aspnet-mvc-route-02/04.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/04.webp)
 
 註：保哥有一篇文章在講版本不同專案範本的差異 [ASP.NET MVC 4 在 .NET 4.0 與 .NET 4.5 的專案範本差異](http://blog.miniasp.com/post/2013/06/24/ASPNET-MVC-4-IIS-runAllManagedModulesForAllRequests-ExtensionlessUrlHandler.aspx) 有興趣可以去看
 
-![](/static/images/2014/aspnet-mvc-route-02/05.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/05.webp)
 
 - 可以看到這樣子寫會有一些問題，就是所有輸出的 `Url` 都會使用第一個設定，格式和原本的不一樣
 
@@ -44,37 +44,37 @@ layout: PostSimple
 
 這裡有兩種方式可以用，選擇其中一種就可以了
 
-![](/static/images/2014/aspnet-mvc-route-02/06.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/06.webp)
 
 - 一種是直接在 `Url` 寫死，不過還是要有 `Controller` 的值，所以就設預設值為 `jQuery`
 
-![](/static/images/2014/aspnet-mvc-route-02/07.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/07.webp)
 
 - 一種是原本的 `Url` 不變，用 `constraints` 作限制
 
-![](/static/images/2014/aspnet-mvc-route-02/08.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/08.webp)
 
 改完之後，原本的 `Url` 正常了，而且自定的 `Route` 也是可以進去
 
 5、第一個沒有問題，第二個 `Url` 的設定就比較簡單了
 
-![](/static/images/2014/aspnet-mvc-route-02/09.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/09.webp)
 
 6、如果我們要讓產出的 `Url` 格式跟我們自定的一樣時怎麼作
 
-![](/static/images/2014/aspnet-mvc-route-02/10.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/10.webp)
 
 可以看到原本的 `HtmlHelper` 的方式是用 `ActionLink` 的方式產生
 
 不過它沒有辦法指定使用那一個 `Route` 的設定產出 `Url`，這時就要改用 `RouteLink` 指定 `Route` 輸出
 
-![](/static/images/2014/aspnet-mvc-route-02/11.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/11.webp)
 
-![](/static/images/2014/aspnet-mvc-route-02/12.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/12.webp)
 
 - 第一個參數通常是 `Link` 的文字，第二個參數是 `Route Name` 也就是 `jQuery1`，後面就是代入 `RouteValue`
 
-![](/static/images/2014/aspnet-mvc-route-02/13.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-route-02/13.webp)
 
 可以看到輸出的 `Url` 是我們需要的格式了
 

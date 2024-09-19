@@ -33,7 +33,7 @@ public class HomeControllerTests
 
 - 來到專案的`設定頁面`，在原本的建置步驟下面在多一個步驟 `執行 Shell`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 參考官方的指令 [dotnet test](https://docs.microsoft.com/zh-tw/dotnet/core/tools/dotnet-test?tabs=netcore21)，使用 `dotnet test` + 專案檔就可以執行測試
 
@@ -41,13 +41,13 @@ public class HomeControllerTests
 dotnet test ./TestJenkins.Test/TestJenkins.Test.csproj
 ```
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 測試執行測試
 
 - 手動建置專案，可以看到有跑測試了，而且是成功的
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 產生測試報告
 
@@ -59,52 +59,52 @@ dotnet test ./TestJenkins.Test/TestJenkins.Test.csproj --logger "trx;LogFileName
 
 - 再一次建置專案，可以看到有產生測試報告出來
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## Jenkins 顯示測試結果
 
 - 來到 Jenkins 的 `設定` 頁面，選擇 `管理外掛程式`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 點選 `可用的` 頁籤，在右上角的 `過濾條件` 打 `xunit`，然後選擇 `xUnit`，點選 `直接安裝`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 等到變成 `藍燈 成功`，就好了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 回到專案的設定頁面，到最下面的 `建置後動作` 區塊
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 選擇 `Publish xUnit test result report`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - `Report Type` 的地方選擇 `MSTest-Version`
 
 > 注意：不要選成 `xUnit` 了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 填入產出 report 的路徑，如果不確定路徑的話，可以看一下執行的內容，就是 `workspace` 後面的路徑，因自己已經是 `TestJenkins`，所以路徑從下一層開始
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 儲存之後重新建置一次，就可以看到頁面上多了一個 `最近測試結果`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 點進去就可以看到相關的記錄
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 如果執行兩次以上右邊就會出現圖表
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)

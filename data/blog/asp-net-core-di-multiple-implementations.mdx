@@ -64,7 +64,7 @@ public IActionResult Index()
 
 直接執行程式，會發現 ILog 跑的是 SentryLog
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 在注入多個實作的時候，預設是拿到最後註冊的那一個
 
@@ -93,7 +93,7 @@ public IActionResult Index()
 
 執行程式，ILog 會寫入 FileLog 和 SentryLog
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 這裡要注意的是注入的型別一定要是 `IEnumerable<>`，如果使用 `List<>` 是會出錯的
 
@@ -121,4 +121,4 @@ public IActionResult Index()
 
 執行結果
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)

@@ -9,7 +9,7 @@ draft: true
 images: ['/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/cover.webp)
 
 在上一篇文章中，我們介紹了 Spring Security 的基礎知識
 
@@ -75,7 +75,7 @@ public class SecurityConfig {
 > 注意：這僅為說明目的，實際應用中絕對不要將密碼記錄在 Log 中  
 > (很重要，要說三次）
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/01.webp)
 
 預設產生的密碼，由`$`分隔成了三個部份
 
@@ -96,15 +96,15 @@ public class SecurityConfig {
 
 使用 admin 呼叫需要 `ADMIN 角色`的 API，可以正常呼叫
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/02.webp)
 
 如果用 user 呼叫，則會發生 `Access Denied`
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/03.webp)
 
 user 呼叫`一般 API`也沒有問題
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/04.webp)
 
 ## 自訂 HttpSecurity 
 
@@ -177,11 +177,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
 在 `requestMatchers` 打 `/api/` 時，會出現專案所有 `/api/` 下面的端點
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/05.webp)
 
 設定完，點選前面的 `盾牌` 就可以看到這個 `Matchers` 下面所有的端點
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/06.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/06.webp)
 
 ## 將使用者資料儲存到H2資料庫
 
@@ -265,7 +265,7 @@ public class DatabaseInitializer {
 
 也可以看到 `H2` 裡面有使用者的相關資料
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/07.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/07.webp)
 
 建立自訂義的 `UserDetailsService`
 
@@ -301,11 +301,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 log 也可以看的到，目前的 `UserDetailsService` 是使用 `⁠CustomUserDetailsService`
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/08.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/08.webp)
 
 這樣子 `API` 在使用`基本認證`的時候，就會呼叫 `loadUserByUsername` 這個方法
 
-![](/static/images/2024/ithome/30day-day33-spring-security-advanced/09.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day33-spring-security-advanced/09.webp)
 
 > 這裡因為範例講解的方便性，直接把使用者寫到資料庫內，所以沒有處理註冊相關的問題  
 > 實務上，還需要有使用者註冊的 API

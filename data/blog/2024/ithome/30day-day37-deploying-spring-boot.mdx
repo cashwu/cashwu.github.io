@@ -9,7 +9,7 @@ draft: true
 images: ['/static/images/2024/ithome/30day-day37-deploying-spring-boot/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/cover.webp)
 
 Spring Boot 應用程式也算是開發的差不多了
 
@@ -27,11 +27,11 @@ Gradle 就會建立一個 `可執行的 JAR 檔` ，這個 JAR 檔會包含你�
 ./gradlew bootJar
 ```
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/01.webp)
 
 在 `build/libs` 的目錄下，就會產生一個 JAR 檔
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/02.webp)
 
 ### IDE 方式
 
@@ -39,9 +39,9 @@ Gradle 就會建立一個 `可執行的 JAR 檔` ，這個 JAR 檔會包含你�
 
 一樣會產生 JAR 檔在 `build/libs` 的目錄下
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/03.webp)
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/04.webp)
 
 ## 執行 JAR 檔
 
@@ -53,7 +53,7 @@ java -jar build/libs/todolist-0.0.1-SNAPSHOT.jar
 
 預設一樣是在 `8080` port，可以開瀏覽器來確認看看
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/05.webp)
 
 ## 建立 Docker Image
 
@@ -80,15 +80,15 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 在根目錄下面，執行指令，就會建立一個 docker Image
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/06.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/06.webp)
 
 可以查看 Image 是不是有建立
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/07.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/07.webp)
 
 執行 todoapp Image，可以查看一下，是否有成功執行
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/08.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/08.webp)
 
 打開瀏覽器，瀏覽 `8080` port，應該是可以成功的看到畫面
 
@@ -134,15 +134,15 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 重新建立 Image 的 2.0 版本
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/09.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/09.webp)
 
 可以查看 Image 是不是有建立 2.0 的版本
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/10.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/10.webp)
 
 執行 todoapp Image 2.0 版本，可以查看一下，是否有成功執行
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/11.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/11.webp)
 
 打開瀏覽器，瀏覽 `8080` port，應該是可以成功的看到畫面
 
@@ -156,57 +156,57 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 在 `Dashboard` 點選 `New Project`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/12.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/12.webp)
 
 選擇一個專案的所在區域，這裡使用 `Tokyo, Japan`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/13.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/13.webp)
 
 選擇部署的方式，這裡使用 `Github`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/14.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/14.webp)
 
 選擇一個 Github 的 repo ，這裡當然是選我們的 `Todo 應用程式`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/15.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/15.webp)
 
 如果它在目錄裡面偵測到 `Dockerfile`，就會顯示使用 `Docker`，然後按 `Deploy` 部署
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/16.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/16.webp)
 
 可以在專案 `Deployments` 裡面有一個 `Building` 正在進行，點選看一下 `Build Logs`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/17.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/17.webp)
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/18.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/18.webp)
 
 等到 Build 完後，就會自動切到 `Runtime Logs`，就可以看到有相關的 Spring Boot log
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/19.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/19.webp)
 
 回到專案的頁面，選選 `Networking` 的選單
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/20.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/20.webp)
 
 建立一個自定義的 `Domain`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/21.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/21.webp)
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/22.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/22.webp)
 
 確認新增後，就可以在專案上面看到相關的 `Domain 資訊`
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/23.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/23.webp)
 
 把 `api-test.http` 裡面的 `Domain` 換成 `Zeabur` 的 `Domain` 就可以來測試了
 
 可以看到 API 都可以正常呼叫
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/24.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/24.webp)
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/25.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/25.webp)
 
-![](/static/images/2024/ithome/30day-day37-deploying-spring-boot/26.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day37-deploying-spring-boot/26.webp)
 
 ## 結論
 

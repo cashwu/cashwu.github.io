@@ -20,21 +20,21 @@ layout: PostSimple
 
 先新增一個測試的資料表叫 `Test`，並且更新 `EF`
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/01.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/01.webp)
 
 在資料表上按右鍵，選擇刪除
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/02.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/02.webp)
 
 Update `EF` 之後重 Build，會發現有 Error 出現
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/03.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/03.webp)
 
 用 'XML' 打開 `EF` 來看，會發現 `CSDL` 的 `Test` 資料表沒有刪除
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/04.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/04.webp)
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/05.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/05.webp)
 
 手動把 `CSDL` 的 `Test` 資料表刪除就好了
 
@@ -49,19 +49,19 @@ Update `EF` 之後重 Build，會發現有 Error 出現
 
 把 `客戶資料` 之前新增的 `建立時間` 欄位給刪除
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/06.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/06.webp)
 
 Update `EF` 之後重 Build，會發現有 Error 出現
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/07.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/07.webp)
 
 用 'XML' 打開 `EF` 來看，會發現 `CSDL` 的資料欄位沒有刪除
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/08.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/08.webp)
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/09.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/09.webp)
 
-![](/static/images/2014/aspnet-mvc-db-dev-04/10.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-db-dev-04/10.webp)
 
 手動把 `CSDL` 的資料欄位 `建立時間` 刪除就好了
 

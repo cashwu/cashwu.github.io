@@ -93,10 +93,10 @@ public class AddPersonCommandHandler : IRequestHandler<AddPersonCommand, Unit>
 
 - 實際新增 Person 測試，可以看到有印出兩個 Notification
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 多個 Notification 的問題
 
 預設處理 Notification 時，會等每一個處理的 Handler 都執行完成。如果這不是你想要的執行方式，可以參考官網的 [MediatR.Examples.PublishStrategies 程式碼](https://github.com/jbogard/MediatR/tree/master/samples/MediatR.Examples.PublishStrategies)，修改自己的程式碼，達到下面這 6 種策略
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)

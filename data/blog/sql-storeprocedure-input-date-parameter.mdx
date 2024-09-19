@@ -14,25 +14,25 @@ layout: PostSimple
 
 下面為 Table 的 Schema 和 測試資料
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 下面為測試的三個 SP，原則上就傳入時的參數型態不同而已 (對應到 Table 裡面的三個時間的型態)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 下面為使用 Linqpad 測試的回傳結果
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 其實很明顯可以看的出來，如果只是使用等於的話，除非傳入參數的型態和資料欄位的型態一樣都是 `Date`，而且程式端需要使用 `DateTime.Today` 傳入，不然的話都查不到資料。所以其實影響查詢的重點有三個：程式端參數、SP 參數和資料欄位，不光只有程式端注意就好了，SP 也是很大的重點
 

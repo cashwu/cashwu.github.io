@@ -18,7 +18,7 @@ layout: PostSimple
 heroku addons:create heroku-postgresql:hobby-dev
 ```
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 建立完成之後可以看一下相關的資訊
 
@@ -26,7 +26,7 @@ heroku addons:create heroku-postgresql:hobby-dev
 heroku pg:info
 ```
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 可以直接透過 cli 拿到相關的連線資料
 
@@ -34,43 +34,43 @@ heroku pg:info
 heroku pg:credentials:url DATABASE
 ```
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## Heroku 畫面建立
 
 - 來到 `Resources` Tab，在下方 `Add-ons` 的地方搜尋 `Postgres`，點 `Heroku Postgres` 安裝
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 選擇 `Hobby Dev - Free` 然後按 `Provision`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 看到畫面下方出現 `Heroku Postgres :: Database` 就代表建立好了，可以點進去
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 會另開新分頁顯示 Database 的相關資訊
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 可以點 `Settings` Tab，點開 `View Credentials`，可以在下面看到相關的連線資訊
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 使用 DataGrip 連接
 
 - 按照前面畫面上的資料，依序填入
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 點選 `Advanced` Tab，找到 `sslmode`，把 Value 改成 `require`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 回到 `General` Tab，點 `Test Connection` 應該會出現 `Successful`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 使用 ASP.NET Core MVC 連接
 

@@ -9,7 +9,7 @@ draft: false
 images: ['/static/images/2024/ithome/30day-day16-data-validation/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day16-data-validation/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day16-data-validation/cover.webp)
 
 ## Bean Validation
 
@@ -96,11 +96,11 @@ Content-Type: application/json
 
 可以看到返回了 400 `Invalid request content`
 
-![](/static/images/2024/ithome/30day-day16-data-validation/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day16-data-validation/01.webp)
 
 看一下 debug log，可以發現，我們之前的範例，使用了 GlobalExceptionHandler 繼承 `ResponseEntityExceptionHandler`，所以被它的方法給捕捉到
 
-![](/static/images/2024/ithome/30day-day16-data-validation/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day16-data-validation/02.webp)
 
 我們可以 override 它，來返回比較詳細的資訊
 
@@ -145,7 +145,7 @@ public static class ErrorDetails {
 
 重新測試一下，就可以看到錯誤訊息比較容易理解了
 
-![](/static/images/2024/ithome/30day-day16-data-validation/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day16-data-validation/03.webp)
 
 ### 常見的 Java Bean Validation
 
@@ -279,7 +279,7 @@ Content-Type: application/json
 
 符合 TodoValidator 的驗證邏輯的話，就會發生錯誤
 
-![](/static/images/2024/ithome/30day-day16-data-validation/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day16-data-validation/04.webp)
 
 ## Bean Validation 與 Spring Validator 的比較
 

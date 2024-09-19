@@ -69,11 +69,11 @@ using (var ms = new MemoryStream())
 
 - 測試，上傳後可以拿到圖片的 URL
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 檢查 Firebase，可以看到上傳的檔案
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 加入資料夾 `Folder` 測試
 
@@ -83,7 +83,7 @@ await storage.Child("Folder").Child(img.FileName).PutAsync(ms);
 
 - 檢查 Firebase，可以看到多了一個資料夾
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 刪除檔案
 
@@ -103,7 +103,7 @@ catch (Exception e)
 
 - 如果刪除不存在的檔案會發生 `Exception`，需要注意
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 

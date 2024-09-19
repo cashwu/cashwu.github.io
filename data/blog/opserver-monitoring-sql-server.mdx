@@ -34,34 +34,34 @@ Opserver 是 Stackoverflow 所開發，用來監控自家的 Server、DB 的一�
 
 因為 Opserver 只是網站的專案，所以執行上相當的簡單
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 [Github](https://github.com/opserver/Opserver#installation) 的相關說明
 
 使用 VS 開啟下載後的專案檔，打開後會有兩個 Project
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - `Opserver` 是主要網站 Project，使用 ASP.NET MVC
 - `Opserver.Core` 是核心處理資料的 Project
 
 如果什麼都不作，直接執行 (`ctrl + F5`) 的話，會發生找不到 Config 的錯誤
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 其實 Opserver 用了很多 Config 來配制，可以看到 Config 資料夾下面有很多相關的 Config
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 而第一個需要作的是設置 `SecuritySettings.config`
 
 3、設置 SecuritySettings.config
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 [Github](https://github.com/opserver/Opserver#security-configuration) 的相關說明
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 因為在自已本機測試，所以就不使用預設的 `AD` 認證，直接使用 `alladmin`
 
@@ -69,27 +69,27 @@ Opserver 是 Stackoverflow 所開發，用來監控自家的 Server、DB 的一�
 
 `Build` 一下重新執行就可以看到 Opserver 的登入畫面
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 目前的設定為 `alladmin`, 所以不用打帳號和密碼直接 Login 就好了，不過因為還沒有設定相關監控的 Config 所以會發生沒有 Configuration 的錯誤
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 4、About 頁面
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 如果連到 about 頁面的話，可以看到整個網站的情況
 
 5、設置 SQLSettings.json
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 [Github](https://github.com/opserver/Opserver#monitoring-configuration) 的相關說明
 
 > 注意：除了 SecuritySettings.config 是 `XML` 外，其餘的設定檔都是 `json` 格式
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 `SQLSettings.json.example` 裡面可以看到有分成三個區塊
 
@@ -104,7 +104,7 @@ Opserver 是 Stackoverflow 所開發，用來監控自家的 Server、DB 的一�
 
 它其實會透過 master DB 去達到監控的效果，所以只給 Instance Name 也可以，或都是給它一個 DB 的 connectionString 也是可以，不過還是建議使用 connectionString 的方式，比較好作權限的管理
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 在這裡很簡單的設定，就去抓本機的 SQLExpress 的 Northwind
 
@@ -129,103 +129,103 @@ Opserver 是 Stackoverflow 所開發，用來監控自家的 Server、DB 的一�
 
 ### instance
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 可以看到 SQL Server 的相關資訊，下面就簡單的介紹一下可點連結的內容
 
 點選 `Databases`，和點選 nav bar 的 top 一樣
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 點選 `Jobs`，會跳出一個視窗顯示目前的所有的 SQL Server jobs
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 注意：這裡可以把 job 停止或是啟動
 
 點選 View Configuration，會跳出一個視窗顯示 SQL Server 相關的屬性資料
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 點選 `CPU`，和點選 nav bar 的 top 一樣
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 這個部份等後面講 databases 的時候在看
 
 點選 `Memory`，會跳出一個視窗顯示目前 SQL Server 使用記憶體的詳細情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 點選 `Connections`，會跳出一個視窗顯示 SQL Server 登入情況和做了幾個動作 (Connection)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 點選視窗右上角的 View Detail，和點選 nav bar 的 connections 一樣
 
 點選 `Volumes`，會跳出一個視窗顯示 SQL Server 相關的檔案情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 不過點選視窗右上角的 View Detail 的話，不知道為什麼會找不到頁面，還沒有仔細的研究
 
 top
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 不知道為什麼裡面沒有資料，之後研究出來再更新
 
 active
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 如果執行時發生 `sp_WhoIsActive` 錯誤的話，請參考這個網頁的解法 [sp_whoisactive and Azure SQL Database](http://sqlblog.com/blogs/adam_machanic/archive/2015/04/10/sp-whoisactive-and-azure-sql-database.aspx)，就會出現頁面了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 其實這個頁面是看 Deadlock 的狀態，如果自己製造一個 Deadlock 就可以看到資料了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 connections
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 可以看到所有 `connection` 的情況
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 點選一筆的話，會跳出視窗顯示詳細的 Query 內容
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 而且還可以看到執行計畫，滑鼠移上去也會顯示詳細內容，和在 SSMS 裡面看到的差不多喔 !!
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 不過有的時候點選會出現問題，目前還沒有研究為什麼會出錯
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 databases
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 顯示每個 DB 的目前情況
 
 點選其中一筆的話會跳出一個視窗顯示 DB 詳細的內容，不過不知道為什麼我只可以點選 `Tables`，其它的內容就等研究出來再更新
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 總結
 

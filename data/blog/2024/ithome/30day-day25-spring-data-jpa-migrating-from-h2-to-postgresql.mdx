@@ -9,7 +9,7 @@ draft: true
 images: ["/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/cover.webp"]
 ---
 
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/cover.webp)
 
 
 在前面的文章中，我們已經介紹了如何在 Spring Boot 中使用 H2 資料庫
@@ -37,7 +37,7 @@ H2 資料庫非常適合快速原型開發和測試環境，但在實際的正�
 
 先建立一個專案，在建立時就要設定 `資料庫密碼`
 
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/01.webp)
 
 
 大約 3 ~ 5 分鐘就可以建立完專案
@@ -49,7 +49,7 @@ H2 資料庫非常適合快速原型開發和測試環境，但在實際的正�
 
 記得將 `[YOUR-PASSWORD]` 替換成一開始建立專案時自行設定的密碼
   
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/02.webp)
 
 ### 增加依賴
 
@@ -136,11 +136,11 @@ PostgreSQL 對於未加`引號`的識別符會自動轉換為`小寫`， 換句
 
 啟動應用程式時，可以看到已經正常連線到 `Supabase` 的資料庫，而且也`初始化成功` 
 
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/03.webp)
 
 在 `Supabase` 檢查資料庫相關資料表，也看到有 `todos` 
 
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/04.webp)
 
 
 一樣使用 `api-test.http` 來測試所有的 API
@@ -148,7 +148,7 @@ PostgreSQL 對於未加`引號`的識別符會自動轉換為`小寫`， 換句
 在 `Supabase` 也可以看到（查詢到）相關的資料
 
   
-![](/static/images/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day25-spring-data-jpa-migrating-from-h2-to-postgresql/05.webp)
 
 
 ## 結論

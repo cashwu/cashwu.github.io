@@ -42,7 +42,7 @@ public class User
 - 使用 EF Core 的 migrations 到 DB
   - 可以看到在 DB 裡面的型別為 `text array`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 > 必須要注意的是在 C# 的型別要使用 `string array` 而不能是 `List<string>`，如果是使用 List 的話，相關的 Array 操作是無法轉譯成 SQL Command 的
 
@@ -65,12 +65,12 @@ public void Insert()
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 查看 Table
   - 可以看到 DB 裡面的表示方式是使用 `{ }`
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 修改
 
@@ -88,7 +88,7 @@ public void Update()
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 查詢
 
@@ -100,7 +100,7 @@ public void Update()
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 取出單筆資料查詢
 
@@ -110,7 +110,7 @@ _dbContext.User.Where(a => a.Phones[0] == "1234")
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 使用 `SequenceEqual` 查詢
   - 基本上就是比對兩個 Array 是不是相等，而且順序要相同
@@ -121,7 +121,7 @@ _dbContext.User.Where(a => a.Phones.SequenceEqual(new[] { "1234", "5678", "4321"
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 長度查詢
 
@@ -131,7 +131,7 @@ _dbContext.User.Where(a => a.Phones.Length == 3)
 
 - 產生的 SQL Command
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 

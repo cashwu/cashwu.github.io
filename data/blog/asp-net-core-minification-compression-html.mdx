@@ -46,7 +46,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 而且移除空白有不同的層級，建議使用 `WhitespaceMinificationMode.Safe` 選項
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 在 `Startup` 裡面的 `Configure` 去使用 `UseWebMarkupMin`
 
@@ -61,15 +61,15 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 - 下面是原始沒有移除空白的原始碼和大小
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 加入 Minification 之後的原始碼和大小
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 壓縮 HTML
 
@@ -111,7 +111,7 @@ services.AddWebMarkupMin(options =>
 
 - 可以看到網頁的 `Content-Encoding` 變成 `gzip` 了
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 

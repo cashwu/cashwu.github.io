@@ -15,7 +15,7 @@ layout: PostSimple
 而 `return View` 裡面總共有 8 個 `overloading`，
 不外乎指定 `View`、`Model` 或是 `Layout`
 
-![](/static/images/2014/aspnet-mvc-controller-02/01.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/01.webp)
 
 在預設的情況之下，View 的名稱等同於 `Action` 的名稱
 
@@ -24,7 +24,7 @@ layout: PostSimple
 而如果只 `reutnr View` 的話 (只是要顯示畫面)
 就可以用比較具像的回傳型別 `ViewResult` 取代 `ActionResult`
 
-![](/static/images/2014/aspnet-mvc-controller-02/02.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/02.webp)
 
 這樣子的好處是
 
@@ -36,7 +36,7 @@ layout: PostSimple
 
 如果回傳了一個不存在的 View，網頁就會出現找不到 View 的錯誤
 
-![](/static/images/2014/aspnet-mvc-controller-02/03.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/03.webp)
 
 從錯誤中可以知道 View 的尋找順序，會先搜尋和 Controller 同名的 View 目錄，如果找不到時會找 View 下面的 Shared 目錄，而且搜尋時預設先尋找 `.aspx` 、 `.ascx` 再尋找 `.cshtml` 、 `.vshtml`
 
@@ -44,9 +44,9 @@ layout: PostSimple
 
 可以在 在 `Global.asax` 下面加上幾行程式，先把 `ViewEngines` 清空在加上 `RazorViewEngine`，這樣子之後就不會尋找 `WebForm` 檔案，只會搜尋 `MVC` 檔案
 
-![](/static/images/2014/aspnet-mvc-controller-02/04.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/04.webp)
 
-![](/static/images/2014/aspnet-mvc-controller-02/05.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/05.webp)
 
 註：如果有用到 `WebForm` 的話，就把 `WebFormViewEngine` 放在 `RazorViewEngine` 下面，
 這樣子的話找 `MVC` 檔案也會比較快
@@ -57,7 +57,7 @@ layout: PostSimple
 
 有 4 個 `overloading`
 
-![](/static/images/2014/aspnet-mvc-controller-02/06.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/06.webp)
 
 ## ContentResult
 
@@ -65,11 +65,11 @@ layout: PostSimple
 
 `Content-Type` 定義為 `xml` 輸出時就是 `xml`
 
-![](/static/images/2014/aspnet-mvc-controller-02/07.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/07.webp)
 
 有 4 個 `overloading`
 
-![](/static/images/2014/aspnet-mvc-controller-02/08.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/08.webp)
 
 註：如同之前使用 `Response.Write` 一樣，千萬不要再使用 `Request` 或 `Response` 物件
 
@@ -78,7 +78,7 @@ layout: PostSimple
 主要是下載檔案用，可以輸出任何 `二進制` 的資料，
 而如果希望瀏覽器直接下載檔案而不要開啟，可以傳入檔案名稱到第三個參數
 
-![](/static/images/2014/aspnet-mvc-controller-02/09.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/09.webp)
 
 有 6 個 `overloading`
 
@@ -86,21 +86,21 @@ layout: PostSimple
 - `FileContentResult`：回應一個 `byte array` 內容
 - `FileStreamResult`：回應一個 `Stream` 內容
 
-![](/static/images/2014/aspnet-mvc-controller-02/10.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/10.webp)
 
 ---
 
 也可以直接在網頁輸出圖片
 
-![](/static/images/2014/aspnet-mvc-controller-02/11.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/11.webp)
 
-![](/static/images/2014/aspnet-mvc-controller-02/12.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/12.webp)
 
 ---
 
 目前的瀏覽器對中文檔名是沒有問題的，如果是 `舊的IE` 的話就需要加上 `UrlPathEncode` 才會正常的輸出
 
-![](/static/images/2014/aspnet-mvc-controller-02/13.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/13.webp)
 
 註：盡量不要指定 `中文檔名` 下載
 
@@ -112,19 +112,19 @@ layout: PostSimple
 
 所以下面兩個的輸出結果是一樣的
 
-![](/static/images/2014/aspnet-mvc-controller-02/14.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/14.webp)
 
 沒有 `overloading`
 
-![](/static/images/2014/aspnet-mvc-controller-02/15.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/15.webp)
 
 ---
 
 也可以利用 return `Partial View` 的方式，在 `View` 裡面輸出 `JavaScript`
 
-![](/static/images/2014/aspnet-mvc-controller-02/16.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/16.webp)
 
-![](/static/images/2014/aspnet-mvc-controller-02/17.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/17.webp)
 
 ## JsonResult
 
@@ -133,7 +133,7 @@ layout: PostSimple
 而且基於安全性，只能使用 `Post方法` 取得資料，
 如果要對 `Get` 可以回應，需要加上一個參數來設定
 
-![](/static/images/2014/aspnet-mvc-controller-02/18.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/18.webp)
 
 預設的 `Content-Type` 為 `application/json`
 
@@ -141,7 +141,7 @@ layout: PostSimple
 
 有 6 個 `overloading`
 
-![](/static/images/2014/aspnet-mvc-controller-02/19.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/19.webp)
 
 ## RedirectResult
 
@@ -149,7 +149,7 @@ layout: PostSimple
 
 有 24 個 `overloading`
 
-![](/static/images/2014/aspnet-mvc-controller-02/20.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/20.webp)
 
 - 其實主要就分成三種
   - 1、直接用 `Url` 作導向
@@ -159,7 +159,7 @@ layout: PostSimple
   - 1、結尾有加 `Permanent` 為回應 `HTTP 301` 永久轉址
   - 2、沒有的為回應 `HTTP 302` 暫時轉址
 
-![](/static/images/2014/aspnet-mvc-controller-02/21.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/21.webp)
 
 註：如果只給 `路由名稱` 不給任何值的話，預設會以這個路由名稱下的規則和現在的 `controller` 和 `action` 輸出網址
 
@@ -170,11 +170,11 @@ layout: PostSimple
 - `4xx` 為 Client 端的錯誤
 - `5xx` 為 Server 端的錯誤
 
-![](/static/images/2014/aspnet-mvc-controller-02/22.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/22.webp)
 
 而因為 `404` 比較特別，所以被獨立出來
 
-![](/static/images/2014/aspnet-mvc-controller-02/23.webp)
+![](https://image.cashwu.com/2014/aspnet-mvc-controller-02/23.webp)
 
 還有 授權失敗也是被獨立出來
 

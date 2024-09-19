@@ -9,7 +9,7 @@ draft: false
 images: ['/static/images/2024/ithome/30day-day13-global-error-handling/cover.webp']
 ---
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/cover.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/cover.webp)
 
 在 Spring Boot 應用程序中，有效的錯誤處理對於提供良好的用戶體驗和便於除錯至關重要
 
@@ -68,7 +68,7 @@ var r = b / a;
 
 可以看到呼叫 API 後，收到的錯誤訊息
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/01.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/01.webp)
 
 ## 使用 @ControllerAdvice（全域級別）
 
@@ -155,7 +155,7 @@ public String ex() {
 
 可以看到，這裡的錯誤訊息，會是全域的錯誤處理類別 `Exception` 裡面的訊息
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/02.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/02.webp)
 
 然後我們可以修改 Todo 中一個處理 not found 情況的程式碼，改為 throw `TodoNotFoundException` 來測試
 
@@ -177,7 +177,7 @@ public String ex() {
 
 可以看到，這裡的錯誤訊息，會是全域的錯誤處理類別 `TodoNotFoundException` 裡面的訊息
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/03.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/03.webp)
 
 ## 使用 ResponseEntityExceptionHandler（Spring MVC 特定異常處理）
 
@@ -213,7 +213,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 在 IDE 可以看到 override 的 method 類型非常多
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/04.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/04.webp)
 
 ### 優點
 
@@ -245,7 +245,7 @@ Content-Type: application/json
 
 可以看到，這裡的錯誤訊息，會是 `handleHttpMessageNotReadable` 裡面的訊息
 
-![](/static/images/2024/ithome/30day-day13-global-error-handling/05.webp)
+![](https://image.cashwu.com/2024/ithome/30day-day13-global-error-handling/05.webp)
 
 ## 全域異常處理的優缺點
 

@@ -47,7 +47,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 在這裡使用之前的新增 Person 來作測試，可以看到有把 Request 給 Log 下來
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 新增 LogPostProcessor 實作 IRequestPostProcessor
 
@@ -85,7 +85,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 新增 LogBehavior 實作 IPipelineBehavior
 
@@ -126,7 +126,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 組合不同的 IPipelineBehavior
 
@@ -173,7 +173,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 測試，可以拿到執行 Request 的時間出現在 Log 前面
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 - 如果調整順序把 `RequestPerformanceBehavior` 移到 Pipeline 的第一個
 
@@ -188,7 +188,7 @@ public void ConfigureServices(IServiceCollection services)
 
 - 再一次測試，可以拿到執行 Request 的時間出現在 Log 後面，也就是放的順序和出現的順序是相反的
 
-![](/static/images/404.webp)
+![](https://image.cashwu.com/404.webp)
 
 ## 後記
 
