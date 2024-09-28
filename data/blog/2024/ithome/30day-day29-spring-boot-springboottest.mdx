@@ -81,6 +81,8 @@ public class TodoEndToEndTest {
     void createTodo() {
 
         // 呼叫 API
+        // 這裡示範了怎麼使用完整 url (port) 來呼叫
+        // 在使用 TestRestTemplate 就可以不用指定主機和 port 號，這裡只是示範
         String url = "http://localhost:" + port + "/api/todos";
         Todo newTodo = new Todo(null, "測試待辦事項", false);
         var response = restTemplate.postForEntity(url, newTodo, MyApiResponse.class);
