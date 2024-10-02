@@ -1,12 +1,12 @@
 ---
 layout: PostSimple
-title: "「Spring Boot API 開發：從 0 到 1」Day 27 MockMvc 測試"
-summary: "使用 MockMVC 測試 Spring MVC 應用程式的控制器是有效的方法，它允許開發者模擬 HTTP 請求而無需啟動伺服器。本文介紹了如何使用 @WebMvcTest 註解來專門測試控制器，以及如何利用 @MockBean 模擬服務層行為，並通過 MockMvc 模擬 HTTP 請求。文中詳細展示了 CRUD 操作的測試案例，涵蓋了創建、查詢、更新和刪除待辦事項的各種情境，並強調了驗證回應狀態碼和內容的重要性。建議為每個控制器方法編寫全面的測試案例，以提高應用品質"
-date: "2024-09-27"
-lastmod: "2024-09-27"
-tags: ["Spring Boot", "Java", "ithome2024", "test"]
+title: '「Spring Boot API 開發：從 0 到 1」Day 27 MockMvc 測試'
+summary: '使用 MockMVC 測試 Spring MVC 應用程式的控制器是有效的方法，它允許開發者模擬 HTTP 請求而無需啟動伺服器。本文介紹了如何使用 @WebMvcTest 註解來專門測試控制器，以及如何利用 @MockBean 模擬服務層行為，並通過 MockMvc 模擬 HTTP 請求。文中詳細展示了 CRUD 操作的測試案例，涵蓋了創建、查詢、更新和刪除待辦事項的各種情境，並強調了驗證回應狀態碼和內容的重要性。建議為每個控制器方法編寫全面的測試案例，以提高應用品質'
+date: '2024-09-27'
+lastmod: '2024-09-27'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'test']
 draft: false
-images: ["https://image.cashwu.com/2024/ithome/30day-day27-spring-boot-mockmvc-test/cover.webp"]
+images: ['https://image.cashwu.com/2024/ithome/30day-day27-spring-boot-mockmvc-test/cover.webp']
 ---
 
 ![](https://image.cashwu.com/2024/ithome/30day-day27-spring-boot-mockmvc-test/cover.webp)
@@ -17,11 +17,10 @@ images: ["https://image.cashwu.com/2024/ithome/30day-day27-spring-boot-mockmvc-t
 
 在這裡我們就不用和 `Service` 一樣的單元測試的方式
 
-我們會使用 Spring 框架提供給我們的 `MockMVC` 這個工具，它專門用來測試 Spring MVC 應用程式的`控制器（Controller）` 
+我們會使用 Spring 框架提供給我們的 `MockMVC` 這個工具，它專門用來測試 Spring MVC 應用程式的`控制器（Controller）`
 
 它允許開發者模擬 HTTP 的動作，而無需實際啟動伺服器
 
-  
 ## MockMVC Test 的主要用途
 
 - 驗證控制器的行為：測試各種 `HTTP 方法`（GET、POST、PUT、DELETE 等）的處理
@@ -145,9 +144,9 @@ public class TodoControllerTest {
 }
 ```
 
-> 要注意 import 的 package  
-> 
-> - MockServer 開頭的，主要用於 WebFlux 
+> 要注意 import 的 package
+>
+> - MockServer 開頭的，主要用於 WebFlux
 > - MockMvc 開頭的，主要用於 Spring MVC - 這才是我們要 import 的
 
 在測試中，`@WebMvcTest(TodoController.class)` 告訴 Spring Boot 只初始化與 `TodoController` 相關的 Spring MVC 基礎設施
@@ -156,7 +155,9 @@ public class TodoControllerTest {
 
 我們驗證了回應的`狀態碼` 和`內容`，確保控制器正確處理請求並返回預期的結果
 
-> 有點可惜的是，找不到一個驗證 Json 比較方便的工具，所以只好用 `jsonPath` 來驗證
+> ~有點可惜的是，找不到一個驗證 Json 比較方便的工具，所以只好用 `jsonPath` 來驗證~
+
+> 已經寫了一篇文章來介紹三種優雅的 JSON 驗證方法，有興趣的可以看看：[Day 32.5 進化你的Spring Boot測試：三種優雅的JSON驗證方法](/blog/2024/ithome/30day-day32-5-spring-boot-testing-evolution-three-elegant-json-validation-methods)
 
 ## 結論
 
@@ -167,7 +168,6 @@ public class TodoControllerTest {
 在實際開發中，建議為每個控制器方法編寫全面的測試案例，包括正向和反向的情境
 
 這樣可以大大提高應用程式的品質，並在進行修改或重構時提供安全網
-
 
 > 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 27 MockMVC 測試](https://ithelp.ithome.com.tw/articles/10349137)
 

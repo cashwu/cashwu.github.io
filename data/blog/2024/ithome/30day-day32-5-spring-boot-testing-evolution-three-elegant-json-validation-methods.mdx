@@ -1,0 +1,131 @@
+---
+layout: PostSimple
+title: '「Spring Boot API 開發：從 0 到 1」Day 32.5 Spring Boot 測試進化：三種優雅的 JSON 驗證方法'
+summary: '本文介紹了在 Spring Boot 測試中使用 content().json()、JSONAssert 和物件比對三種方法來驗證 JSON，提高測試的可讀性、可靠性和維護性'
+date: '2024-10-02'
+lastmod: '2024-10-02'
+tags: ['Spring Boot', 'Java', 'ithome2024', 'test']
+draft: false
+images:
+  [
+    'https://image.cashwu.com/2024/ithome/30day-day32-5-spring-boot-testing-evolution-three-elegant-json-validation-methods/cover.webp',
+  ]
+---
+
+![](https://image.cashwu.com/2024/ithome/30day-day32-5-spring-boot-testing-evolution-three-elegant-json-validation-methods/cover.webp)
+
+在之前的測試文章中，我們使用的 JSON 驗證方法都是透過 `jsonPath()` 來進行驗證
+
+本文將介紹三種優雅且強大的 JSON 驗證方法，這些方法不僅能提高測試的可讀性，還能增強測試的可靠性
+
+讓我們一起來看看如何運用這些技巧來改善我們的測試程式碼吧！
+
+## 使用 `content().json()` 進行直觀的 JSON 比對
+
+Spring Boot 的 MockMvc 提供了一個非常直觀的方法來驗證 JSON 回應：`content().json()`
+
+這個方法允許我們直接比對整個 JSON 結構，無需逐一檢查每個欄位
+
+```java
+mockMvc.perform(get("/api/todos/1"))
+    .andExpect(status().isOk())
+    .andExpect(content().json("""
+        {
+          "success": true,
+          "data" : {
+            "id" : 1,
+            "title" : "測試待辦事項",
+            "completed" : false
+          }
+        }
+        """
+    ));
+```
+
+這種方法的優點是：
+
+- 直觀易讀，一眼就能看出預期的 JSON 結構
+- 減少了冗長的 `jsonPath()`
+- 可以一次性驗證整個 JSON 結構
+
+## 使用 `JSONAssert` 進行精確的 JSON 比對
+
+`JSONAssert` 是一個強大的 JSON 驗證 package，它提供了更細緻的 JSON 比對功能
+
+使用之前，需要先引入 `JSONAssert` 的套件
+
+```groovy
+// https://mvnrepository.com/artifact/org.skyscreamer/jsonassert
+testImplementation 'org.skyscreamer:jsonassert:1.5.3'
+```
+
+使用 `JSONAssert`，我們可以進行嚴格模式的比對，確保 JSON 的每個細節都完全符合預期
+
+```java
+var result = mockMvc.perform(get("/api/todos/1"))
+    .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+JSONAssert.assertEquals("""
+    {
+      "success": true,
+      "data" : {
+        "id" : 1,
+        "title" : "測試待辦事項",
+        "completed" : false
+      },
+      "error" : null
+    }
+    """, result, true);
+```
+
+這種方法的優點包括：
+
+- 可以進行嚴格模式的比對，確保 JSON 完全匹配
+- 提供詳細的錯誤訊息，幫助快速定位問題
+- 可以忽略某些欄位或進行部分比對
+
+## 將 JSON 轉換為物件進行比對
+
+這種方法將 JSON 轉換為 Java 物件，然後使用 `AssertJ` 等驗證庫進行物件比對
+
+這種方法特別適合於需要進行複雜邏輯驗證的場景
+
+```java
+var apiResult = objectMapper.readValue(result, new TypeReference<MyApiResponse<Todo>>() {});
+
+assertThat(apiResult.isSuccess()).isTrue();
+var expected = new Todo(1L, "測試待辦事項", false);
+assertThat(apiResult.getData()).usingRecursiveComparison().isEqualTo(expected);
+```
+
+這種方法的優點是：
+
+- 可以進行更複雜的邏輯驗證
+- 利用了強型別的優勢，減少了錯誤
+- 可以重用領域物件，提高了測試的可維護性
+
+## 程式碼
+
+上面的講解只有列出部份的程式碼，完整的程式碼可以參考 [Github commit](https://github.com/cashwu/30day_springboot_api/commit/06b203bc23247dffe231ac5caaf1f5dc32128dec)
+
+## 結論
+
+為什麼這些方法比原先的方法更好？
+
+1. 提高可讀性：特別是 `content().json()` 和 `JSONAssert` 方法，它們提供了更直觀的 JSON 結構視圖，使得測試程式碼更易於理解和維護。
+2. 減少重複：原本的方法需要為每個欄位編寫單獨的 `jsonPath()` 驗證，而新方法可以一次性驗證整個 JSON 結構。
+3. 更強大的驗證： `JSONAssert` 提供了嚴格模式的比對，可以捕捉到細微的 JSON 差異。而物件比對方法則允許進行更複雜的邏輯驗證。
+4. 靈活性：這三種方法可以根據不同的需求靈活選用，從簡單的結構驗證到複雜的邏輯檢查都能輕鬆應對。
+5. 錯誤訊息更清晰：特別是 `JSONAssert`，它提供了詳細的錯誤訊息，幫助開發者快速定位問題。
+
+透過採用這些方法，我們可以寫出更簡潔、更可靠、更易維護的測試程式碼
+
+在實際開發中，可以根據具體需求選擇最適合的方法，甚至組合使用這些方法來達到最佳的測試效果
+
+> 同步刊登於 iTHome 鐵人賽 [「Spring Boot API 開發：從 0 到 1」Day 32.5 Spring Boot 測試進化：三種優雅的 JSON 驗證方法](https://ithelp.ithome.com.tw/articles/10362162)
+
+> 圖片來源：AI 產生
+
+## 參考連結
+
+- https://github.com/skyscreamer/JSONassert
