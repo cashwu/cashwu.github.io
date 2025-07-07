@@ -138,3 +138,54 @@ yarn analyze
 - **移除自動生成標籤**：不要使用包含「Generated with Claude Code」或類似的自動生成標籤
 - **簡潔明確**：使用簡潔、描述性的提交訊息，專注於實際的程式碼變更內容
 - **中文優先**：提交訊息建議使用正體中文，但也可以使用英文
+
+## 部落格文章撰寫指南
+
+### 文章格式規範
+
+- 新增文章時，請參考 `data/blog/_Draft/index.mdx` 的相關格式和內容
+- 使用 `PostSimple` 版面配置作為預設選項
+- 必須包含 `lastmod` 欄位以追蹤文章更新時間
+- 圖片使用 `image.cashwu.com` CDN 託管
+- 每篇文章需有封面圖片，格式為 `https://image.cashwu.com/YYYY/article-slug/01.webp`
+
+### Frontmatter 必填欄位
+
+```yaml
+---
+layout: PostSimple
+title: '文章標題'
+summary: '文章摘要'
+date: 'YYYY-MM-DD'
+lastmod: 'YYYY-MM-DD'
+tags: ['標籤1', '標籤2']
+draft: false
+images: ['https://image.cashwu.com/YYYY/article-slug/01.webp']
+---
+```
+
+### 內容結構
+
+1. **封面圖片**：文章開頭放置封面圖片
+
+   ```markdown
+   ![](https://image.cashwu.com/YYYY/article-slug/01.webp)
+   ```
+
+2. **圖片來源標註**：根據圖片來源選擇適當的標註
+
+   - AI 生成：`> 圖片來源：AI 產生`
+   - 網路來源：`> 圖片來源：網路。若分享內容有侵害您的圖片版權，請來信告知，我們會及時加上版權信息，若是您反對使用，本著對版權人尊重的原則，會儘速移除相關內容。`
+   - Unsplash：`> Photo by [作者名](連結) on [Unsplash](連結)`
+
+3. **內容區塊**：可選擇性包含以下結構
+   - 問題描述
+   - 原因分析
+   - 解決方案
+   - 參考連結
+
+### 多媒體內容
+
+- **YouTube 嵌入**：使用 iframe 元件，設定 16:9 比例
+- **程式碼區塊**：支援語法高亮，使用三個反引號包圍
+- **數學表達式**：支援 KaTeX 語法
