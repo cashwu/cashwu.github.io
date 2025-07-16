@@ -1,0 +1,107 @@
+---
+layout: PostSimple
+title: 'Kiro 初體驗'
+summary: '測試 Kiro 開發工具的初次體驗，從需求分析到程式實作的完整流程記錄，以及與 Claude Code 的比較心得'
+date: '2025-07-16'
+lastmod: '2025-07-16'
+tags: ['kiro', 'AI']
+draft: false
+images: ['https://image.cashwu.com/2025/kiro-first-experience/cover.webp']
+---
+
+![](https://image.cashwu.com/2025/kiro-first-experience/cover.webp)
+
+今天早上測試了一下 `Kiro` 改一個小功能，下面是相關的一些記錄
+
+## 功能實作
+
+### Requirements
+
+先開 `Spec` 模式，然後在對話視窗跟它說需求，送出後會進入 `Requirements` 階段，會開始分析需求，然後產生 `requirements.md` 檔案
+
+每個 `Requirements` 裡面會有 `User Story` 和 `Acceptance Criteria`
+
+感覺跟 Sprint Planning Part 1 很像，列的內容還不錯
+
+檔案產生結束後，在對話視窗會出現，進入 `design` 階段的按鈕
+
+![](https://image.cashwu.com/2025/kiro-first-experience/01.webp)
+
+### Design
+
+基本上 `design` 階段就是分析程式碼，看要怎麼實作前面列出來的相關 `requirements` 的內容，會產生 `design.md` 檔案
+
+可以看成相關技術的分析，和目前的程式碼要怎麼實作需求的規劃
+
+檔案產生結束後，在對話視窗會出現，可以進入 `implementation plan` 階段的按鈕
+
+(因為文件裡面會有一些技術細節和程式碼，圖片就打碼了)
+
+![](https://image.cashwu.com/2025/kiro-first-experience/02.webp)
+
+### Task list
+
+`implementation plan` 階段就是根據前面的 `requirements` 和 `design` 階段的內容，列出實際要執行的 `task` 內容
+
+然後它每一個 task 下面，會寫跟前面的 `requirements` 那一項是有關係的
+
+檔案產生結束後，在對話視窗會出現，`結束 task list` 階段的按鈕
+
+感覺 `design` 和 `implementation plan` 跟 Sprint Planning Part 2 還蠻像的
+
+(因為文件裡面會有一些技術細節和程式碼，圖片就打碼了)
+
+![](https://image.cashwu.com/2025/kiro-first-experience/03.webp)
+
+### Finalize
+
+按下 `Finalize task list` 的按鈕，會總結這次的相關內容，把相關的資訊列在對話視窗裡面
+
+最後會跟你說，可以打開 `tasks.md`，點擊任務旁的 `Start task`，或是還要繼續討論
+
+我這裡是請它直接實作所有的內容
+
+![](https://image.cashwu.com/2025/kiro-first-experience/04.webp)
+
+### 執行
+
+執行過程就跟一般的 Agent 的實作差不多，就不列出相關內容了 XD
+
+執行完後，原本的 `tasks.md` 上面會變成 `Task completed`，後面會有 `View changes` 和 `View execution`
+
+可以看這個 task 的執行狀況
+
+![](https://image.cashwu.com/2025/kiro-first-experience/05.webp)
+
+相關的文件，也可以在 Kiro 的相關視窗裡面的 `SPECS` 找到
+
+![](https://image.cashwu.com/2025/kiro-first-experience/06.webp)
+
+## 感想 / 後記
+
+我覺得它的 `SPECS` 三階段的內容，有點像是我想要用 `Claude Code` 模擬出 `Scrum Team` 流程的感覺，沒想到 `Kiro` 它是這樣子實作的
+
+如果這個階段做的好的話，感覺後續的開發上應該會比較少碰到問題吧？
+
+另外
+
+網路上有人說，`速度很慢` 的問題，個人體感的比較起來，速度好像真的有比 `Claude Code` 有慢了一點，不過我覺得差異沒有這麼的大
+
+然後在產生測試後，感覺好像它`沒有執行相關的測試`來驗證，至少我看對話裡面是看不出來
+
+這點真的就是比較大的問題，而且我還叫它修了兩次才修好
+
+這點如果沒有 fix，我覺得我不會想要用它 XD
+
+過程中好像也沒有遇到需要用到工具，權限的相關問題，`Claude Code` 的相關安全性好像做的比較好一點
+
+感覺上它的價錢和次數，是蠻有競爭力的
+
+- $19 鎂 1000 次
+- $39 鎂 3000 次
+
+應該是可以打到 `Claude Code` 了，就看後續 `Kiro` 怎麼發展
+
+## 相關連結
+
+- [kiro.dev](https://kiro.dev)
