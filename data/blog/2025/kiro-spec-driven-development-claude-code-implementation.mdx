@@ -1,0 +1,163 @@
+---
+layout: PostSimple
+title: '在 Claude Code 中重現 Kiro 的規格驅動開發流程'
+summary: '探討一位日本開發者如何透過逆向工程的方式，在 Anthropic Claude Code 中完整重現 Amazon Kiro 的規格驅動開發 (SDD) 流程，包含核心概念、實作方法與使用指南'
+date: '2025-07-22'
+lastmod: '2025-07-22'
+tags: ['kiro', 'claude-code', 'sdd', 'spec-driven-development', 'AI']
+draft: false
+images:
+  ['https://image.cashwu.com/2025/kiro-spec-driven-development-claude-code-implementation/01.webp']
+---
+
+![](https://image.cashwu.com/2025/kiro-spec-driven-development-claude-code-implementation/01.webp)
+
+最近看到一篇來自日本的技術文章，詳細介紹了作者如何在 Anthropic 的 Claude Code 中，徹底重現 Amazon AI 編碼代理 Kiro 的「規格驅動開發 (Spec-Driven Development, SDD)」流程。這個專案展示了即使無法直接使用 Kiro，也能在其他 AI 編碼工具中實現其高效且嚴謹的開發模式。
+
+## Kiro 及其規格驅動開發
+
+Kiro 是 Amazon 推出的一款整合開發環境 (IDE)，內建 AI 編碼代理，其核心特色在於採用 SDD 開發方法論。與傳統 AI 工具立即開始編碼的做法不同，Kiro 採用了更加嚴謹的開發流程：
+
+1. **詳細分析階段**：深入理解需求，識別潛在問題
+2. **設計階段**：創建全面的設計文件
+3. **實作階段**：基於詳細規格進行編碼
+
+這種方法論被認為非常理想，有望成為未來軟體開發的業界標準。
+
+## 為何選擇在 Claude Code 中重現 Kiro？
+
+儘管 Kiro 提供了優異的使用者體驗，但作者指出其存在一些限制，促使其在 Claude Code 中進行重現：
+
+### 技術限制
+
+- **模型限制**：Kiro 目前無法使用 Opus4 模型，而 Claude Code 可以
+- **功能整合**：Kiro 預設未整合網路搜尋 (WebSearch) 和網路擷取 (WebFetch) 功能，Claude Code 則內建這些功能，可將最新資訊納入需求與詳細設計
+
+### 客製化與成本考量
+
+- **客製化彈性**：Kiro 的規格 (Spec) 在現階段難以自由客製化需求定義
+- **成本考量**：Kiro 預覽期結束後，可能產生額外費用
+
+基於這些原因，作者透過「逆向工程」（或稱逆向上下文工程）的方式，力求在 Claude Code 中重現 Kiro 的 SDD 流程。
+
+## Kiro 規格驅動開發的兩大核心概念
+
+為在 Claude Code 中成功重現 Kiro，理解其兩個關鍵概念至關重要：
+
+### 1. Specs (規格)
+
+這是 SDD 的基石，能將模糊的提示轉換為符合實際開發流程的詳細實作計畫。在實作前，會先產出三份詳細設計文件，並在獲得回饋後才開始實作：
+
+- **`requirements.md`**：需求定義書
+- **`design.md`**：技術設計書
+- **`tasks.md`**：實作計畫
+
+### 2. Steering (導向/指導)
+
+此功能負責將專案的整體知識，如架構、技術堆疊、程式碼規範等，以 Markdown 檔案形式永久儲存在 `.kiro/steering/` 目錄下，確保程式碼生成的一致性。
+
+這類似於 Claude Code 的 `Claude.md` 或 Cursor 的 Project Rules，但 Steering 將各項目分開儲存，緩解了單一大型設定檔可能導致的問題：
+
+- **避免上下文膨脹**
+- **降低更新時易損壞的風險**
+
+Steering 預設會自動生成以下三份文件，並可依需求新增自訂檔案：
+
+- **`product.md`**：產品概覽
+- **`tech.md`**：技術堆疊
+- **`structure.md`**：專案結構
+
+## 在 Claude Code 中重現的規格驅動開發工作流程
+
+作者根據 Kiro 的設計理念，在 Claude Code 中重現了其 SDD 流程。這是一個相對冗長但嚴謹的流程，透過 Claude Code 的斜線指令 (Slash Commands) 和簡單的提示啟動，依序進行：
+
+1. **創建需求定義書**：分析和明確化需求
+2. **技術設計書**：制定技術實作方案
+3. **實作計畫**：規劃具體執行步驟
+
+每個階段都需要人工審核與確認，確保品質和準確性。
+
+## 使用方法與設定
+
+作者已經將完整的 Claude Code SDD prompt 架構開源到 GitHub 專案中，提供了一套完整可用的解決方案。將 Kiro 的 SDD 流程導入現有的 Claude Code 專案非常簡便。
+
+### 專案架構
+
+GitHub 專案提供了完整的目錄結構和配置檔案：
+
+```
+project-root/
+├── .claude/
+│   └── commands/          # 斜線指令定義檔案
+├── .kiro/
+│   ├── steering/          # 專案導向文件
+│   └── specs/             # 功能規格文件
+├── CLAUDE.md              # Claude Code 設定檔
+├── spec.json              # 階段審核追蹤
+└── README.md              # 專案說明文件
+```
+
+### 可用的斜線指令
+
+作者提供了完整的斜線指令集，涵蓋整個 SDD 工作流程：
+
+- **`/steering-init`**：創建初始導向文件（product.md、tech.md、structure.md）
+- **`/spec-init`**：開始新功能規格制定流程
+- **`/spec-requirements`**：生成需求定義書
+- **`/spec-design`**：創建技術設計文件
+- **`/spec-tasks`**：生成實作任務清單
+- **`/spec-status`**：檢查當前進度狀態
+
+### 三階段審核工作流程
+
+該系統實現了嚴謹的三階段審核機制：
+
+1. **需求階段**：產生 `requirements.md`，需人工審核批准
+2. **設計階段**：產生 `design.md`，需人工審核批准
+3. **任務階段**：產生 `tasks.md`，需人工審核批准
+
+每個階段都有對應的追蹤機制，確保開發品質。
+
+### 首次設定步驟
+
+1. **複製專案檔案**：從 GitHub 專案複製所有必要檔案到專案目錄
+2. **設定 CLAUDE.md**：根據專案需求調整設定檔
+3. **執行初始化指令**：
+   - 可選：`/steering-init` 創建導向文件
+   - 必須：`/spec-init "你的專案或想做的詳細說明"` 創建功能規格
+4. **遵循工作流程**：依照 Claude Code 的回應繼續流程，在每個階段進行人工審核
+5. **追蹤進度**：使用 `/spec-status` 隨時檢查當前開發狀態
+
+## 總結與展望
+
+作者表示，完整重現 Kiro 的規格驅動開發流程比預期中更具挑戰性，但最終取得了良好的成果。然而，Kiro 的最大優勢在於其將 SDD 工作流程完美整合至 IDE 中的「流暢使用者體驗」，這一點難以完全在 Claude Code 中複製。
+
+### 未來發展方向
+
+作者計畫持續改進此實作，並將其應用於實際專案中，包括：
+
+- **整合 Hooks**：提升自動化程度
+- **GitHub 議題整合**：將任務註冊至 GitHub 議題系統
+- **GitHub Actions 自動化**：利用 CI/CD 進行自動化處理
+
+### 社群回饋
+
+作者鼓勵使用者試用此重現方案並提供回饋，共同完善這個開源專案。這個專案不僅展示了 AI 工具之間的互操作性，也為開發者提供了一個在不同平台間遷移工作流程的範例。
+
+## 完整 Prompt 資源
+
+最重要的是，作者已經將所有相關的 Claude Code SDD prompt 完整地開源到 GitHub 專案中。這意味著開發者可以：
+
+- **直接使用**：無需從零開始設計 prompt，直接複製使用
+- **客製化調整**：根據專案需求修改斜線指令和設定
+- **持續改進**：參與開源專案，共同優化工作流程
+- **學習參考**：了解如何設計結構化的 AI 開發工作流程
+
+這個開源專案為想要在 Claude Code 中實現規格驅動開發的團隊提供了完整且立即可用的解決方案。
+
+## 參考連結
+
+- [Kiroの仕様書駆動開発プロセスをClaude Codeで徹底的に再現した](https://zenn.dev/gotalab/articles/3db0621ce3d6d2)
+- [GitHub 專案：Claude Code Spec-Driven Development](https://github.com/gotalab/claude-code-spec)
+- [Kiro 官方網站](https://kiro.dev)
+- [Claude Code 官方文件](https://docs.anthropic.com/en/docs/claude-code)
