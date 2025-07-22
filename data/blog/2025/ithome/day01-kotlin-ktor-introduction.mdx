@@ -1,0 +1,212 @@
+---
+layout: PostSimple
+title: 'Kotlin Ktor API 開發實戰 Day 01：緣起：為什麼選擇 Kotlin Ktor'
+summary: '介紹 Kotlin Ktor 框架的核心優勢與特色，深入比較 Ktor 與 Spring Boot 的差異，探討 Kotlin 協程的非同步程式設計優勢，以及 Ktor 輕量化設計帶來的開發效益'
+date: '2025-07-22'
+lastmod: '2025-07-22'
+tags: ['Kotlin', 'Ktor', 'API', 'Backend', 'Framework']
+draft: true
+images: ['https://image.cashwu.com/2025/ithome/day01-kotlin-ktor-introduction/01.webp']
+---
+
+![](https://image.cashwu.com/2025/ithome/day01-kotlin-ktor-introduction/01.webp)
+
+## 前言
+
+在後端開發的世界裡，Spring Boot 長期以來都是 Java 生態系統中的佼佼者，提供了豐富的功能和完整的開發體驗。然而，隨著 Kotlin 語言的成熟和協程技術的發展，一個全新的選擇正在崛起 ——Kotlin Ktor。
+
+這個系列文章將帶領大家從零開始學習 Ktor 框架，建立一個完整的 Todo List API 專案。我們將探索 Ktor 的核心概念、深入了解 Kotlin 協程的非同步程式設計模式，並實作現代後端開發的最佳實務。
+
+## 為什麼選擇 Kotlin Ktor？
+
+### Spring Boot vs Ktor：框架哲學的差異
+
+**Spring Boot：約定優於配置的完整解決方案**
+
+Spring Boot 採用「約定優於配置」的理念，提供了一個龐大而完整的生態系統。它就像是一個功能齊全的瑞士軍刀：
+
+```kotlin
+// Spring Boot 範例
+@RestController
+@RequestMapping("/api")
+class TodoController {
+
+    @GetMapping("/todos")
+    fun getAllTodos(): List<Todo> {
+        // Spring Boot 的約定：自動序列化、異常處理、日誌記錄
+        return todoService.findAll()
+    }
+}
+```
+
+**Ktor：極簡主義的模組化設計**
+
+相對於 Spring Boot 的「全家桶」模式，Ktor 採用模組化的極簡設計哲學，只提供核心功能，讓開發者根據需求選擇所需的組件：
+
+```kotlin
+// Ktor 範例
+fun Application.configureRouting() {
+    routing {
+        get("/api/todos") {
+            // 明確的控制流程：你決定如何處理請求和回應
+            val todos = todoService.findAll()
+            call.respond(HttpStatusCode.OK, todos)
+        }
+    }
+}
+```
+
+### Kotlin 協程：非同步程式設計的革命
+
+**傳統阻塞 I/O 的問題**
+
+在傳統的同步程式設計模式中，當執行 I/O 操作（如資料庫查詢或 HTTP 請求）時，執行緒會被阻塞，直到操作完成：
+
+```kotlin
+// 傳統阻塞方式
+fun getUsers(): List<User> {
+    // 執行緒在此阻塞，等待資料庫回應
+    val users = database.query("SELECT * FROM users")
+    return users
+}
+```
+
+**Ktor + 協程：真正的非同步處理**
+
+Ktor 原生支援 Kotlin 協程，讓我們能夠以同步的語法撰寫非同步程式碼：
+
+```kotlin
+// Ktor + 協程的非同步方式
+suspend fun getUsers(): List<User> {
+    // 非阻塞操作：其他協程可以在此時執行
+    return withContext(Dispatchers.IO) {
+        database.query("SELECT * FROM users")
+    }
+}
+
+fun Application.configureRouting() {
+    routing {
+        get("/users") {
+            // 協程自動處理非同步操作
+            val users = getUsers()
+            call.respond(users)
+        }
+    }
+}
+```
+
+> **協程的優勢**：一個執行緒可以同時處理數千個協程，大幅提升應用程式的併發能力
+
+### Ktor 的核心優勢
+
+**1. 輕量化設計**
+
+Ktor 的核心非常小巧，基本應用程式的 JAR 檔案大小通常只有幾十 MB，相比 Spring Boot 動輒上百 MB 的大小，在容器化部署時具有明顯優勢。
+
+**2. 原生 Kotlin 支援**
+
+Ktor 完全使用 Kotlin 開發，提供了完美的 Kotlin 語言特性支援：
+
+```kotlin
+// Kotlin 的優雅語法
+routing {
+    route("/api/v1") {
+        authenticate {
+            get("/profile") {
+                val user = call.principal<UserPrincipal>()
+                call.respond(user?.toDto() ?: throw UnauthorizedException())
+            }
+        }
+    }
+}
+```
+
+**3. 模組化插件系統**
+
+只引入你需要的功能，避免不必要的複雜性：
+
+```kotlin
+fun Application.module() {
+    // 只安裝需要的插件
+    install(ContentNegotiation) {
+        jackson()
+    }
+    install(CORS)
+    install(Authentication) {
+        jwt { /* 配置 */ }
+    }
+}
+```
+
+## 開始你的 Ktor 之旅
+
+讓我們從最簡單的 Hello World 開始，感受 Ktor 的魅力：
+
+```kotlin
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+
+fun main() {
+    // 嵌入式伺服器，快速啟動
+    embeddedServer(Netty, port = 8080) {
+        routing {
+            get("/") {
+                // 簡潔的 API 設計
+                call.respondText("Hello, Ktor World!")
+            }
+
+            get("/json") {
+                // 自動 JSON 序列化
+                call.respond(mapOf("message" to "Hello from Ktor!"))
+            }
+        }
+    }.start(wait = true)
+}
+```
+
+執行這個程式，你就有了一個完全功能的 HTTP 伺服器！
+
+## 系列學習規劃
+
+在接下來的 38 天裡，我們將逐步建構一個完整的 Todo List API，涵蓋：
+
+### 第一週：Ktor 基礎概念
+
+- 框架架構與協程基礎
+- 專案結構與配置管理
+- 插件系統與依賴注入
+
+### 第二週：API 核心實作
+
+- 路由設計與參數處理
+- 內容序列化與錯誤處理
+- API 文件化
+
+### 第三週：資料庫整合
+
+- Exposed 框架應用
+- 交易管理與連接池
+- 資料庫遷移
+
+### 第四週：測試與安全
+
+- 單元測試與整合測試
+- JWT 身分驗證與授權
+- API 安全防護
+
+### 第五週：進階主題
+
+- 檔案處理與快取機制
+- WebSocket 即時通訊
+- 容器化部署
+
+## 總結
+
+Kotlin Ktor 代表了現代後端開發的新方向：**極簡、高效、協程原生**。相比於 Spring Boot 的重量級解決方案，Ktor 提供了更精準的控制能力和更優異的效能表現。
+
+---
+
+> 圖片來源：AI 產生

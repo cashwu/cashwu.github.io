@@ -1,0 +1,237 @@
+---
+layout: PostSimple
+title: 'Kotlin Ktor API 開發實戰 Day 02：建立你的第一個 Ktor 應用程式'
+summary: '從零開始建立 Ktor 專案，詳解 Gradle 設定與依賴管理，實作第一個 Hello World API 端點，探討專案結構與最佳實務，讓你快速上手 Ktor 開發'
+date: '2025-07-22'
+lastmod: '2025-07-22'
+tags: ['Kotlin', 'Ktor', 'API', 'Backend', 'Gradle']
+draft: true
+images: ['https://image.cashwu.com/2025/ithome/day02-first-ktor-app/01.webp']
+---
+
+![](https://image.cashwu.com/2025/ithome/day02-first-ktor-app/01.webp)
+
+> 圖片來源：AI 產生
+
+## 前言
+
+昨天我們探討了為什麼選擇 Kotlin Ktor，了解了它相較於 Spring Boot 的優勢，以及 Kotlin 協程帶來的非同步程式設計革命。今天我們要動手實作，從零開始建立你的第一個 Ktor 應用程式。
+
+這篇文章將帶你完成以下目標：
+
+- 建立一個完整的 Ktor 專案
+- 理解 Gradle 的依賴配置
+- 實作第一個 API 端點
+- 掌握 Ktor 的基本專案結構
+
+## 建立 Ktor 專案
+
+### 專案初始化
+
+首先，建立一個新的資料夾並初始化 Gradle 專案：
+
+```bash
+# 建立專案目錄
+mkdir todo-ktor-api
+cd todo-ktor-api
+
+# 初始化 Gradle 專案
+gradle init --type kotlin-application --dsl kotlin
+```
+
+### 專案結構概覽
+
+建立完成後，你的專案結構應該如下所示：
+
+```
+todo-ktor-api/
+├── build.gradle.kts          # Gradle 建置檔案
+├── settings.gradle.kts       # Gradle 設定檔案
+├── gradle/                   # Gradle 包裝器
+├── src/
+│   ├── main/
+│   │   ├── kotlin/          # 主要程式碼
+│   │   │   └── com/example/
+│   │   │       └── Application.kt
+│   │   └── resources/       # 資源檔案
+│   │       └── logback.xml
+│   └── test/                # 測試程式碼
+│       └── kotlin/
+└── README.md
+```
+
+## Gradle 設定詳解
+
+讓我們先配置 `settings.gradle.kts`，使用 Ktor 的版本目錄來統一管理依賴版本：
+
+```kotlin
+// settings.gradle.kts
+rootProject.name = "todo-ktor-api"
+
+// 使用 Ktor 版本目錄來管理依賴
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("ktorLibs") {
+            from("io.ktor:ktor-version-catalog:3.2.2")
+        }
+    }
+}
+```
+
+接下來配置主要的建置檔案 `build.gradle.kts`：
+
+```kotlin
+// build.gradle.kts
+plugins {
+    kotlin("jvm") version "1.9.21"
+    id("io.ktor.plugin") version "3.2.2"
+    application
+}
+
+group = "com.example"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Ktor 核心依賴
+    implementation("io.ktor:ktor-server-core")
+    implementation("io.ktor:ktor-server-netty")
+
+    // 內容協商（JSON 支援）
+    implementation("io.ktor:ktor-server-content-negotiation")
+    implementation("io.ktor:ktor-serialization-jackson")
+
+    // 日誌系統
+    implementation("ch.qos.logback:logback-classic:1.4.14")
+
+    // 測試依賴
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.21")
+}
+
+// 指定主類別
+application {
+    mainClass.set("com.example.ApplicationKt")
+}
+
+// Ktor 外掛設定
+ktor {
+    fatJar {
+        archiveFileName.set("todo-ktor-api.jar")
+    }
+}
+```
+
+> **重要提醒**：Ktor 3.2.2 使用 `ktor-server-core` 作為核心依賴，不再需要 `ktor-server-core-jvm` 後綴
+
+## 實作第一個 Hello World API
+
+現在讓我們建立主要的應用程式檔案：
+
+```kotlin
+// src/main/kotlin/com/example/Application.kt
+package com.example
+
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.routing.*
+import io.ktor.server.response.*
+import io.ktor.http.*
+
+fun main() {
+    // 啟動嵌入式 Netty 伺服器
+    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+        // 配置應用程式模組
+        configureRouting()
+    }.start(wait = true)
+}
+
+// 路由配置
+fun Application.configureRouting() {
+    routing {
+        // 基本的 Hello World 端點
+        get("/") {
+            call.respondText(
+                text = "歡迎來到 Todo Ktor API！",
+                contentType = ContentType.Text.Plain
+            )
+        }
+    }
+}
+
+// 內容協商配置（用於 JSON 序列化）
+fun Application.configureContentNegotiation() {
+    install(ContentNegotiation) {
+        jackson()
+    }
+}
+```
+
+## 啟動與測試應用程式
+
+### 啟動應用程式
+
+使用 Gradle 啟動開發伺服器：
+
+```bash
+# 啟動開發伺服器
+./gradlew run
+```
+
+如果一切順利，你應該會看到類似以下的輸出：
+
+```
+> Task :run
+22:30:15.123 [main] INFO  Application - Responding at http://0.0.0.0:8080
+22:30:15.125 [main] INFO  Application - Application started in 0.456 seconds.
+```
+
+### 測試 API 端點
+
+現在你可以使用 curl 或瀏覽器測試各個端點：
+
+```bash
+# 測試首頁
+curl http://localhost:8080/
+# 回應：歡迎來到 Todo Ktor API！
+```
+
+## 程式碼深度解析
+
+### 嵌入式伺服器 vs EngineMain
+
+我們使用了 `embeddedServer` 的方式啟動應用程式，這種方式的優點是：
+
+```kotlin
+// 嵌入式伺服器：直接在程式碼中配置
+embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    configureRouting()
+}.start(wait = true)
+```
+
+另一種方式是使用 `EngineMain`，它會從設定檔讀取配置：
+
+```kotlin
+// EngineMain 方式：需要配置檔
+fun main(args: Array<String>): Unit =
+    io.ktor.server.netty.EngineMain.main(args)
+```
+
+> **開發建議**：開發階段使用 `embeddedServer` 較為直觀，生產環境可考慮使用 `EngineMain` 搭配外部配置檔
+
+## 總結
+
+恭喜你！你已經成功建立了第一個 Ktor 應用程式。讓我們回顧一下今天學到的重點：
+
+- **專案結構**：使用標準的 Gradle Kotlin 專案結構，便於管理和擴展
+- **依賴管理**：透過 Ktor 版本目錄統一管理依賴版本，避免版本衝突
+- **嵌入式伺服器**：Netty 提供高效能的 HTTP 伺服器支援
+- **路由設計**：採用模組化的路由配置，讓程式碼更清晰易讀
+- **JSON 支援**：整合 Jackson 進行 JSON 序列化和反序列化
+- **測試框架**：使用 Ktor 的測試引擎進行單元測試
+
+明天我們將深入探討 Ktor 的專案結構與設定，學習如何組織大型應用程式的程式碼架構。這個 Hello World 應用程式將作為我們後續開發 Todo API 的基礎。
