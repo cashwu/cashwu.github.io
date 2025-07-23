@@ -197,7 +197,7 @@ images: ['https://image.cashwu.com/YYYY/article-slug/01.webp']
 ```markdown
 ## 支持創作
 
-如果這篇文章對您有幫助，歡迎透過 [贊助連結](https://portaly.cc/cashwugeek) 支持我持續創作優質內容。您的支持是我前進的動力！
+如果這篇文章對您有幫助，歡迎透過 [贊助連結](https://portaly.cc/cashwugeek/support) 支持我持續創作優質內容。您的支持是我前進的動力！
 ```
 
 **位置**：放在文章內容結束後、分隔線和圖片來源標註之前
