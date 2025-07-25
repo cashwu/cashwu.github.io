@@ -1,0 +1,641 @@
+---
+layout: PostSimple
+title: 'Kotlin Ktor API 開發實戰 Day 03：剖析 Ktor 專案結構與設定'
+summary: '深入分析 Ktor 專案的標準目錄結構與檔案組織，探討模組化設計原則、核心檔案職責，以及設定檔管理基礎。比較 Ktor 與 Spring Boot 的架構差異，學習如何建立可維護的企業級 API 專案結構。'
+date: '2025-07-25'
+lastmod: '2025-07-25'
+tags: ['Kotlin', 'Ktor', 'API', 'Project Structure', 'Configuration']
+draft: true
+images: ['https://image.cashwu.com/2025/ithome/day03-ktor-project-structure/01.webp']
+---
+
+![](https://image.cashwu.com/2025/ithome/day03-ktor-project-structure/01.webp)
+
+> 圖片來源：AI 產生
+
+## 前言
+
+在前一天的文章中，我們成功建立了第一個 Ktor 應用程式，體驗了 Ktor 的極簡設計和協程的威力。然而，當我們要開發真實的企業級 API 時，一個清晰且可維護的專案結構就顯得至關重要。
+
+今天我們將深入探討 Ktor 專案的標準結構，學習如何組織程式碼、管理設定檔，以及建立可擴展的模組化架構。透過與 Spring Boot 的對比，你將更深入理解 Ktor 的設計哲學。
+
+## Ktor 專案標準結構
+
+讓我們從一個完整的 Todo List API 專案結構開始：
+
+```
+todo-list-api/
+├── build.gradle.kts              # Gradle 建置設定
+├── gradle.properties             # Gradle 屬性設定
+├── settings.gradle.kts           # Gradle 專案設定
+├── src/
+│   ├── main/
+│   │   ├── kotlin/
+│   │   │   └── com/
+│   │   │       └── demo/
+│   │   │           ├── Application.kt           # 應用程式進入點
+│   │   │           ├── config/                  # 設定相關
+│   │   │           │   ├── Database.kt
+│   │   │           │   └── Security.kt
+│   │   │           ├── plugins/                 # Ktor 插件設定
+│   │   │           │   ├── Routing.kt
+│   │   │           │   ├── Serialization.kt
+│   │   │           │   ├── Monitoring.kt
+│   │   │           │   └── HTTP.kt
+│   │   │           ├── routes/                  # 路由定義
+│   │   │           │   ├── TodoRoutes.kt
+│   │   │           │   └── HealthRoutes.kt
+│   │   │           ├── models/                  # 資料模型
+│   │   │           │   ├── Todo.kt
+│   │   │           │   └── ApiResponse.kt
+│   │   │           ├── services/                # 業務邏輯
+│   │   │           │   └── TodoService.kt
+│   │   │           ├── repositories/            # 資料存取層
+│   │   │           │   └── TodoRepository.kt
+│   │   │           └── utils/                   # 工具類別
+│   │   │               └── Extensions.kt
+│   │   └── resources/
+│   │       ├── application.conf                 # 主要設定檔
+│   │       ├── application-dev.conf             # 開發環境設定
+│   │       ├── application-prod.conf            # 生產環境設定
+│   │       └── logback.xml                      # 日誌設定
+│   └── test/
+│       └── kotlin/
+│           └── com/
+│               └── demo/
+│                   ├── ApplicationTest.kt       # 應用程式測試
+│                   ├── routes/                  # 路由測試
+│                   │   └── TodoRoutesTest.kt
+│                   └── services/                # 服務測試
+│                       └── TodoServiceTest.kt
+└── docker/
+    ├── Dockerfile                              # 容器化設定
+    └── docker-compose.yml                      # 本地開發環境
+```
+
+### 建置設定檔 (`build.gradle.kts`)
+
+Ktor 專案的 Gradle 設定檔是整個專案的建置基礎：
+
+```kotlin
+// build.gradle.kts
+val ktor_version: String by project
+val kotlin_version: String by project
+val logback_version: String by project
+
+plugins {
+    kotlin("jvm") version "1.9.10"
+    id("io.ktor.plugin") version "3.2.2"
+    kotlin("plugin.serialization") version "1.9.10"
+    application
+}
+
+group = "com.demo"
+version = "0.0.1"
+
+application {
+    mainClass.set("com.demo.ApplicationKt")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Ktor 核心依賴
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+
+    // 內容協商和序列化
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+
+    // HTTP 功能
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
+    implementation("io.ktor:ktor-server-compression:$ktor_version")
+    implementation("io.ktor:ktor-server-default-headers:$ktor_version")
+
+    // 監控和日誌
+    implementation("io.ktor:ktor-server-call-logging:$ktor_version")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+
+    // 測試相關
+    testImplementation("io.ktor:ktor-server-tests:$ktor_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+}
+```
+
+## 核心檔案詳細解析
+
+### 1. 應用程式進入點 (`Application.kt`)
+
+這是整個應用程式的核心，負責啟動伺服器和載入所有模組：
+
+```kotlin
+package com.demo
+
+import com.demo.plugins.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+
+fun main() {
+    // 嵌入式伺服器啟動
+    embeddedServer(
+        Netty,
+        port = 8080,
+        host = "0.0.0.0",
+        module = Application::module
+    ).start(wait = true)
+}
+
+/**
+ * 主要應用程式模組
+ * 負責配置所有的插件和功能
+ */
+fun Application.module() {
+    // 設定 HTTP 相關功能（CORS、壓縮等）
+    configureHTTP()
+
+    // 設定監控和日誌
+    configureMonitoring()
+
+    // 設定序列化（JSON 處理）
+    configureSerialization()
+
+    // 設定路由
+    configureRouting()
+}
+```
+
+> **設計原則**：`Application.kt` 僅負責模組的整合與載入，具體的配置邏輯分散在各個 plugins 檔案中
+
+### 2. Plugins 目錄 - 功能模組化
+
+Ktor 的插件系統是其模組化設計的核心。每個插件檔案負責特定功能的配置：
+
+**HTTP.kt - HTTP 相關設定**
+
+```kotlin
+package com.demo.plugins
+
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.plugins.defaultheaders.*
+
+fun Application.configureHTTP() {
+    // 設定 CORS 政策
+    install(CORS) {
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentType)
+        // 開發環境允許所有來源
+        if (isDevelopment()) {
+            anyHost()
+        } else {
+            // 生產環境指定允許的域名
+            allowHost("api.example.com", schemes = listOf("https"))
+        }
+    }
+
+    // 啟用 Gzip 壓縮
+    install(Compression) {
+        gzip {
+            priority = 1.0
+            minimumSize(1024) // 超過 1KB 才壓縮
+        }
+    }
+
+    // 設定預設回應標頭
+    install(DefaultHeaders) {
+        header("X-Engine", "Ktor")
+        header("X-API-Version", "1.0")
+    }
+}
+```
+
+**Serialization.kt - 資料序列化設定**
+
+```kotlin
+package com.demo.plugins
+
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import kotlinx.serialization.json.Json
+
+fun Application.configureSerialization() {
+    install(ContentNegotiation) {
+        json(Json {
+            // 美化 JSON 輸出
+            prettyPrint = true
+            // 忽略未知的 JSON 屬性
+            ignoreUnknownKeys = true
+            // 允許特殊的浮點數值
+            allowSpecialFloatingPointValues = true
+        })
+    }
+}
+```
+
+**Monitoring.kt - 監控與日誌**
+
+```kotlin
+package com.demo.plugins
+
+import io.ktor.server.application.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.request.*
+import org.slf4j.event.Level
+
+fun Application.configureMonitoring() {
+    install(CallLogging) {
+        level = Level.INFO
+
+        // 自訂日誌格式
+        format { call ->
+            val status = call.response.status()
+            val httpMethod = call.request.httpMethod.value
+            val uri = call.request.uri
+            val userAgent = call.request.headers["User-Agent"]
+            "$status: $httpMethod $uri - $userAgent"
+        }
+
+        // 過濾敏感路徑
+        disableDefaultColors()
+        filter { call ->
+            call.request.path().startsWith("/api")
+        }
+    }
+}
+```
+
+**Routing.kt - 路由配置**
+
+```kotlin
+package com.demo.plugins
+
+import com.demo.routes.configureHealthRoutes
+import com.demo.routes.configureTodoRoutes
+import io.ktor.server.application.*
+import io.ktor.server.routing.*
+
+fun Application.configureRouting() {
+    routing {
+        // 健康檢查路由
+        configureHealthRoutes()
+
+        // API 版本路由群組
+        route("/api/v1") {
+            configureTodoRoutes()
+        }
+    }
+}
+```
+
+### 3. Routes 目錄 - 路由定義
+
+將不同功能的路由分別定義，提高程式碼的可維護性：
+
+**TodoRoutes.kt**
+
+```kotlin
+package com.demo.routes
+
+import com.demo.models.Todo
+import com.demo.services.TodoService
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+
+fun Route.configureTodoRoutes() {
+    val todoService = TodoService()
+
+    route("/todos") {
+        // GET /api/v1/todos - 取得所有待辦事項
+        get {
+            try {
+                val todos = todoService.getAllTodos()
+                call.respond(HttpStatusCode.OK, todos)
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    mapOf("error" to "無法取得待辦事項")
+                )
+            }
+        }
+
+        // POST /api/v1/todos - 建立新的待辦事項
+        post {
+            try {
+                val todo = call.receive<Todo>()
+                val createdTodo = todoService.createTodo(todo)
+                call.respond(HttpStatusCode.Created, createdTodo)
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf("error" to "無法建立待辦事項")
+                )
+            }
+        }
+
+        // GET /api/v1/todos/{id} - 取得特定待辦事項
+        get("/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest, mapOf("error" to "無效的 ID"))
+                return@get
+            }
+
+            try {
+                val todo = todoService.getTodoById(id)
+                if (todo != null) {
+                    call.respond(HttpStatusCode.OK, todo)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "找不到待辦事項"))
+                }
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    mapOf("error" to "伺服器錯誤")
+                )
+            }
+        }
+    }
+}
+```
+
+### 4. Models 目錄 - 資料模型
+
+定義 API 的資料結構，使用 Kotlin 的 `@Serializable` 註解：
+
+```kotlin
+package com.demo.models
+
+import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+
+@Serializable
+data class Todo(
+    val id: Int? = null,
+    val title: String,
+    val description: String? = null,
+    val completed: Boolean = false,
+    val createdAt: String = LocalDateTime.now().toString(),
+    val updatedAt: String? = null
+)
+
+@Serializable
+data class ApiResponse<T>(
+    val success: Boolean,
+    val data: T? = null,
+    val message: String? = null,
+    val timestamp: String = LocalDateTime.now().toString()
+)
+```
+
+## 設定檔管理
+
+### 1. 主設定檔 (`application.conf`)
+
+Ktor 使用 HOCON (Human-Optimized Config Object Notation) 格式：
+
+```hocon
+# application.conf
+ktor {
+    deployment {
+        port = 8080
+        port = ${?PORT}  # 從環境變數讀取
+    }
+
+    application {
+        modules = [ com.demo.ApplicationKt.module ]
+    }
+
+    # 開發環境設定
+    development = true
+    development = ${?KTOR_DEVELOPMENT}
+}
+
+# 資料庫設定
+database {
+    driverClassName = "org.h2.Driver"
+    jdbcURL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
+    jdbcURL = ${?DATABASE_URL}
+    maximumPoolSize = 10
+}
+
+# JWT 設定
+jwt {
+    domain = "https://jwt-provider-domain/"
+    audience = "jwt-audience"
+    realm = "ktor sample app"
+    secret = "secret"
+    secret = ${?JWT_SECRET}
+}
+```
+
+### 2. 環境特定設定
+
+**application-dev.conf** (開發環境)
+
+```hocon
+include "application.conf"
+
+ktor {
+    development = true
+}
+
+database {
+    jdbcURL = "jdbc:h2:mem:devdb;DB_CLOSE_DELAY=-1"
+}
+
+logging {
+    level = DEBUG
+}
+```
+
+**application-prod.conf** (生產環境)
+
+```hocon
+include "application.conf"
+
+ktor {
+    development = false
+    deployment {
+        port = 8080
+    }
+}
+
+database {
+    jdbcURL = ${DATABASE_URL}
+    maximumPoolSize = 20
+}
+
+logging {
+    level = INFO
+}
+```
+
+## Ktor vs Spring Boot：架構對比
+
+讓我們比較相同功能在兩個框架中的實現方式：
+
+### Spring Boot 結構
+
+```
+spring-boot-app/
+├── src/main/java/com/demo/
+│   ├── Application.java              # @SpringBootApplication
+│   ├── controller/                   # @RestController
+│   │   └── TodoController.java
+│   ├── service/                      # @Service
+│   │   └── TodoService.java
+│   ├── repository/                   # @Repository
+│   │   └── TodoRepository.java
+│   └── model/                        # @Entity
+│       └── Todo.java
+└── src/main/resources/
+    └── application.properties        # Spring 設定
+```
+
+### Ktor 結構
+
+```
+ktor-app/
+├── src/main/kotlin/com/demo/
+│   ├── Application.kt                # 明確的伺服器啟動
+│   ├── plugins/                      # 功能模組化
+│   │   ├── Routing.kt
+│   │   ├── Serialization.kt
+│   │   └── HTTP.kt
+│   ├── routes/                       # 路由定義
+│   │   └── TodoRoutes.kt
+│   ├── services/                     # 業務邏輯
+│   │   └── TodoService.kt
+│   └── models/                       # 資料模型
+│       └── Todo.kt
+└── src/main/resources/
+    └── application.conf              # HOCON 設定
+```
+
+### 關鍵差異分析
+
+| 面向         | Spring Boot                          | Ktor                            |
+| ------------ | ------------------------------------ | ------------------------------- |
+| **配置方式** | 註解驅動 (`@Configuration`, `@Bean`) | 函式呼叫 (`install`, `routing`) |
+| **依賴注入** | 自動掃描和註冊                       | 手動管理或使用 Koin             |
+| **路由定義** | 註解在控制器方法上                   | 專門的路由檔案                  |
+| **設定檔**   | Properties/YAML                      | HOCON                           |
+| **模組載入** | 自動掃描套件                         | 明確呼叫配置函式                |
+
+**Spring Boot 範例**：
+
+```java
+@RestController
+@RequestMapping("/api/v1")
+@Component  // 自動掃描註冊
+public class TodoController {
+
+    @Autowired  // 自動注入
+    private TodoService todoService;
+
+    @GetMapping("/todos")  // 註解定義路由
+    public ResponseEntity<List<Todo>> getAllTodos() {
+        return ResponseEntity.ok(todoService.getAllTodos());
+    }
+}
+```
+
+**Ktor 範例**：
+
+```kotlin
+fun Route.configureTodoRoutes() {
+    val todoService = TodoService()  // 明確建立實例
+
+    route("/todos") {  // 明確路由定義
+        get {  // 明確 HTTP 方法
+            val todos = todoService.getAllTodos()
+            call.respond(HttpStatusCode.OK, todos)
+        }
+    }
+}
+```
+
+> **核心差異**：Spring Boot 強調「約定優於配置」，而 Ktor 強調「明確性優於隱式性」
+
+## 最佳實踐建議
+
+### 1. 包命名慣例
+
+```kotlin
+com.yourcompany.projectname
+├── config/          # 配置相關類別
+├── plugins/         # Ktor 插件配置
+├── routes/          # 路由定義
+├── models/          # 資料模型和 DTO
+├── services/        # 業務邏輯層
+├── repositories/    # 資料存取層
+├── utils/           # 工具類別和擴展函式
+└── exceptions/      # 自訂例外類別
+```
+
+### 2. 模組化原則
+
+- **單一職責**：每個檔案只負責一個特定功能
+- **依賴方向**：上層模組依賴下層模組，避免循環依賴
+- **配置集中**：所有插件配置集中在 `plugins` 目錄
+
+### 3. 錯誤處理結構
+
+```kotlin
+// exceptions/TodoException.kt
+sealed class TodoException(message: String) : Exception(message) {
+    class NotFound(id: Int) : TodoException("Todo with id $id not found")
+    class InvalidData(field: String) : TodoException("Invalid data for field: $field")
+    class DatabaseError(cause: Throwable) : TodoException("Database operation failed: ${cause.message}")
+}
+
+// plugins/ErrorHandling.kt
+fun Application.configureErrorHandling() {
+    install(StatusPages) {
+        exception<TodoException.NotFound> { call, cause ->
+            call.respond(HttpStatusCode.NotFound, mapOf("error" to cause.message))
+        }
+        exception<TodoException.InvalidData> { call, cause ->
+            call.respond(HttpStatusCode.BadRequest, mapOf("error" to cause.message))
+        }
+    }
+}
+```
+
+## 總結
+
+今天我們深入探討了 Ktor 專案的標準結構和組織原則：
+
+1. **模組化設計**：透過 `plugins` 目錄實現功能的模組化配置
+2. **明確的控制流程**：每個功能都需要明確的設定和呼叫
+3. **靈活的設定管理**：使用 HOCON 格式支援環境特定配置
+4. **清晰的程式碼組織**：按功能分離路由、服務、模型等
+
+相比 Spring Boot 的註解驅動和自動配置，Ktor 提供了更多的控制權和透明度。雖然需要更多的手動配置，但這種明確性讓我們對應用程式的每個部分都有完全的掌控。
+
+在下一篇文章中，我們將學習 Ktor 的插件系統，深入了解如何使用和自訂插件來增強我們的 API 功能。
+
+## 支持創作
+
+如果這篇文章對您有幫助，歡迎透過 [贊助連結](https://portaly.cc/cashwugeek/support) 支持我持續創作優質內容。您的支持是我前進的動力！
+
+---
+
+> 圖片來源：AI 產生
