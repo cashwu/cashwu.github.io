@@ -1,0 +1,249 @@
+---
+layout: PostSimple
+title: 'Make the Change Easy：Kent Beck 重構哲學的重構實踐'
+summary: '深入探討 Kent Beck 經典名言「先讓修改變得容易，然後再進行容易的修改」，透過實際重構示範了解如何在遺留代碼中實現優雅的設計改進'
+date: '2025-07-27'
+lastmod: '2025-07-27'
+tags: ['refactor', 'kent-beck', 'coding', 'software-development']
+draft: false
+images: ['https://image.cashwu.com/2025/make-the-change-easy-kent-beck-refactoring/cover.webp']
+---
+
+![](https://image.cashwu.com/2025/make-the-change-easy-kent-beck-refactoring/cover.webp)
+
+在軟體開發的世界中，Kent Beck 的一句經典名言深深影響了無數開發者的思維方式：「先讓修改變得容易，然後再進行容易的修改」（"Make the change easy, then make the easy change"）。這句話看似簡單，但其中蘊含的重構哲學卻是軟體工程中的深刻智慧。
+
+Samman Coaching - Emily 製作的一部影片，展示了技術教練 Ivett Ördög 如何將這一理念付諸實踐。這不只是技術示範，更是相關概念的重構詮釋。
+
+## Kent Beck 重構哲學的核心理念
+
+### "Make the Change Easy" 的深層含義
+
+Kent Beck 的這句名言包含了兩個關鍵階段，而**順序至關重要**：
+
+1. **先讓修改變得容易**（Make the change easy）
+2. **然後進行容易的修改**（Then make the easy change）
+
+許多開發者在面對功能需求時，往往急於直接實現功能，忽略了第一個步驟的重要性。然而，如果代碼結構不支持即將進行的修改，直接添加功能往往會導致更複雜、更難維護的代碼。
+
+### 英文原文的簡潔力量
+
+英文原文 "Make the change easy, then make the easy change" 用詞精準而有力，體現了技術文獻中語言的重要性。這種簡潔的表達方式讓概念更容易記住和傳播，也突顯了好的技術思想往往具有優雅的表達形式。
+
+## 「穿越沼澤」的重構隱喻
+
+在影片中，Ivett Ördög 使用了一個生動的比喻來解釋重構的價值：**穿越沼澤**。
+
+### 直線路徑 vs. 迂迴路徑
+
+- **直線路徑**：直接在現有的糟糕設計上添加功能，就像在沼澤中直線行走，每一步都舉步維艱
+- **迂迴路徑**：先重構代碼結構，雖然看起來像是在「倒退」，但最終會到達「堅實的地面」（良好設計），從那裡進行修改就變得輕而易舉
+
+這個隱喻深刻地說明了為什麼我們需要投資時間在代碼品質上：**短期的迂迴，換取長期的效率**。
+
+## Trivia 遺留代碼的重構實踐
+
+### 問題背景
+
+影片中的示範基於經典的「Trivia」（問答遊戲）遺留代碼練習。目標看似簡單：為遊戲新增兩個類別，同時保持 12 個場地並讓類別循環。
+
+### 現有設計的問題
+
+原始代碼存在多個設計問題：
+
+1. **緊耦合**：每個類別都有獨立的鏈結串列存放問題
+2. **硬編碼**：所有類別都被硬編碼在 `AskQuestion` 和 `CurrentCategory` 函式中
+3. **重複邏輯**：類別判斷邏輯散布在多個地方
+
+這些問題使得簡單的功能擴展變得異常複雜。
+
+## 三階段重構策略
+
+Ivett 採用了系統性的三階段重構策略：
+
+### 階段一：解耦函式依賴
+
+#### 重構 `CurrentCategory` 函式
+
+**原始問題**：函式依賴於 `Game` 類別中的 `places` 和 `currentPlayer`
+
+**解決方案**：
+
+1. 提取 `place` 變數
+2. 將邏輯抽離為獨立的 `GetCategoryFor` 函式
+
+```java
+// 重構前：緊耦合
+private string CurrentCategory() {
+    if (places[currentPlayer] == 0) return "Pop";
+    // ... 更多硬編碼邏輯
+}
+
+// 重構後：解耦
+private string GetCategoryFor(int place) {
+    if (place == 0) return "Pop";
+    // ... 邏輯保持不變，但不依賴外部狀態
+}
+```
+
+#### 重構 `AskQuestion` 函式
+
+**特殊考量**：函式包含日誌記錄器，而日誌不應屬於 `Questions` 類別
+
+**解決策略**：
+
+1. 引入 `question` 變數來存儲問題
+2. 先記錄結果，再根據類別 (`currentCategory`) 覆寫問題
+3. 提取核心邏輯為 `GetQuestionFor` 函式
+
+### 階段二：提取獨立類別
+
+將所有與問題和類別相關的邏輯移動到新的 `Questions` 類別：
+
+- 四個問題的鏈結串列
+- `InitializedQuestions` 函式（整合到建構函式）
+- `GetQuestionFor` 和 `GetCategoryFor` 函式
+
+### 階段三：實現簡化功能
+
+#### 引入 Questions 陣列
+
+```java
+public class Questions {
+    private String[] _categories = ['Pop', 'Science', 'Sports', 'Rock'];
+}
+```
+
+#### 利用餘數運算簡化邏輯
+
+```java
+// 重構前：硬編碼條件判斷
+public string GetCategoryFor(int place) {
+    if (place == 0) return "Pop";
+    if (place == 4) return "Pop";
+    if (place == 8) return "Pop";
+    // ... 更多重複邏輯
+}
+
+// 重構後：優雅的數學運算
+public string GetCategoryFor(int place) {
+    return _categories[place % _categories.length];
+}
+```
+
+#### 統一數據結構
+
+將四個獨立的鏈結串列替換為統一的字典結構：
+
+```java
+// 重構前：分散的數據結構
+private readonly LinkedList<string> _popQuestions = new LinkedList<string>();
+private readonly LinkedList<string> _scienceQuestions = new LinkedList<string>();
+private readonly LinkedList<string> _sportsQuestions = new LinkedList<string>();
+private readonly LinkedList<string> _rockQuestions = new LinkedList<string>();
+
+// 重構後：統一的數據結構
+private Dictionary<string, LinkedList<string>> _questions = new Dictionary<string, LinkedList<string>>();
+
+private void InitializedQuestions()
+{
+    foreach (var category in _categories)
+    {
+        _questions[category] = new LinkedList<string>();
+    }
+
+    //... 其它程式碼
+}
+
+```
+
+## 重構的價值主張
+
+### 時間投資的回報
+
+Ivett 強調了一個重要概念：**通過預先改善設計節省的時間，抵消了重構所需的時間**。這意味著：
+
+- 重構不是額外的負擔，而是功能開發的一部分
+- 良好的設計讓後續修改變得輕鬆
+- 投資代碼品質是一種明智的時間管理策略
+
+### 完美的結果
+
+經過重構後，原本複雜的功能擴展變得極其簡單：
+
+> 添加兩個新類別，只需要加到 \_categories 的陣列中就好
+
+```javascript
+
+public class Questions {
+    private String[] _categories = ['Pop', 'Science', 'Sports', 'Rock', 'History', 'Geography'];
+}
+```
+
+這正是 Kent Beck 哲學的完美體現：**先投資於讓修改變得容易，然後修改就變得輕而易舉**。
+
+## 重構過程中的實用技巧
+
+### 小步驟，頻繁測試
+
+Ivett 在重構過程中展示了幾個重要的實踐原則：
+
+1. **每次重構後都運行測試**：確保功能不被破壞
+2. **使用多游標編輯**：在沒有自動重構工具時提高效率
+3. **先複製後刪除**：讓新舊結構並存，確保穩定性
+
+### 錯誤處理與修正
+
+即使是經驗豐富的開發者，在重構過程中也會犯錯。影片中 Ivett 發現並修正了一個小錯誤（問題字串沒有根據類別修改），這提醒我們：
+
+- 重構是一個迭代過程
+- 測試是發現問題的最佳方式
+- 快速修正比完美規劃更重要
+
+## 對現代軟體開發的啟示
+
+### 技術債務的管理
+
+這個重構示範告訴我們，技術債務不應該被視為「以後再處理的問題」，而是當前開發工作的一部分。當我們面對難以修改的代碼時，正確的做法是：
+
+1. **停下來評估**：是否應該先改善設計？
+2. **投資重構**：讓代碼支持即將進行的修改
+3. **然後實現功能**：在良好的基礎上添加新功能
+
+### 設計思維的培養
+
+Kent Beck 的重構哲學培養了一種重要的設計思維：
+
+- **前瞻性思考**：考慮代碼的未來演進方向
+- **階段性規劃**：將複雜任務分解為可管理的步驟
+- **品質意識**：將代碼品質視為功能交付的一部分
+
+## 結語
+
+Kent Beck 的「先讓修改變得容易，然後再進行容易的修改」不僅是一句格言，更是一種軟體開發的智慧。通過 Ivett Ördög 的精彩示範，我們看到了這一理念在實際項目中的強大威力。
+
+在快節奏的開發環境中，我們常常被迫直接在糟糕的代碼上添加功能。但正如影片所展示的，有時候「走遠路」反而是最快的路徑。投資於代碼品質，讓修改變得容易，這不僅會讓我們的工作更加高效，也會讓編程重新變得有趣。
+
+英文原文 `Make the change easy, then make the easy change` 的簡潔有力，正如優秀的代碼一樣，用最少的詞彙表達了最深刻的思想。這正是我們在軟體開發中應該追求的境界：簡潔、優雅、有力。
+
+<iframe
+  style={{
+    width: '100%',
+    aspectRatio: '16 / 9',
+  }}
+  src="https://www.youtube.com/embed/6vCA4dYnbX4?si=7qqF-g5lEC5PgTsG"
+  title="'Make the Code Change Easy' Demo - Trivia Legacy Kata with Ivett Ördög"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
+
+---
+
+## 支持創作
+
+如果這篇文章對您有幫助，歡迎透過 [贊助連結](https://portaly.cc/cashwugeek/support) 支持我持續創作優質內容。您的支持是我前進的動力！
+
+---
+
+> 圖片來源：AI 產生
