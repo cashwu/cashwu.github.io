@@ -147,7 +147,7 @@ yarn analyze
 - 使用 `PostSimple` 版面配置作為預設選項
 - 必須包含 `lastmod` 欄位以追蹤文章更新時間
 - 圖片使用 `image.cashwu.com` CDN 託管
-- 每篇文章需有封面圖片，格式為 `https://image.cashwu.com/YYYY/article-slug/01.webp`
+- 每篇文章需有封面圖片，格式為 `https://image.cashwu.com/YYYY/article-slug/cover.webp`
 
 ### Frontmatter 必填欄位
 
@@ -160,7 +160,7 @@ date: 'YYYY-MM-DD'
 lastmod: 'YYYY-MM-DD'
 tags: ['標籤1', '標籤2']
 draft: false
-images: ['https://image.cashwu.com/YYYY/article-slug/01.webp']
+images: ['https://image.cashwu.com/YYYY/article-slug/cover.webp']
 ---
 ```
 
@@ -169,16 +169,10 @@ images: ['https://image.cashwu.com/YYYY/article-slug/01.webp']
 1. **封面圖片**：文章開頭放置封面圖片
 
    ```markdown
-   ![](https://image.cashwu.com/YYYY/article-slug/01.webp)
+   ![](https://image.cashwu.com/YYYY/article-slug/cover.webp)
    ```
 
-2. **圖片來源標註**：根據圖片來源選擇適當的標註
-
-   - AI 生成：`> 圖片來源：AI 產生`
-   - 網路來源：`> 圖片來源：網路。若分享內容有侵害您的圖片版權，請來信告知，我們會及時加上版權信息，若是您反對使用，本著對版權人尊重的原則，會儘速移除相關內容。`
-   - Unsplash：`> Photo by [作者名](連結) on [Unsplash](連結)`
-
-3. **內容區塊**：可選擇性包含以下結構
+2. **內容區塊**：可選擇性包含以下結構
    - 問題描述
    - 原因分析
    - 解決方案
@@ -201,3 +195,11 @@ images: ['https://image.cashwu.com/YYYY/article-slug/01.webp']
 ```
 
 **位置**：放在文章內容結束後、分隔線和圖片來源標註之前
+
+## 圖片來源標註：根據圖片來源選擇適當的標註，預設為 AI 生成
+
+- AI 生成：`> 圖片來源：AI 產生`
+- 網路來源：`> 圖片來源：網路。若分享內容有侵害您的圖片版權，請來信告知，我們會及時加上版權信息，若是您反對使用，本著對版權人尊重的原則，會儘速移除相關內容。`
+- Unsplash：`> Photo by [作者名](連結) on [Unsplash](連結)`
+
+## **位置**：放在 `支持創作` 之後，使用分隔線和前面的支持創作區隔
