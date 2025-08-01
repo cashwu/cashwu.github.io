@@ -48,6 +48,7 @@ Provide your review in the following structure:
 - List specific language improvements needed
 - Highlight any terminology inconsistencies
 - Suggest more natural zh-TW expressions where applicable
+- 使用 `開發` 而不是 `編程`
 
 ### 技術準確性 (Technical Accuracy)
 
