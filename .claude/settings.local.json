@@ -6,7 +6,8 @@
       "WebFetch(domain:github.com)",
       "Bash(mkdir:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "WebFetch(domain:docs.koog.ai)"
     ],
     "deny": []
   },
@@ -33,5 +34,6 @@
         ]
       }
     ]
-  }
+  },
+  "$schema": "https://json.schemastore.org/claude-code-settings.json"
 }
