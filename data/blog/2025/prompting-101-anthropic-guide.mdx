@@ -1,0 +1,362 @@
+---
+layout: PostSimple
+title: 'Prompting 101：提示工程基礎指南 - Anthropic 官方實踐與深度解析'
+summary: '深入解析 Anthropic 官方分享的提示工程最佳實踐，從基礎概念到結構化框架，透過實際案例學習如何優化 AI 互動效果'
+date: '2025-08-03'
+lastmod: '2025-08-03'
+tags: ['AI', 'Prompt Engineering', 'Claude', 'Anthropic']
+draft: true
+images: ['https://image.cashwu.com/2025/prompting-101-anthropic-guide/cover.webp']
+---
+
+![](https://image.cashwu.com/2025/prompting-101-anthropic-guide/cover.webp)
+
+## 前言：提示工程在 AI 時代的持續重要性
+
+還記得 AI 剛興起的時候嗎？那時候大家都在熱烈討論 prompt engineering，研究如何撰寫 AI 能理解的提示來獲得理想的回應。隨著 AI 模型越來越聰明，許多人開始認為 prompt 不用寫得太詳細，AI 就能產生不錯的結果，因此 prompt engineering 的討論聲量似乎逐漸降低。
+
+然而，提示工程的重要性並沒有因為 AI 的進步而消失。特別是在 AI Agent 的時代，如果 prompt 不夠詳細精確，AI Agent 可能會產生不正確的結果，不僅浪費時間，也會消耗不必要的 token（也就是金錢）。因此，我們仍然需要投入時間在 prompt engineering 上，確保 AI Agent 能夠正確且高效地完成任務。
+
+## Anthropic 官方技術分享
+
+以下是 2025 年 5 月 22 日在美國舊金山舉辦的技術分享會影片，由 Anthropic 應用 AI 團隊的 Hannah 和 Christian 主講，專門介紹提示工程的最佳實踐
+
+## 什麼是提示工程？
+
+提示工程（Prompt Engineering）是與語言模型溝通的關鍵技術，目標是讓模型執行我們期望的任務。這項實踐涉及三個核心要素：
+
+1. **撰寫清晰的指令**：明確告訴模型我們想要它做什麼
+2. **提供必要的上下文資訊**：給予模型執行任務所需的背景知識
+3. **思考資訊組織方式**：以最佳方式結構化這些資訊
+
+提示工程本質上是一門迭代且實證的科學，需要透過不斷試驗和調整來提升模型表現。
+
+## 實戰案例：瑞典汽車保險理賠分析
+
+Anthropic 團隊以一個瑞典汽車保險公司的真實案例為靈感，演示如何讓 Claude 分析兩份事故相關的視覺資料：一份瑞典語的汽車事故報告表單和一張手繪的事故草圖。讓我們看看提示語是如何逐步優化的：
+
+### 第一次嘗試（V1）：簡單提示
+
+**提示內容：**
+
+```
+請審查這份事故報告表單並判斷事故經過和責任。
+```
+
+**結果問題：**
+
+- Claude 錯誤地將其解讀為「滑雪事故」
+- 無法做出準確判斷
+- 產生幻覺或錯誤理解
+
+**學到的教訓：**
+缺乏足夠的情境設定會導致模型產生完全錯誤的理解。
+
+### 第二次嘗試（V2）：新增任務與語氣情境
+
+**改進內容：**
+
+- 增加了模型角色定義（汽車保險理賠分析師）
+- 明確任務目標（審查瑞典語汽車事故報告）
+- 強調保持事實性與自信，資訊不足時不應臆測
+
+**結果改善：**
+
+- Claude 能夠正確辨識為汽車事故
+- 從表單中提取部分資訊（車輛 A 和 B 的標記）
+- 但對責任判斷仍表示資訊不足
+
+**學到的教訓：**
+任務情境和語氣設定對引導模型理解任務至關重要，但仍需更多背景資訊。
+
+### 第三次嘗試（V3）：新增背景細節與表單結構
+
+**關鍵改進：**
+在系統提示中加入詳細的表單背景資訊：
+
+- 表單格式（兩欄、17個勾選項目）
+- 各項目含義說明
+- 人類填寫的不規範性（畫圈、塗鴉而非標準打勾）
+
+**顯著改善：**
+
+- Claude 大幅提升理解和分析能力
+- 減少自述式解讀，直接羅列發現的勾選項目
+- 基於這些資訊自信地判斷責任歸屬
+
+**學到的教訓：**
+提供詳盡的背景知識（特別是固定不變的資料結構）能大幅提升模型分析動態內容的效率和準確性。
+
+### 第四次嘗試（V4）：新增詳細任務指令與輸出格式
+
+**最終優化：**
+
+- 加入詳細的分析步驟指令
+- 要求按特定順序處理（先審查表單，再結合草圖）
+- 指定 XML 標籤格式輸出最終判斷
+
+**完美結果：**
+
+- Claude 按照指示清晰展示分析過程
+- 逐一檢查每個方框的勾選狀態
+- 在指定的 `<final_verdict>` 標籤中給出自信的責任判斷
+
+**最終學到的教訓：**
+指導模型按照人類邏輯思考順序，並要求結構化輸出，能顯著提高複雜問題的解決能力。
+
+## Anthropic 推薦的結構化框架
+
+為了提升 Claude 處理任務的準確性與效率，Anthropic 推薦了一套標準化的提示語結構，特別適用於透過 API 發送單一訊息期望一次性完成任務的場景。以下透過影片中的 **AI 職業教練 Joe** 範例來詳細說明這十個核心組成部分：
+
+### 1. 任務情境 (Task Context)
+
+開宗明義地定義 Claude 的角色、身份以及本次互動的主要目標。這就像是為 AI 設定一個明確的身份背景。
+
+**影片範例：**
+
+```
+You will be acting as an AI career coach named Joe created by the company AdAstra Careers. Your goal is to give career advice to users. You will be replying to users who are on the AdAstra site and will be confused if you don't respond in the character of Joe.
+```
+
+**中文解析：**
+
+- 明確定義角色：AI 職業教練 Joe
+- 指定創建者：AdAstra Careers 公司
+- 說明目標：提供職業建議
+- 設定使用情境：用戶在 AdAstra 網站上互動
+
+### 2. 語氣情境 (Tone Context)
+
+設定模型的回應語氣與風格，確保輸出符合預期的專業度和態度。
+
+**影片範例：**
+
+```
+You should maintain a friendly customer service tone.
+```
+
+**中文解析：**
+保持友善的客服語氣，這確保了 AI 的回應既專業又親切。
+
+### 3. 背景資料、文件與圖像 (Background Data, Documents, and Images)
+
+提供靜態且固定的參考資訊，幫助模型建立對資料結構的預期。這些資訊通常在多次互動中保持不變。
+
+**影片範例：**
+
+```
+Here is the career guidance document you should reference when answering the user: <guide>[DOCUMENT]</guide>
+```
+
+**中文解析：**
+使用 XML 標籤包圍參考文件，讓模型清楚知道可以引用的資源範圍。
+
+### 4. 詳細任務說明與規則 (Detailed Task Description & Rules)
+
+提供執行任務的具體步驟或需要遵守的規則清單，引導模型按照邏輯順序思考和處理。
+
+**影片範例：**
+
+```
+Here are some important rules for the interaction:
+- Always stay in character, as Joe, an AI from AdAstra careers
+- If you are unsure how to respond, say "Sorry, I didn't understand that. Could you rephrase your question?"
+- If someone asks something irrelevant, say, "Sorry, I am Joe and I give career advice. Do you have a career question today I can help you with?"
+```
+
+**中文解析：**
+
+- 保持角色一致性
+- 處理不確定情況的標準回應
+- 轉移無關話題到核心任務
+
+### 5. 範例 (Examples)
+
+透過提供輸入和期望輸出的範例，示範模型應如何應對特定情境。這對處理複雜或模糊的案例特別有效。
+
+**影片範例：**
+
+```
+Here is an example of how to respond in a standard interaction:
+
+<example>
+User: Hi, how were you created and what do you do?
+Joe: Hello! My name is Joe, and I was created by AdAstra Careers to give career advice. What can I help you with today?
+</example>
+```
+
+**中文解析：**
+提供了完整的對話範例，展示正確的回應模式和語氣。
+
+### 6. 對話歷史 (Conversation History)
+
+納入先前的對話內容，讓模型了解當前請求的完整上下文，適用於多輪互動情境。
+
+**影片範例：**
+
+```
+Here is the conversation history (between the user and you) prior to the question. It could be empty if there is no history:
+<history>[HISTORY]</history>
+```
+
+**中文解析：**
+使用 XML 標籤結構化地包含對話歷史，如果沒有歷史記錄則為空。
+
+### 7. 即時任務說明或請求 (Immediate Task Description or Request)
+
+提出當前需要模型立即處理的核心問題或指令。
+
+**影片範例：**
+
+```
+Here is the user's question: <question>[QUESTION]</question>
+
+How do you respond to the user's question?
+```
+
+**中文解析：**
+清楚標記當前需要回應的具體問題，並明確詢問模型如何回應。
+
+### 8. 逐步思考／深呼吸 (Thinking Step by Step / Take a Deep Breath)
+
+鼓勵模型進行內部思考，分解問題。這類似於人類的逐步推理過程，有助於提高複雜任務的準確性。
+
+**影片範例：**
+
+```
+Think about your answer first before you respond.
+```
+
+**中文解析：**
+簡潔地要求模型在回應前先進行思考，這能提升回應品質。
+
+### 9. 輸出格式化 (Output Formatting)
+
+明確指定回應的格式，便於自動化解析和後續處理。
+
+**影片範例：**
+
+```
+Put your response in <response></response> tags.
+```
+
+**中文解析：**
+使用 XML 標籤包圍回應內容，便於系統程式化處理。
+
+### 10. 預設回應 (Prefilled Response)
+
+預先提供回應的開頭，強制模型以特定格式開始輸出。
+
+**影片範例：**
+
+```
+Assistant (prefill): <response>
+```
+
+**中文解析：**
+預填充回應的開始標籤，確保模型按照指定格式輸出。
+
+## 深化應用技巧
+
+除了上述結構化框架，Anthropic 團隊還分享了其他重要的應用原則：
+
+### Few-shot Learning（少樣本學習）
+
+透過在提示語中提供多個輸入與期望輸出的範例，能有效引導 Claude 處理複雜或邊界案例。這對於處理「灰色地帶」特別有效。
+
+### 對話歷史管理
+
+對於面向使用者的應用，將相關的對話歷史納入系統提示，能豐富模型上下文，使其在連續對話中保持連貫性。
+
+### 預設回應技巧
+
+當需要模型以特定格式開頭時，可以預先給出開頭部分，引導模型按照預期格式生成內容。
+
+### 擴展思考功能
+
+利用 Claude 等先進模型的「擴展思考」功能，讓模型在生成最終回應前進行內部推理。這對於理解模型出錯原因並優化提示語非常有幫助。
+
+## 在 AI Agent 時代的實際應用
+
+在當今的 AI Agent 開發中，這套結構化框架的價值更加凸顯：
+
+### 1. 提升任務執行精度
+
+當 AI Agent 需要執行複雜的多步驟任務時，清晰的提示結構能確保每個步驟都被正確理解和執行。
+
+### 2. 降低成本和時間消耗
+
+精確的提示能減少模型的錯誤嘗試，有效降低 token 使用量和執行時間。
+
+### 3. 增強可維護性
+
+結構化的提示更容易維護和調試，當需要修改某個環節時，可以精確定位並調整。
+
+### 4. 促進團隊協作
+
+標準化的提示結構讓團隊成員更容易理解和協作，提升開發效率。
+
+## 實戰建議與最佳實踐
+
+### 迭代優化策略
+
+1. **從簡單開始**：先用基本提示測試模型理解程度
+2. **逐步增加複雜度**：根據結果逐一添加框架元素
+3. **持續測試驗證**：每次修改後都要測試效果
+4. **記錄優化過程**：建立提示優化的版本記錄
+
+### 常見陷阱與避免方法
+
+1. **過度複雜化**：不是所有任務都需要完整的十個元素
+2. **忽略測試**：理論上完美的提示在實際使用中可能效果不佳
+3. **缺乏情境**：忘記為模型提供足夠的背景資訊
+4. **格式不一致**：輸出格式的不一致會影響後續處理
+
+## 未來展望：自動化提示優化
+
+不知道是否可以開發一個「Prompt Structure Generator」來幫助我們自動產生優化的提示結構呢？ (笑
+
+這樣的工具可能包含：
+
+- **任務類型識別**：根據用戶描述自動識別最適合的提示結構
+- **模板生成**：為不同類型的任務提供結構化模板
+- **動態優化**：根據模型回應效果自動調整提示結構
+- **版本管理**：追蹤和比較不同版本提示的效果
+
+這將大大降低提示工程的門檻，讓更多開發者能夠有效利用 AI 的能力。
+
+## 結論
+
+提示工程在 AI 快速發展的時代不僅沒有過時，反而變得更加重要。Anthropic 提供的這套結構化框架為我們提供了一個系統性的方法，從最初的錯誤理解到最終的精確分析，展示了結構化提示的威力。
+
+無論你是 AI 應用開發者、資料科學家，還是對 AI 技術感興趣的技術人員，掌握這套框架都能幫助你更有效地與 AI 模型互動，創造更大的價值。
+
+記住，提示工程是一門實踐的藝術。理論知識重要，但更重要的是在實際專案中不斷嘗試、優化和改進。從今天開始，試著將這個結構化框架應用到你的 AI 專案中，相信你會看到顯著的改善效果。
+
+在 AI Agent 逐漸普及的未來，精通提示工程將成為技術人員的一項重要技能。投資時間學習和實踐這門技術，不僅能提升當前工作效率，更能為未來的技術發展做好準備。
+
+<div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+  <iframe
+    src="https://www.youtube.com/embed/ysPbXH0LpIE?si=CIvQfhgqUaWbZ-cz"
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      border: 'none',
+    }}
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  />
+</div>
+
+---
+
+## 支持創作
+
+如果這篇文章對您有幫助，歡迎透過 [贊助連結](https://portaly.cc/cashwugeek/support) 支持我持續創作優質內容。您的支持是我前進的動力！
+
+---
+
+> 圖片來源：AI 產生
